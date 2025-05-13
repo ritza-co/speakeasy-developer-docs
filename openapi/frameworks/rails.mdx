@@ -20,17 +20,15 @@ The basic idea behind RSwag is simple: you write special RSpec tests that descri
 
 ```mermaid
 graph TD
-    R[(Rails API Endpoints)] -->|are defined in| A[RSpec request specs] 
+    R[(Rails API Endpoints)] -->|are defined in| A[RSpec request specs]
     A -->|feed| B[RSwag generator]
-    B --> |generate| C[(OpenAPI spec)]
+    B --> |generate| C[(OpenAPI document)]
 ```
 
 RSwag has three main parts that we'll use in this guide:
 
 - **rswag-specs**: This adds special test commands to [RSpec](https://rspec.info/) that let you describe your API endpoints. When you run these tests, they check if your API works correctly and collect information for the documentation.
-
 - **rswag-api**: This creates an endpoint in your Rails app that serves the OpenAPI file (in JSON or YAML format) so other tools can use it.
-
 - **rswag-ui**: This adds the Swagger documentation UI to your app, giving you a nice web page where you can see and try out your API.
 
 What makes RSwag really useful is that your documentation is always up-to-date with your code. If you change how your API works but forget to update the documentation, your tests will fail. This helps you catch documentation errors early. Also, since the documentation is generated from tests that actually run against your API, you can be confident that what's in the documentation really works.
@@ -41,13 +39,13 @@ What makes RSwag really useful is that your documentation is always up-to-date w
 
 ## Example API Repository
 
-The source code for a complete implementation of this guide is available in the [rails-f1-laps-api repository](). You can clone it and follow along with the tutorial or use it as a reference for your own Rails project.
+The source code for a complete implementation of this guide is available in the [rails-f1-laps-api repository](https://github.com/speakeasy-api/examples/tree/main/frameworks-rails-rswag). You can clone it and follow along with the tutorial or use it as a reference for your own Rails project.
 
 For this guide, we'll use a simple Formula 1 lap times API with the following resources:
 
-- **Drivers**: F1 drivers with name, code, and country
-- **Circuits**: Racing circuits with name and location
-- **Lap Times**: Records of lap times for drivers on specific circuits
+- **Drivers**: F1 drivers with name, code, and country.
+- **Circuits**: Racing circuits with name and location.
+- **Lap Times**: Records of lap times for drivers on specific circuits.
 
 The API allows clients to list all drivers, circuits, and lap times. You can also filter lap times by driver, circuit, and lap number using query parameters and create new lap time records using POST requests.
 
@@ -100,7 +98,7 @@ Now that we have the RSwag components installed, we need to configure them to wo
 
 ### Configuring the OpenAPI Document generator
 
-The `swagger_helper.rb` file is the central configuration for your API documentation. Here's an example configuration for our F1 Laps API:
+The `spec/swagger_helper.rb` file is the central configuration for your API documentation. Here's an example configuration for our F1 Laps API:
 
 ```ruby swagger_helper.rb
 RSpec.configure do |config|
@@ -158,7 +156,7 @@ This configuration defines:
 
 ### Configuring the Swagger UI
 
-You can customize the Swagger UI through the `rswag_ui.rb` file, which will be rendered at `<your-api-url>/api-docs` by default:
+You can customize the Swagger UI through the `config/initializers/rswag_ui.rb` file, which will be rendered at `<your-api-url>/api-docs` by default:
 
 ```ruby rswag_ui.rb
 Rswag::Ui.configure do |c|
@@ -179,7 +177,7 @@ end
 
 ### Configuring the OpenAPI files (rswag_api.rb)
 
-The `rswag_api.rb` file configures how the OpenAPI files are served:
+The `config/initializers/rswag_api.rb` file configures how the OpenAPI files are served:
 
 ```ruby rswag_api.rb
 Rswag::Api.configure do |c|
@@ -204,7 +202,7 @@ RSpec.describe 'Health API', type: :request do
     get 'Get API health status' do
       tags 'Health'
       produces 'application/json'
-      
+
       response '200', 'health status' do
         schema type: :object,
           properties: {
@@ -213,7 +211,7 @@ RSpec.describe 'Health API', type: :request do
             timestamp: { type: :string, format: 'date-time' }
           },
           required: ['status', 'version', 'timestamp']
-        
+
         run_test!
       end
     end
@@ -243,12 +241,12 @@ RSpec.describe 'Lap Times API', type: :request do
     get 'List all lap times' do
       tags 'Lap Times'
       produces 'application/json'
-      
+
       parameter name: :driver_id, in: :query, type: :integer, required: false, description: 'Filter by driver ID'
       parameter name: :circuit_id, in: :query, type: :integer, required: false, description: 'Filter by circuit ID'
       parameter name: :lap_min, in: :query, type: :integer, required: false, description: 'Minimum lap number'
       parameter name: :lap_max, in: :query, type: :integer, required: false, description: 'Maximum lap number'
-      
+
       response '200', 'lap times found' do
         schema type: :array,
           items: {
@@ -264,7 +262,7 @@ RSpec.describe 'Lap Times API', type: :request do
             },
             required: ['id', 'driver_id', 'circuit_id', 'time_ms', 'lap_number']
           }
-        
+
         run_test!
       end
     end
@@ -273,7 +271,7 @@ RSpec.describe 'Lap Times API', type: :request do
       tags 'Lap Times'
       consumes 'application/json'
       produces 'application/json'
-      
+
       parameter name: :lap_time, in: :body, schema: {
         type: :object,
         properties: {
@@ -284,7 +282,7 @@ RSpec.describe 'Lap Times API', type: :request do
         },
         required: ['driver_id', 'circuit_id', 'time_ms', 'lap_number']
       }
-      
+
       response '201', 'lap time created' do
         let(:lap_time) { { driver_id: 1, circuit_id: 1, time_ms: 80000, lap_number: 1 } }
         run_test!
@@ -302,9 +300,9 @@ RSpec.describe 'Lap Times API', type: :request do
     get 'Get lap times for a specific driver' do
       tags 'Lap Times'
       produces 'application/json'
-      
+
       parameter name: :driver_id, in: :path, type: :integer, required: true
-      
+
       response '200', 'lap times found' do
         let(:driver_id) { 1 }
         schema type: :array,
@@ -381,9 +379,9 @@ path '/api/v1/drivers' do
   get 'List all drivers' do
     tags 'Drivers'
     produces 'application/json'
-    
+
     parameter name: :team, in: :query, type: :string, required: false, description: 'Filter drivers by team'
-    
+
     # Other documentation
   end
 end
@@ -398,9 +396,9 @@ path '/api/v1/drivers' do
   get 'List all drivers' do
     tags 'Drivers'
     produces 'application/json'
-    
+
     parameter name: :team, in: :query, type: :string, required: false, description: 'Filter drivers by team'
-    
+
     response '200', 'drivers found' do
       schema type: :array,
         items: {
@@ -425,7 +423,7 @@ Provide test data using the `let` syntax to define the values that will be used 
 path '/api/v1/drivers' do
   post 'Create a driver' do
     # ... parameter and other definitions ...
-    
+
     response '201', 'driver created' do
       let(:driver) { { name: 'Max Verstappen', code: 'VER' } }
       run_test!
@@ -442,14 +440,14 @@ After writing your documentation specs, you can generate the OpenAPI specificati
 RAILS_ENV=test # first we need to set the environment
 ```
 
-```bash 
+```bash
 rake rswag:specs:swaggerize
 ```
 
 This command performs two important steps:
 
 1. It runs your RSwag specs to validate that your API implementation matches the documentation
-2. It generates the OpenAPI specification file at the configured location
+2. It generates the OpenAPI document file at the configured location
 
 The result is an OpenAPI file (e.g., `swagger/v1/swagger.yaml`) that can be used with various tools, including the built-in Swagger UI and Speakeasy for SDK generation.
 
@@ -458,7 +456,7 @@ If your tests fail during this process, it indicates that your API implementatio
 
 ### Generated OpenAPI Specification
 
-After running the `rswag:specs:swaggerize` command, RSwag generates a comprehensive OpenAPI specification document. Here's what a section of that generated document looks like for the lap times endpoint:
+After running the `rswag:specs:swaggerize` command, RSwag generates a comprehensive OpenAPI document. Here's what a section of that generated document looks like for the lap times endpoint:
 
 ```yaml swagger.yaml
 # Generated OpenAPI spec for Lap Times endpoint
@@ -560,7 +558,7 @@ You can see how RSwag has automatically documented:
 - Query parameters for filtering
 - Request body schema for creating new records
 - Response codes and schemas
-- Required fields 
+- Required fields
 
 This is all generated from your RSwag spec files and matches the actual implementation of your API.
 
@@ -571,7 +569,7 @@ While the basic RSwag setup provides a solid foundation, you can enhance your do
 
 ### Documenting Authentication
 
-If your API requires authentication, you can configure security schemes in `swagger_helper.rb` and add security requirements to your specs:
+If your API requires authentication, you can configure security schemes in `spec/swagger_helper.rb` and add security requirements to your specs:
 
 ```ruby swagger_helper.rb
 components: {
@@ -592,7 +590,7 @@ path '/api/v1/protected_resource' do
   get 'Access protected resource' do
     tags 'Protected'
     security [bearer_auth: []]
-    
+
     # Other documentation
   end
 end
@@ -607,9 +605,9 @@ For endpoints that handle file uploads, you can use the `multipart/form-data` co
 ```ruby lap_times_spec.rb
 post 'Upload file' do
   consumes 'multipart/form-data'
-  
+
   parameter name: :file, in: :formData, type: :file, required: true
-  
+
   response '200', 'file uploaded' do
     # Test implementation
   end
@@ -618,7 +616,7 @@ end
 
 ### Creating Reusable Schemas
 
-To keep your specs DRY [(Don't Repeat Yourself)](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself), you can define reusable schema components in `swagger_helper.rb`:
+To keep your specs DRY [(Don't Repeat Yourself)](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself), you can define reusable schema components in `spec/swagger_helper.rb`:
 
 ```ruby swagger_helper.rb
 components: {
@@ -668,7 +666,7 @@ If your OpenAPI file isn't generated correctly, you should make sure that you ar
 
 ## Creating SDKs with Speakeasy
 
-Once you have generated your OpenAPI specification with RSwag, you can use Speakeasy to create client SDKs for your API. This makes it easy for developers to interact with your API in their preferred programming language.
+Once you have generated your OpenAPI document with RSwag, you can use Speakeasy to create client SDKs for your API. This makes it easy for developers to interact with your API in their preferred programming language.
 
 First, install the Speakeasy CLI:
 
@@ -676,7 +674,7 @@ First, install the Speakeasy CLI:
 curl -fsSL https://go.speakeasy.com/cli-install.sh | sh
 ```
 
-Next, you can follow the instructions on the [Getting Started](https://www.speakeasy.com/docs/speakeasy-reference/cli/getting-started) page to setup and authenticate with Speakeasy.
+Next, you can follow the instructions on the [Getting Started](https://www.speakeasy.com/docs/speakeasy-reference/cli/getting-started) page to set up and authenticate with Speakeasy.
 
 To generate a client SDK, run the following command from the root of your project:
 
@@ -688,5 +686,5 @@ Follow the prompts to provide your OpenAPI document location (`swagger/v1/swagge
 
 ## Summary
 
-In this guide, we've explored how you can use RSwag to generate OpenAPI documents for your Rails API. We've looked at how to document your API endpoints using RSwag's RSpec-based DSL, how to generate the OpenAPI document using RSwag, how to customize the OpenAPI document, and how to use Speakeasy to generate client SDKs. 
+In this guide, we've explored how you can use RSwag to generate OpenAPI documents for your Rails API. We've looked at how to document your API endpoints using RSwag's RSpec-based DSL, how to generate the OpenAPI document using RSwag, how to customize the OpenAPI document, and how to use Speakeasy to generate client SDKs.
 
