@@ -65,6 +65,14 @@ git clone https://github.com/getsentry/sentry-mcp
 cd sentry-mcp
 ```
 
+### Install dependencies
+
+Install the dependencies using pnpm:
+
+```bash
+pnpm install
+```
+
 ### Authenticate Wrangler with Cloudflare
 
 Wrangler is Cloudflare's CLI for deploying and managing Workers. We'll use `npx` to run it without installing globally.
@@ -203,9 +211,17 @@ npx wrangler secret put COOKIE_SECRET
 
 When prompted, enter the values you copied from the Sentry API application and the random string you generated. This will store the secrets in your Cloudflare account.
 
+### Build the project
+
+Now that you have everything set up, you can build the project. Run the following command in the `packages/mcp-cloudflare` directory:
+
+```bash
+pnpm build
+```
+
 ### Deploy the server
 
-Now that you have everything set up, you can deploy the server to Cloudflare Workers. Run the following command:
+Now that you have everything set up, you can deploy the server to Cloudflare Workers. Run the following command in the `packages/mcp-cloudflare` directory:
 
 ```bash
 npx wrangler deploy
