@@ -343,7 +343,7 @@ You'll need:
 
 ### Generate a Polar access token
 
-To allow the Lambda function to authenticate with the Polar API, you need to generate an organization access token from the Polar dashboard. The steps below describe this process, referencing the user interface elements shown in the screenshot that follows.
+To allow the on-premises MCP server to authenticate with the Polar API, you need to generate an organization access token from the Polar dashboard. The steps below describe this process, referencing the user interface elements shown in the screenshot that follows.
 
 Log in to your Polar organization on [sandbox.polar.sh](https://sandbox.polar.sh) for testing. For production environments, you would typically use [polar.sh](https://polar.sh).
 
@@ -353,7 +353,7 @@ Log in to your Polar organization on [sandbox.polar.sh](https://sandbox.polar.sh
 4. Select an **Expiration** period for the token from the dropdown menu, for example, `7 days`.
 5. Under **Scopes**, ensure all permissions are selected by checking each corresponding box. This grants the MCP server the necessary access to interact with your Polar data.
 6. Scroll down and click the **Create** button.
-7. Polar will display the generated access token only once upon creation. Copy this token and store it. You will need this value for the `POLAR_ACCESS_TOKEN` environment variable when you configure your Lambda function in a later step.
+7. Polar will display the generated access token only once upon creation. Copy this token and store it. You will need this value for the `POLAR_ACCESS_TOKEN` environment variable when you configure your Docker container in a later step.
 
 ![Screenshot of the Polar web interface showing the Create Organization Access Token dialog. The dialog is titled Create Organization Access Token and contains fields for Name, Expiration, and Scopes. The Name field is filled with polar-mcp. Expiration is set to 7 days. The Scopes section lists multiple permissions, each with a checkbox, including openid, profile, email, user:read, organizations:read, organizations:write, custom_fields:read, custom_fields:write, discounts:read, discounts:write, checkout_links:read, checkout_links:write, checkouts:read, checkouts:write, and products:read. All checkboxes are selected. The wider interface shows a sidebar with navigation options such as Home, Products, Benefits, Customers, Sales, Analytics, Finance, and Settings, with Settings highlighted. The overall tone is neutral and professional, designed to guide users through generating an access token.](./assets/remote-servers/polar-token.png)
 
