@@ -190,9 +190,20 @@ In this flow:
 3. The MCP server exchanges tokens with the provider and maintains the mapping
 4. Your tools can use the provider's APIs without exposing tokens to clients
 
-#### Real-World Example: Sentry MCP with OAuth
+Let's see how this works with the Sentry MCP server, which uses Sentry's OAuth service as its identity provider
 
-Let's see how this works with the Sentry MCP server, which uses Sentry's OAuth service as its identity provider:
+```mermaid
+flowchart LR
+    Client[MCP Client]
+    MCP[MCP Server]
+    SentryOAuth[Sentry OAuth]
+    SentryAPI[Sentry API]
+    
+    Client <-->|"Auth & Tools"| MCP
+    MCP <-->|"OAuth Flow"| SentryOAuth
+    Client <-->|"Consent"| SentryOAuth
+    MCP <-->|"API Calls"| SentryAPI
+```
 
 1. **Initial Connection**: Your MCP client connects to a Sentry MCP server
 
