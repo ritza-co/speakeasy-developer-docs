@@ -3,6 +3,8 @@ title: Deploying remote MCP servers
 description: Learn how to deploy and harden remote MCP servers.
 ---
 
+import { Callout } from "@/mdx/components";
+
 # Deploying remote MCP servers
 
 It is still the early days for Model Context Protocol (MCP), and even though it is already widely implemented, the specification is [changing rapidly](https://modelcontextprotocol.io/development/roadmap). For example, in the [March 2025 update](https://modelcontextprotocol.io/specification/2025-03-26/changelog), a new transport, "[streamable HTTP](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http)" was added to the specification, along with an optional [authorization framework](https://modelcontextprotocol.io/specification/2025-03-26/basic/authorization), based on OAuth 2.1.
@@ -36,7 +38,7 @@ Let's look at the options available for hosting remote MCP servers.
 ## Choose your hosting model
 
 | Hosting model               | Best for                                                              | Pain points                                                           |
-| --------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- |
+|-----------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------------------|
 | **Cloudflare Workers**      | need zero-ops edge scale, instant HTTPS, built-in OAuth               | limited CPU / 50 ms wall-clock per event; can't spawn native binaries |
 | **Cloud VM**                | want full OS control, can hand-roll networking, cheap burst workloads | you patch and monitor; long-lived SSE needs extra nginx tuning        |
 | **Docker / Kubernetes**     | require strict isolation, multi-instance scaling, CI/CD pipelines     | learning curve; cluster maintenance                                   |
@@ -246,7 +248,7 @@ The Sentry MCP repository includes a documentation page that explains how to use
 Now let's test the MCP server. Open a terminal and run the following command:
 
 ```bash
-pnpx @modelcontextprotocol/inspector@latest
+pnpx @modelcontextprotocol/inspector@0.11.0
 ```
 
 This will start the MCP inspector, which allows you to interact with the MCP server in your browser.
@@ -290,7 +292,7 @@ There are, in effect, *two* OAuth flows happening here:
 1. The MCP Inspector is requesting authorization to access your Sentry MCP server.
 2. The Sentry MCP server is requesting authorization to access your Sentry account on behalf of the MCP Inspector.
 
-Click **Approve** to authorize the MCP Inspector to access your Sentry account. This will redirect you back to the MCP Inspector, and you should see a message indicating that the connection was successful.
+Click **Approve**. The MCP Inspector will then redirect to the Sentry OAuth page for your app.
 
 ![Sentry OAuth authorization dialog for Useful Goshawk, a Sentry API application, requesting access to a Sentry account linked to ritza@example.com. The dialog lists permissions including reading and writing access to organization details, teams, projects, and events. Two buttons labeled Approve and Deny are at the bottom. The interface has a clean, modern design with a purple sidebar and a light background featuring faint Sentry-themed icons. The overall tone is professional and neutral.](./assets/remote-servers/mcp-sentry-approve.png)
 
@@ -322,7 +324,7 @@ In this example, we'll deploy the Polar MCP server on-premises and make it secur
 
 ### Why Cloudflare Tunnel with Zero Trust?
 
-When hosting an MCP server on-premises, you have several options for making it remotely accessible:
+When hosting an MCP server on-premise, you have several options for making it remotely accessible:
 
 1. Open a port on your firewall (not recommended for security reasons).
 2. Set up a VPN (adds client complexity and management overhead).
@@ -343,7 +345,7 @@ You'll need:
 
 ### Generate a Polar access token
 
-To allow the on-premises MCP server to authenticate with the Polar API, you need to generate an organization access token from the Polar dashboard. The steps below describe this process, referencing the user interface elements shown in the screenshot that follows.
+To allow the on-premise MCP server to authenticate with the Polar API, you need to generate an organization access token from the Polar dashboard. The steps below describe this process, referencing the user interface elements shown in the screenshot that follows.
 
 Log in to your Polar organization on [sandbox.polar.sh](https://sandbox.polar.sh) for testing. For production environments, you would typically use [polar.sh](https://polar.sh).
 
@@ -387,13 +389,13 @@ Replace `your_polar_api_key` with your actual Polar API key generated in the pre
 Start the Polar MCP server:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 Verify that the server is running correctly:
 
 ```bash
-curl http://localhost:3000
+curl http://localhost:3000/sse
 ```
 
 If everything is working, you should see a response with a session ID and `/message` endpoint.
@@ -417,11 +419,11 @@ Now let's configure Cloudflare Zero Trust to secure access to your MCP server.
 7. Configure the application:
    - **Application name**: Polar MCP
    - **Session duration**: Choose how long users stay authenticated (e.g., 24 hours)
-   - **Application domain**: Choose a subdomain where your MCP server will be available (e.g., `polar-mcp.yourdomain.com`)
+   - **Application domain**: Choose **+ Add public hostname** and add a subdomain where your MCP server will be available (e.g., `polar-mcp.yourdomain.com`)
    - Leave other settings at default values for now
 
 8. Create an access policy:
-   - Click **Create new policy**
+   - Click **Add a policy**
    - **Policy name**: Polar MCP Access
    - **Action**: Allow
    - **Configure rules**: Select who should have access to your MCP server
@@ -429,15 +431,17 @@ Now let's configure Cloudflare Zero Trust to secure access to your MCP server.
      - For a team, you might use "Emails ending in" with your company domain
    - Click **Save**
 
-9. Finish by clicking **Save** to create the application.
+9. Click **Next** on the application. You can leave the default selected values for the optional settings.
+10. Finish by clicking **Save** to create the application.
+11. Make sure that the policy you created is linked to the application's policies on the application's **Policies** tab.
 
 ### Install and configure Cloudflare Tunnel
 
 Next, we'll set up a tunnel to securely connect your local MCP server to Cloudflare.
 
 1. In the Cloudflare Zero Trust dashboard, navigate to **Networks** > **Tunnels**.
-2. Select **Cloudflared** as the tunnel type.
-3. Click **Create a tunnel**.
+2. Click **Create a tunnel**.
+3. Select **Cloudflared** as the tunnel type.
 4. Give your tunnel a name (e.g., `polar-mcp-tunnel`).
 5. Click **Save tunnel**.
 
@@ -485,8 +489,8 @@ services:
 Restart the Docker containers:
 
 ```bash
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose up -d
 ```
 
 In Cloudflare, your tunnel should now show up as a connector.
@@ -523,7 +527,7 @@ In Cloudflare Zero Trust:
 2. Click on **Add a device**.
 3. Follow the instructions to install Cloudflare Warp on your machine.
 
-Open the Cloudflare Warp app, and navigate to the **Preferences** tab.
+Open the Cloudflare Warp app, and navigate to the **Preferences** > **Account** tab.
 
 ![Screenshot of Cloudflare WARP preferences window showing the Account tab selected. The interface displays a license key, a section labeled Devices using your license key showing macOS (This device) Mac15,12, and a Login to Cloudflare Zero Trust button at the bottom. The window has standard macOS red, yellow, and gray control buttons in the top-left corner and uses a light-colored interface with clear organization of settings options.](./assets/remote-servers/cloudflare-warp.png)
 
@@ -534,6 +538,12 @@ Your team name is the customizable portion of your team domain. You can view you
 Enter your team name and click **Continue**. This will open a browser window to authenticate with Cloudflare Zero Trust.
 
 Once authenticated, you should see a message indicating that your device is connected to Cloudflare Zero Trust.
+
+<Callout title="Note" type="info">
+If you encounter connection issues, you may need to disable Warp's DNS features. To do so you would navigate to your Cloudflare Zero Trust dashboard **Settings** > **Warp Client** > **Profile settings**. Select **Configure** from the 3-dot menu option for your profile and under **Service mode** select "Secure Web Gateway without DNS Filtering".
+</Callout>
+
+Once Warp is connected restart your `polar-mcp` and `cloudflared` Docker containers so that `cloudflared` routes tunnel correctly.
 
 ### Add Warp access to the MCP server
 
@@ -549,13 +559,13 @@ Once authenticated, you should see a message indicating that your device is conn
 To test the MCP connection, you can use the MCP Inspector we used earlier:
 
 ```bash
-pnpx @modelcontextprotocol/inspector@latest
+pnpx @modelcontextprotocol/inspector@0.11.0
 ```
 
 In the MCP Inspector:
 
-1. Select the Streamable HTTP transport.
-2. Enter your MCP server URL: `https://polar-mcp.yourdomain.com/mcp`
+1. Select the SSE transport.
+2. Enter your MCP server URL: `https://polar-mcp.yourdomain.com/sse`
 3. Click **Connect**.
 
 You'll be redirected to the Cloudflare Access login page. After authentication, the MCP Inspector should connect to your Polar MCP server securely.
@@ -567,7 +577,7 @@ With this in place, you can enroll your team members in Cloudflare Zero Trust an
 ## Comparing deployment models
 
 | Feature                  | Cloudflare Workers         | On-prem with CF Tunnel       |
-| ------------------------ | -------------------------- | ---------------------------- |
+|--------------------------|----------------------------|------------------------------|
 | **Setup complexity**     | Low                        | Medium                       |
 | **Maintenance overhead** | Very low (serverless)      | Medium (server management)   |
 | **Access to local data** | Limited                    | Full                         |
