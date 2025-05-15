@@ -159,30 +159,75 @@ async def update_document(id: str, content: str, context):
 
 ### 3. Third-Party Authorization
 
-MCP also supports delegating authorization to third-party providers like Auth0, Okta, or even the existing auth setup behind your API. This is useful if you want to leverage existing identity management systems or if you have multiple MCP servers that need to share the same authorization logic.
+Instead of building your own authorization system from scratch, you can integrate with existing identity providers like Auth0, Okta, GitHub, or even your own API's authentication layer. This lets you leverage established identity infrastructure and avoid duplicating user management.
 
 ```mermaid
 sequenceDiagram
-    participant C as MCP Client
-    participant S as MCP Server
-    participant A as Third-Party Auth Server
+    participant Client as MCP Client
+    participant Server as MCP Server
+    participant Auth as Identity Provider
 
-    C->>S: Call protected tool (no token)
-    S-->>C: 401 Unauthorized
-    C->>A: Redirect to third-party auth server
-    A-->>C: User authenticates & consents
-    C->>S: Submit third-party token
-    S->>A: Validate token
-    A-->>S: Token valid, return user info
-    S-->>C: Return access token to client
+    Client->>Server: Connect to /sse endpoint
+    Server-->>Client: 401 Unauthorized + auth URL
+    Client->>Server: Redirect to /oauth/authorize
+    Server->>Auth: Forward to provider's OAuth endpoint
+    Auth-->>Client: Show login & consent screen
+    Client->>Auth: User approves access
+    Auth-->>Server: Callback with auth code
+    Server->>Auth: Exchange code for token
+    Auth-->>Server: Return access token
+    Server-->>Client: Issue MCP session token
+    Client->>Server: Call tool with session token
+    Server->>Auth: Use provider token for API calls
+    Auth-->>Server: Return API response
+    Server-->>Client: Return tool response
 ```
 
-1. The MCP server redirects the client to the third-party authorization server
-2. The user authenticates with the third-party provider
-3. The third-party server issues tokens that the MCP server validates
-4. The MCP server maintains a secure mapping between third-party tokens and MCP tokens
+In this flow:
 
-This allows you to use your existing identity infrastructure.
+1. The MCP server acts as a bridge between your MCP client and the identity provider
+2. The identity provider handles user authentication and consent
+3. The MCP server exchanges tokens with the provider and maintains the mapping
+4. Your tools can use the provider's APIs without exposing tokens to clients
+
+#### Real-World Example: Sentry MCP with OAuth
+
+Let's see how this works with the Sentry MCP server, which uses Sentry's OAuth service as its identity provider:
+
+1. **Initial Connection**: Your MCP client connects to a Sentry MCP server
+
+2. **OAuth Initiation**: The server responds with a `401 Unauthorized`, triggering the OAuth flow
+
+3. **First OAuth Step**: The client redirects to the MCP server's OAuth endpoint
+
+4. **Server-Side OAuth**: The MCP server shows its own consent screen first
+
+   ![MCP server consent screen showing the client requesting access](./assets/mcp-authorization/mcp-sentry-auth.png)
+
+5. **Provider Authentication**: After approving this first step, the server redirects to Sentry's OAuth service
+
+6. **Provider Consent**: You'll see Sentry's consent screen showing what permissions the MCP server is requesting
+
+   ![Sentry OAuth authorization dialog](./assets/mcp-authorization/mcp-sentry-approve.png)
+
+7. **Double Token Exchange**: 
+   - Sentry issues an OAuth token to the MCP server (not to your client)
+   - The MCP server creates its own session token for your client
+   - The Sentry token stays secure on the server side
+
+8. **Using Tools**: When you call tools like `list_organizations`:
+   - The server validates your MCP session token
+   - It uses its Sentry token to call the Sentry API
+   - You get the results without ever handling Sentry credentials
+
+This setup creates a secure proxy pattern - the MCP server mediates between clients and the identity provider. There are actually two OAuth flows happening:
+
+1. Between your client and the MCP server
+2. Between the MCP server and Sentry
+
+This double-layer approach provides extra security by keeping the provider's tokens isolated from clients.
+
+For more details on how this works, see the [remote-servers](/remote-servers) page.
 
 ### Authorization Code Flow with PKCE
 
