@@ -316,7 +316,7 @@ Now everyone on your team can use the Sentry MCP server with their IDEs, LLMs, o
 
 ## On-premises deployment with Cloudflare tunnels
 
-The Cloudflare Workers model offers a quick deployment path for remote MCP servers. There are scenarios where you need to run MCP servers within your own infrastructure. This is especially true when your MCP server needs to access internal data that can't be exposed directly to the internet, or when you need more control over the runtime environment.
+While Cloudflare Workers provides an easy way to deploy remote MCP servers, you may have reasons to run servers on your own infrastructure instead. When your organization has strict data handling requirements or MCP servers need access to services on your network, you can host your servers on-premises or in a private cloud.
 
 The [Polar.sh MCP server](https://docs.polar.sh/integrate/mcp) is a great example of a server that you might want to run on-premises. It allows AI assistants to interact with your Polar data, including subscriptions, posts, and other content. You may want to run this server on your own infrastructure for security, compliance, or performance reasons.
 
