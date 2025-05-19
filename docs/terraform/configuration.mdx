@@ -7,9 +7,9 @@ description: "Learn how to configure environment values and manage custom resour
 
 # Configuration
 
-## Configuring Environment Values
+## Configuring environment values
 
-Use the `environmentVariables` configuration in the `gen.yaml` to set up default values for provider variables to be pulled in from an environment variable. This is useful for mapping known environment values that will hold an API key into the provider.
+Use the `environmentVariables` configuration in the generation configuration (`gen.yaml`) file to set up the default values for the provider variables, which are pulled in from an environment variable. This is useful for mapping known environment values that hold an API key in the provider.
 
 ``` yaml
 terraform:
@@ -20,11 +20,11 @@ terraform:
       providerAttribute: access_token
 ```
 
-The `environmentVariables` configuration is expected to be a list of objects with `{env: string, providerAttribute: string}` keys and values. These will create associations from environment variables (referenced as `env`) with provider attributes (referenced as `providerAttribute`).
+The `environmentVariables` configuration should be a list of objects with `{env: string, providerAttribute: string}` keys and values, which create associations from environment variables (referenced as `env`) with provider attributes (referenced as `providerAttribute`).
 
-## Additional Provider Configurations
+## Additional provider configurations
 
-Enable Terraform configurations to specify additional provider-wide customizations in the generation configuration (`gen.yaml`) file with the `additionalProviderAttributes` configuration, for example:
+Use the `additionalProviderAttributes` configuration to enable Terraform configurations to specify additional provider-wide customizations in the `gen.yaml` file. For example:
 
 ```yaml
 terraform:
@@ -32,9 +32,9 @@ terraform:
     # ... configuration ...
 ```
 
-### Custom HTTP Headers
+### Custom HTTP headers
 
-Set the `httpHeaders` configuration with the desired attribute name to enable Terraform configurations to specify a mapping of additional HTTP headers for all HTTP requests.
+Set the `httpHeaders` configuration with the desired attribute name to enable Terraform configurations to specify how additional HTTP headers are mapped for all HTTP requests.
 
 In this example, HTTP header customization is enabled using the `http_headers` provider attribute name:
 
@@ -44,7 +44,7 @@ terraform:
     httpHeaders: http_headers
 ```
 
-This configuration enables provider configuration such as:
+This configuration enables a provider configuration, such as:
 
 ```hcl
 provider "examplecloud" {
@@ -54,7 +54,7 @@ provider "examplecloud" {
 }
 ```
 
-### Skip TLS Verification
+### Skipping TLS verification
 
 Set the `tlsSkipVerify` configuration with the desired attribute name to enable Terraform configurations to specify a boolean to disable TLS verification in the HTTP client.
 
@@ -66,7 +66,7 @@ terraform:
     tlsSkipVerify: tls_skip_verify
 ```
 
-This configuration enables provider configuration such as:
+This configuration enables a provider configuration, such as:
 
 ```hcl
 provider "examplecloud" {
@@ -74,9 +74,9 @@ provider "examplecloud" {
 }
 ```
 
-## Custom Resources or Data Sources
+## Custom resources or data sources
 
-If you would like to include an existing resource that is outside of the Speakeasy-generated provider, reference it in `gen.yaml` like so:
+If you would like to include an existing resource from outside of the Speakeasy-generated provider, reference it in `gen.yaml` as follows:
 
 ```yaml
 terraform:
@@ -90,17 +90,17 @@ terraform:
       datasource: custom.NewCustomDataSource
 ```
 
-The `additionalResources` key is expected to contain a list of `{ importLocation?: string, importAlias?: string, resource: string }` objects. Each `resource` will be inserted into the provider resource list. If `importLocation` or `importAlias` is defined, Speakeasy will add that to the import list at the top of the provider file. The value of `resource` is arbitrary text, and could contain a function invocation if desired.
+The `additionalResources` key is expected to contain a list of `{ importLocation?: string, importAlias?: string, resource: string }` objects. Each `resource` is inserted into the provider resource list. If `importLocation` or `importAlias` is defined, Speakeasy adds it to the import list at the top of the provider file. The value of `resource` is arbitrary text, but you can also use it to contain a function invocation if desired.
 
-The `additionalDataSources` key follows the same syntax, but with `datasource` as the text string to be inserted into the list instead of `resource`.
+The `additionalDataSources` key follows the same syntax but with `datasource` as the text string that is inserted into the list instead of `resource`.
 
-To learn more about how to write a Terraform resource, please consult the [official Terraform documentation](https://developer.hashicorp.com/terraform/plugin/framework).
+To learn more about writing a Terraform resource, please consult the [official Terraform documentation](https://developer.hashicorp.com/terraform/plugin/framework).
 
-## Modifying Resource and Data Source Descriptions
+## Modifying resource and data source descriptions
 
-The `x-speakeasy-entity-description` extension allows modification of the description of a Terraform resource or data source. This is useful when augmenting the documentation in an OpenAPI specification with documentation for specific resources. This documentation is expected to be in Markdown format. Use this extension alongside the `x-speakeasy-entity` extension.
+The `x-speakeasy-entity-description` extension allows you to modify the description of a Terraform resource or data source. This is useful for changing the documentation in an OpenAPI specification that has documentation for specific resources. This documentation is expected to be in Markdown format. Use this extension alongside the `x-speakeasy-entity` extension.
 
-Alternatively, a template folder can be written to customize any or all aspects of generated documentation in alignment with [terraform-plugin-docs](https://github.com/hashicorp/terraform-plugin-docs).
+Alternatively, you can write a template folder to customize any or all aspects of the generated documentation, so that it aligns with the [terraform-plugin-docs](https://github.com/hashicorp/terraform-plugin-docs).
 
 ```yaml
 components:
@@ -117,9 +117,9 @@ components:
         }
 ```
 
-## Deduplicate Terraform Types
+## Deduplicate Terraform types
 
-The `terraform` types folder includes a representation of your data models that is appropriate for the `terraform-plugin-framework` type system. However, if you have multiple types with the same *signature* (e.g. the same set of child property *types*), there might be a lot of these types that are effectively duplicated. To minimize the git repository / binary size, it might make sense to deduplicate these by re-using types with the same *signature* across different resources. If you would like to enable this, set the following configuration option:
+The `terraform` types folder includes a representation of your data models that is appropriate for the `terraform-plugin-framework` type system. However, if you have multiple types with the same **signature** (for example, the same set of child property **types**), there may be a lot of types that are effectively duplicated. To minimize the Git repository / binary size, it might make sense to deduplicate these by reusing types with the same **signature** across different resources. To reuse types with the same signature, set the following configuration option:
 
 This option is `false` by default.
 
