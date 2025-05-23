@@ -247,7 +247,7 @@ curl https://api.openai.com/v1/responses \
   }'
 ```
 
-If you run this command, you'll see the text being generated in real time, one chunk at a time. This is the power of streaming!
+If you run this command (you may need to install `coreutils` if the `stdbuf` command is not found), you'll see the text being generated in real time, one chunk at a time. This is the power of streaming!
 
 <video controls={false} loop={true} autoPlay={true} muted={true} width="100%" className="mt-10">
   <source src="./assets/jsonl/curl-stream.webm" type="video/webm" />
@@ -606,7 +606,7 @@ components:
           type: string
 ```
 
-See our documentation on [enabling JSON lines responses](/docs/customize/runtime/jsonl-events) for detailed information on how to best prepare your OpenAPI spec for streaming JSONL responses.
+See our documentation on [enabling JSON lines responses](https://www.speakeasy.com/docs/customize/runtime/jsonl-events) for detailed information on how to best prepare your OpenAPI spec for streaming JSONL responses.
 
 Speakeasy also generates the necessary code for SSE, so your users don't need to worry about the underlying implementation details. They can focus on building their applications and consuming your API.
 
