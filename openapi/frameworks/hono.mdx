@@ -25,7 +25,7 @@ Your Hono project might not be as simple as our example app, but the steps below
 
 [Zod OpenAPI](https://hono.dev/examples/zod-openapi#zod-openapi) is Hono middleware that allows you to validate values and types using [Zod](https://zod.dev/) and generate an OpenAPI document. We'll begin by defining data schemas with Zod, then set up the Hono app to generate an OpenAPI document.
 
-The quality of your OpenAPI document determines the quality of generated SDKs and documentation, so we'll look into ways you can improve the generated document based on the Speakeasy [OpenAPI best practices](/docs/best-practices).
+The quality of your OpenAPI document determines the quality of generated SDKs and documentation, so we'll look into ways you can improve the generated document based on the Speakeasy [OpenAPI best practices](/docs/prep-openapi/best-practices).
 
 We'll then use the improved OpenAPI document to generate an SDK using Speakeasy.
 
@@ -712,7 +712,7 @@ export const openAPIObjectConfig = {
 - Extension fields must be prefixed with `x-`.
 - Speakeasy uses extensions that start with `x-speakeasy-`.
 
-Let's add a [Speakeasy extension](https://www.speakeasy.com/docs/speakeasy-reference/extensions) that adds retries to requests from Speakeasy SDKs by adding a top-level `x-speakeasy-retries` schema to the OpenAPI document. We can also override the retry strategy per operation.
+Let's add a [Speakeasy extension](/docs/speakeasy-reference/extensions) that adds retries to requests from Speakeasy SDKs by adding a top-level `x-speakeasy-retries` schema to the OpenAPI document. We can also override the retry strategy per operation.
 
 ### Adding global retries
 
@@ -836,7 +836,7 @@ An `openapi.yaml` file will be created in your root folder.
 
 ### Linting the OpenAPI document with Speakeasy
 
-The Speakeasy CLI has an OpenAPI [linting](/docs/linting) command that checks the OpenAPI document for errors and style issues.
+The Speakeasy CLI has an OpenAPI [linting](/docs/prep-openapi/linting#configuration) command that checks the OpenAPI document for errors and style issues.
 
 Run the linting command:
 
@@ -848,15 +848,15 @@ A lint report will be displayed in the terminal, showing errors, warnings, and h
 
 ![Speakeasy lint report](./assets/hono/speakeasy-lint-report.png)
 
-The Speakeasy Linter uses a [recommended set of rules](/docs/linting/linting#speakeasy-recommended) that you can configure.
+The Speakeasy Linter has a set of [rules](/docs/prep-openapi/linting#available-rules) that you can configure.
 
 Speakeasy has a [VS Code extension](https://marketplace.visualstudio.com/items?itemName=Speakeasy.speakeasy-vscode-extension) to help you validate your OpenAPI documents for the creation of production-grade SDKs.
 
 ### Improving and Customizing the OpenAPI document using Speakeasy Overlays and Transformations
 
-Speakeasy [transformations](https://www.speakeasy.com/docs/prep-openapi/transformations) are predefined functions that modify the OpenAPI document to improve it for SDK generation. You can use them to remove unused components, filter operations, and format the OpenAPI document.
+Speakeasy [transformations](/docs/prep-openapi/transformations) are predefined functions that modify the OpenAPI document to improve it for SDK generation. You can use them to remove unused components, filter operations, and format the OpenAPI document.
 
-[Overlays](https://www.speakeasy.com/docs/prep-openapi/overlays/create-overlays) let you create overlay documents that can be merged with an OpenAPI document. This lets you update and use an OpenAPI document without modifying the original OpenAPI document, which is useful when the same OpenAPI document is used in multiple places. Common use cases include adding Speakeasy extensions, adding examples, and hiding internal APIs from a public SDK.
+[Overlays](/docs/prep-openapi/overlays/create-overlays) let you create overlay documents that can be merged with an OpenAPI document. This lets you update and use an OpenAPI document without modifying the original OpenAPI document, which is useful when the same OpenAPI document is used in multiple places. Common use cases include adding Speakeasy extensions, adding examples, and hiding internal APIs from a public SDK.
 
 ### Creating an SDK from the Speakeasy CLI
 
@@ -896,11 +896,11 @@ In the terminal, you'll see the steps taken by Speakeasy to create the SDK.
 │       └─Uploading Code Samples - success
 ```
 
-Speakeasy [validates](/docs/concepts#validation) the OpenAPI document to check that it's ready for code generation. Validation issues will be printed in the terminal. The generated SDK will be saved as a folder in your project.
+Speakeasy [validates](/docs/core-concepts#validation) the OpenAPI document to check that it's ready for code generation. Validation issues will be printed in the terminal. The generated SDK will be saved as a folder in your project.
 
 If you get ESLint styling errors, run the `speakeasy quickstart` command from outside your project.
 
-Speakeasy also suggests improvements for your SDK, using [Speakeasy Suggest](https://www.speakeasy.com/docs/prep-openapi/maintenance), which is an AI-powered tool in Speakeasy Studio. You can see suggestions by opening the link to your Speakeasy Studio workspace in the terminal:
+Speakeasy also suggests improvements for your SDK, using [Speakeasy Suggest](/docs/prep-openapi/maintenance), which is an AI-powered tool in Speakeasy Studio. You can see suggestions by opening the link to your Speakeasy Studio workspace in the terminal:
 
 ![Speakeasy Studio showing SDK improvement suggestions](./assets/hono/speakeasy-studio-suggestions.png)
 
@@ -1027,8 +1027,8 @@ This guide covered the basics of generating an OpenAPI document using Hono. Here
 - [Speakeasy documentation](/docs): Speakeasy has extensive documentation covering how to generate SDKs from OpenAPI documents, customize SDKs, and more.
 - [Speakeasy OpenAPI reference](/openapi): View a detailed reference for the OpenAPI Specification.
 
-- [Speakeasy Blog](https://www.speakeasy.com/blog): Read articles about OpenAPI, SDK generation, and more including:
+- [Speakeasy Blog](/blog): Read articles about OpenAPI, SDK generation, and more including:
 
-  - [Native JSONL support in your SDKs](https://www.speakeasy.com/blog/release-jsonl-support)
-  - [Introducing comprehensive SDK Testing](https://www.speakeasy.com/blog/release-sdk-testing)
-  - [Model Context Protocol: TypeScript SDKs for the Agentic AI ecosystem](https://www.speakeasy.com/blog/release-model-context-protocol)
+  - [Native JSONL support in your SDKs](/blog/release-jsonl-support)
+  - [Introducing comprehensive SDK Testing](/blog/release-sdk-testing)
+  - [Model Context Protocol: TypeScript SDKs for the Agentic AI ecosystem](/blog/release-model-context-protocol)
