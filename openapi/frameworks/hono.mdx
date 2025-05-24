@@ -29,7 +29,7 @@ The quality of your OpenAPI document determines the quality of generated SDKs an
 
 We'll then use the improved OpenAPI document to generate an SDK using Speakeasy.
 
-W'll explain how to add SDK creation to a CI/CD pipeline so that Speakeasy automatically generates fresh SDKs whenever your Hono API changes in the future.
+We'll explain how to add SDK creation to a CI/CD pipeline so that Speakeasy automatically generates fresh SDKs whenever your Hono API changes in the future.
 
 Finally, we'll use a simplified example to demonstrate how to use the generated SDK.
 
@@ -38,7 +38,7 @@ Finally, we'll use a simplified example to demonstrate how to use the generated 
 This guide assumes that you have an existing Hono app and basic familiarity with Hono.
 
 <Callout title="Example repository" type="info">
-The source code for the completed example is available in the 
+The source code for the completed example is available in the
 [Speakeasy Hono example repository](https://github.com/speakeasy-api/examples/tree/main/framework-hono-ts).
 If you want to follow along step-by-step, you can clone the [Speakeasy Hono example starter repository](https://github.com/speakeasy-api/hono-openapi-example.git), which has the initial state of the app that we'll use to start this tutorial.
 </Callout>
@@ -405,7 +405,7 @@ Speakeasy currently supports the OpenAPI Specification versions 3.0.x and 3.1.x.
 
 Zod OpenAPI Hono can generate an OpenAPI document using version 3.0 or version 3.1 of the OpenAPI Specification. This guide uses version 3.1.
 
-Run the development server and open [`http://localhost:3000/doc`](http://localhost:3000/doc) to see the OpenAPI document in JSON format:
+Run the development server `npm run dev` and open [`http://localhost:3000/doc`](http://localhost:3000/doc) to see the OpenAPI document in JSON format:
 
 ```json
 {
@@ -460,13 +460,13 @@ import { Scalar } from '@scalar/hono-api-reference'
 
 Add `Scalar` as a handler for GET requests to the `/ui` route:
 
-```typescript configureOpenAPI.ts 
+```typescript configureOpenAPI.ts
 // !mark(3)
 export default function configureOpenAPI(app: OpenAPIHono) {
   app.doc31('/doc', openAPIObjectConfig),
-    app.get(
+  app.get(
     '/ui',
-    Scalar({     
+    Scalar({
       url: '/doc',
       pageTitle: 'Users Management API',
     }),
@@ -484,7 +484,7 @@ You can see the parameters required for API endpoints and try out the different 
 
 The request and response content schemas of the OpenAPI document are inline:
 
-```json 
+```json
 "components": {
     "schemas": {},
     "parameters": {}
@@ -512,7 +512,7 @@ Let's make these schemas reusable by adding them to the OpenAPI [Components Obje
 
 Use the [`.openapi()`](https://github.com/asteasolutions/zod-to-openapi#the-openapi-method) method on the Zod object to register your Zod schemas as referenced components in the `src/schemas.ts` file:
 
-```typescript schemas.ts 
+```typescript schemas.ts
 // !mark(7)
 export const UserSelectSchema = z
   .object({
@@ -551,7 +551,7 @@ This adds your schemas to the OpenAPI components object:
 
 The schemas are referenced using a [Reference Object](https://swagger.io/specification/#reference-object) (`$ref`), which is a reference identifier that specifies the location (as a URI) of the value being referenced.
 
-```json 
+```json
 // !focus(7)
   "responses": {
     "200": {
@@ -572,7 +572,7 @@ Let's add additional OpenAPI metadata to our schemas.
 
 In the `src/schemas.ts` file, add example values by passing in an object with an `example` property to the `openapi` method:
 
-```typescript schemas.ts 
+```typescript schemas.ts
 // !mark(4:6)
 export const UserSelectSchema = z
   .object({
@@ -611,7 +611,7 @@ export const UserInsertSchema = z
 
 Define the route parameters for parameter schema:
 
-```typescript schemas.ts 
+```typescript schemas.ts
 // !mark(6:9)
 export const idParamsSchema = z.object({
   id: z
@@ -665,7 +665,7 @@ We can add metadata to the tag by passing in a [Tag Object](https://swagger.io/s
 
 Add a tag to the root OpenAPI object `openAPIObjectConfig` in the `src/lib/configureOpenAPI.ts` file:
 
-```typescript configureOpenAPI.ts 
+```typescript configureOpenAPI.ts
 // !mark(7:14)
 export const openAPIObjectConfig = {
   openapi: '3.1.0',
@@ -689,7 +689,7 @@ When validating an OpenAPI document, Speakeasy expects a list of servers at the 
 
 Add a server by adding a `servers` property to the `openAPIObjectConfig` object:
 
-```typescript configureOpenAPI.ts 
+```typescript configureOpenAPI.ts
 // !mark(7:12)
 export const openAPIObjectConfig = {
   openapi: '3.1.0',
@@ -718,7 +718,7 @@ Let's add a [Speakeasy extension](/docs/speakeasy-reference/extensions) that add
 
 Apply the Speakeasy retries extension globally by adding the following `'x-speakeasy-retries'` property to the `openAPIObjectConfig` object:
 
-```typescript configureOpenAPI.ts 
+```typescript configureOpenAPI.ts
 // !mark(13:23)
 export const openAPIObjectConfig = {
   openapi: '3.1.0',
@@ -749,7 +749,7 @@ export const openAPIObjectConfig = {
 
 To create a unique retry strategy for a single route, add an `'x-speakeasy-retries'` property to the `createRoute` method call's argument object in the `src/routes/users/users.routes.ts` file:
 
-```typescript users.routes.ts 
+```typescript users.routes.ts
 // !mark(6:16)
 export const list = createRoute({
   'operationId': 'getUsers',
@@ -887,12 +887,12 @@ In the terminal, you'll see the steps taken by Speakeasy to create the SDK.
 │     └─Load and Validate Document - success
 │     └─Generate SDK - success
 │     └─Compile SDK - success
-│     └─Setup Environment - success              
-│     └─Load and Validate Document - success     
-│     └─Generate SDK - success                   
-│   └─Generating Code Samples - success          
-│     └─Snapshotting Code Samples - success      
-│       └─Snapshotting Code Samples - success    
+│     └─Setup Environment - success
+│     └─Load and Validate Document - success
+│     └─Generate SDK - success
+│   └─Generating Code Samples - success
+│     └─Snapshotting Code Samples - success
+│       └─Snapshotting Code Samples - success
 │       └─Uploading Code Samples - success
 ```
 
@@ -926,7 +926,7 @@ npm create vite@latest
 
 Copy the SDK folder from your Hono app to the `src` directory of your TypeScript Vite project and delete the SDK folder in your Hono project.
 
-In the SDK `README.md` file, you'll find documentation about your Speakeasy SDK. TypeScript SDKs generated with Speakeasy include an installable [Model Context Protocol (MCP) server](https://www.speakeasy.com/docs/model-context-protocol) where the various SDK methods are exposed as tools that can be invoked by AI applications. 
+In the SDK `README.md` file, you'll find documentation about your Speakeasy SDK. TypeScript SDKs generated with Speakeasy include an installable [Model Context Protocol (MCP) server](https://www.speakeasy.com/docs/model-context-protocol) where the various SDK methods are exposed as tools that can be invoked by AI applications.
 Your SDK documentation includes instructions for installing the MCP server.
 
 Note that the SDK is not ready for production use. To get it production-ready, follow the steps outlined in your Speakeasy workspace.
