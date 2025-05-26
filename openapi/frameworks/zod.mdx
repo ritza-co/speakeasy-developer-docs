@@ -294,24 +294,25 @@ Import `yaml` and `createDocument`.
 ```typescript index.ts
 import * as yaml from "yaml";
 
-import { z } from "zod/v4";
+import { z as z3 } from "zod";
+import { z as z4 } from "zod/v4";
 
 import {
   extendZodWithOpenApi,
   createDocument
 } from "zod-openapi";
-extendZodWithOpenApi(z);
+extendZodWithOpenApi(z3);
 
-const burgerSchema = z.object({
-  id: z.number().min(1).openapi({
+const burgerSchema = z3.object({
+  id: z3.number().min(1).openapi({
     description: "The unique identifier of the burger.",
     example: 1,
   }),
-  name: z.string().min(1).max(50).openapi({
+  name: z3.string().min(1).max(50).openapi({
     description: "The name of the burger.",
     example: "Veggie Burger",
   }),
-  description: z.string().max(255).optional().openapi({
+  description: z3.string().max(255).optional().openapi({
     description: "The description of the burger.",
     example: "A delicious bean burger with avocado.",
   }),
@@ -330,24 +331,25 @@ We'll use the `createDocument` method to generate an OpenAPI document. We'll pas
 ```typescript index.ts
 import * as yaml from "yaml";
 
-import { z } from "zod/v4";
+import { z as z3 } from "zod";
+import { z as z4 } from "zod/v4";
 
 import {
   extendZodWithOpenApi,
   createDocument
 } from "zod-openapi";
-extendZodWithOpenApi(z);
+extendZodWithOpenApi(z3);
 
-const burgerSchema = z.object({
-  id: z.number().min(1).openapi({
+const burgerSchema = z3.object({
+  id: z3.number().min(1).openapi({
     description: "The unique identifier of the burger.",
     example: 1,
   }),
-  name: z.string().min(1).max(50).openapi({
+  name: z3.string().min(1).max(50).openapi({
     description: "The name of the burger.",
     example: "Veggie Burger",
   }),
-  description: z.string().max(255).optional().openapi({
+  description: z3.string().max(255).optional().openapi({
     description: "The description of the burger.",
     example: "A delicious bean burger with avocado.",
   }),
@@ -434,15 +436,16 @@ Let's create the burger ID schema now.
 ```typescript index.ts
 import * as yaml from "yaml";
 
-import { z } from "zod/v4";
+import { z as z3 } from "zod";
+import { z as z4 } from "zod/v4";
 
 import {
   extendZodWithOpenApi,
   createDocument
 } from "zod-openapi";
-extendZodWithOpenApi(z);
+extendZodWithOpenApi(z3);
 
-const BurgerIdSchema = z
+const BurgerIdSchema = z3
   .number()
   .min(1)
   .openapi({
@@ -455,13 +458,13 @@ const BurgerIdSchema = z
     },
   });
 
-const burgerSchema = z.object({
+const burgerSchema = z3.object({
   id: BurgerIdSchema,
-  name: z.string().min(1).max(50).openapi({
+  name: z3.string().min(1).max(50).openapi({
     description: "The name of the burger.",
     example: "Veggie Burger",
   }),
-  description: z.string().max(255).optional().openapi({
+  description: z3.string().max(255).optional().openapi({
     description: "The description of the burger.",
     example: "A delicious bean burger with avocado.",
   }),
@@ -504,15 +507,16 @@ We'll replace the burger ID field with a reference to the burger ID schema.
 ```typescript index.ts
 import * as yaml from "yaml";
 
-import { z } from "zod/v4";
+import { z as z3 } from "zod";
+import { z as z4 } from "zod/v4";
 
 import {
   extendZodWithOpenApi,
   createDocument
 } from "zod-openapi";
-extendZodWithOpenApi(z);
+extendZodWithOpenApi(z3);
 
-const BurgerIdSchema = z
+const BurgerIdSchema = z3
   .number()
   .min(1)
   .openapi({
@@ -525,13 +529,13 @@ const BurgerIdSchema = z
     },
   });
 
-const burgerSchema = z.object({
+const burgerSchema = z3.object({
   id: BurgerIdSchema,
-  name: z.string().min(1).max(50).openapi({
+  name: z3.string().min(1).max(50).openapi({
     description: "The name of the burger.",
     example: "Veggie Burger",
   }),
-  description: z.string().max(255).optional().openapi({
+  description: z3.string().max(255).optional().openapi({
     description: "The description of the burger.",
     example: "A delicious bean burger with avocado.",
   }),
@@ -574,15 +578,16 @@ We'll add a schema for creating burgers that doesn't include an ID. We'll use th
 ```typescript index.ts
 import * as yaml from "yaml";
 
-import { z } from "zod/v4";
+import { z as z3 } from "zod";
+import { z as z4 } from "zod/v4";
 
 import {
   extendZodWithOpenApi,
   createDocument
 } from "zod-openapi";
-extendZodWithOpenApi(z);
+extendZodWithOpenApi(z3);
 
-const BurgerIdSchema = z
+const BurgerIdSchema = z3
   .number()
   .min(1)
   .openapi({
@@ -595,13 +600,13 @@ const BurgerIdSchema = z
     },
   });
 
-const burgerSchema = z.object({
+const burgerSchema = z3.object({
   id: BurgerIdSchema,
-  name: z.string().min(1).max(50).openapi({
+  name: z3.string().min(1).max(50).openapi({
     description: "The name of the burger.",
     example: "Veggie Burger",
   }),
-  description: z.string().max(255).optional().openapi({
+  description: z3.string().max(255).optional().openapi({
     description: "The description of the burger.",
     example: "A delicious bean burger with avocado.",
   }),
@@ -652,16 +657,17 @@ We'll use `ZodOpenApiOperationObject` from `zod-openapi` to add `create burger`,
 ```typescript index.ts
 import * as yaml from "yaml";
 
-import { z } from "zod/v4";
+import { z as z3 } from "zod";
+import { z as z4 } from "zod/v4";
 
 import {
   extendZodWithOpenApi,
   ZodOpenApiOperationObject,
   createDocument
 } from "zod-openapi";
-extendZodWithOpenApi(z);
+extendZodWithOpenApi(z3);
 
-const BurgerIdSchema = z
+const BurgerIdSchema = z3
   .number()
   .min(1)
   .openapi({
@@ -674,13 +680,13 @@ const BurgerIdSchema = z
     },
   });
 
-const burgerSchema = z.object({
+const burgerSchema = z3.object({
   id: BurgerIdSchema,
-  name: z.string().min(1).max(50).openapi({
+  name: z3.string().min(1).max(50).openapi({
     description: "The name of the burger.",
     example: "Veggie Burger",
   }),
-  description: z.string().max(255).optional().openapi({
+  description: z3.string().max(255).optional().openapi({
     description: "The description of the burger.",
     example: "A delicious bean burger with avocado.",
   }),
@@ -725,7 +731,7 @@ const getBurger: ZodOpenApiOperationObject = {
   summary: "Get a burger",
   description: "Gets a burger from the database.",
   requestParams: {
-    path: z.object({ id: BurgerIdSchema }),
+    path: z3.object({ id: BurgerIdSchema }),
   },
   responses: {
     "200": {
@@ -769,16 +775,18 @@ We'll add a webhook that runs when a burger is created. We'll use the `ZodOpenAp
 ```typescript index.ts
 import * as yaml from "yaml";
 
-import { z } from "zod/v4";
+import { z as z3 } from "zod";
+import { z as z4 } from "zod/v4";
 
 import {
   extendZodWithOpenApi,
   ZodOpenApiOperationObject,
   createDocument
 } from "zod-openapi";
-extendZodWithOpenApi(z);
+// Extend the Zod v3 compatible instance for zod-openapi
+extendZodWithOpenApi(z3);
 
-const BurgerIdSchema = z
+const BurgerIdSchema = z3
   .number()
   .min(1)
   .openapi({
@@ -791,13 +799,13 @@ const BurgerIdSchema = z
     },
   });
 
-const burgerSchema = z.object({
+const burgerSchema = z3.object({
   id: BurgerIdSchema,
-  name: z.string().min(1).max(50).openapi({
+  name: z3.string().min(1).max(50).openapi({
     description: "The name of the burger.",
     example: "Veggie Burger",
   }),
-  description: z.string().max(255).optional().openapi({
+  description: z3.string().max(255).optional().openapi({
     description: "The description of the burger.",
     example: "A delicious bean burger with avocado.",
   }),
@@ -864,14 +872,15 @@ We'll register our paths and webhooks by adding them to the document definition.
 ```typescript index.ts
 import * as yaml from "yaml";
 
-import { z } from "zod/v4";
+import { z as z3 } from "zod";
+import { z as z4 } from "zod/v4";
 
 import {
   extendZodWithOpenApi,
   ZodOpenApiOperationObject,
   createDocument
 } from "zod-openapi";
-extendZodWithOpenApi(z);
+extendZodWithOpenApi(z3);
 
 // Previous code from examples above...
 // BurgerIdSchema, burgerSchema, burgerCreateSchema, createBurger, getBurger, createBurgerWebhook
