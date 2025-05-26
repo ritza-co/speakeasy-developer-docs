@@ -139,7 +139,7 @@ const internalUserSchema = z4.strictObject({ // v4 feature
 
 Now let's walk through the process of generating an OpenAPI schema and SDK for our Burgers and Orders API.
 
-## Requirements
+### Requirements
 
 This tutorial assumes basic familiarity with TypeScript and Node.js development.
 
@@ -1192,16 +1192,13 @@ components:
       minimum: 1
       description: The unique identifier of the order.
       example: 1
-
-
-
 ```
 
 ### 17. Generate an SDK
 
 With our OpenAPI schema complete, we can now generate an SDK using the Speakeasy SDK generator.
 
-### Install the Speakeasy CLI
+#### Install the Speakeasy CLI
 
 First, install the Speakeasy CLI:
 
@@ -1213,7 +1210,7 @@ brew install speakeasy-api/tap/speakeasy
 curl -fsSL https://go.speakeasy.com/cli-install.sh | sh
 ```
 
-### Lint Your OpenAPI Spec
+#### Lint Your OpenAPI Spec
 
 Before generating SDKs, lint your spec to catch common issues:
 
@@ -1221,7 +1218,7 @@ Before generating SDKs, lint your spec to catch common issues:
 speakeasy lint openapi --schema openapi.yaml
 ```
 
-### Use AI to Improve Your Spec
+#### Use AI to Improve Your Spec
 
 The Speakeasy CLI now includes AI-powered suggestions to automatically improve your OpenAPI specifications:
 
@@ -1233,7 +1230,7 @@ Follow the onscreen prompts to provide the necessary configuration details for y
 
 Read the [Speakeasy Suggest](/docs/prep-openapi/maintenance) documentation for more information on how to use Speakeasy Suggest.
 
-### Generate Your SDK
+#### Generate Your SDK
 
 Now you can generate your SDK using the quickstart command:
 
@@ -1253,7 +1250,7 @@ TypeScript SDKs generated with Speakeasy include an installable [Model Context P
 Note that the SDK is not ready for production use immediately after generation. To get it production-ready, follow the steps outlined in your Speakeasy workspace.
 </Callout>
 
-## Adding SDK Generation to Your CI/CD Pipeline
+### Adding SDK Generation to Your CI/CD Pipeline
 
 The Speakeasy [`sdk-generation-action`](https://github.com/speakeasy-api/sdk-generation-action) repository provides workflows for integrating the Speakeasy CLI into CI/CD pipelines to automatically regenerate SDKs when your Zod schemas change.
 
@@ -1268,7 +1265,7 @@ In this tutorial, we learned how to generate OpenAPI schemas from Zod and create
 
 By following these steps, you can ensure that your API is well-documented, easy to use, and offers a great developer experience.
 
-## Further Reading
+### Further Reading
 
 This guide covered the basics of generating an OpenAPI document using Zod OpenAPI. Here are some resources to help you learn more about Zod, OpenAPI, and Speakeasy:
 
