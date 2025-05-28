@@ -15,7 +15,7 @@ We'll work with real code you can run locally, building a simple bookstore API t
 
 <Callout title="Example repository" type="info">
   The example below will guide you through the process of creating a Spring Boot project, adding the necessary dependencies, writing Spring Boot controllers with OpenAPI annotations, and generating an OpenAPI document from it.
-  To skip this setup and follow along with our example, clone the [example application](https://github.com/speakeasy-api/spring-boot-openapi-example).
+  To skip this setup and follow along with our example, clone the [example application](https://github.com/speakeasy-api/examples/tree/main/framework-springboot).
 </Callout>
 
 
@@ -25,7 +25,7 @@ First, create a new Spring Boot project using [Spring Initializr](https://start.
 
 - Project: Maven
 - Language: Java
-- Spring Boot: 2.7.x (or the latest stable version)
+- Spring Boot: 3.5.x (or the latest stable version)
 - Project Metadata: Fill in as appropriate
 - Dependencies: Spring Web
 
@@ -39,7 +39,7 @@ Open the `pom.xml` file and add the following dependency:
 <dependency>
     <groupId>org.springdoc</groupId>
     <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-    <version>2.1.0</version>
+    <version>2.8.8</version>
 </dependency>
 ```
 
@@ -494,15 +494,55 @@ speakeasy quickstart
 
 Follow the onscreen prompts to provide the configuration details for the new SDK such as the name, schema location, and output path. Enter `openapi.yaml` when prompted for the OpenAPI document location and select your preferred language, for example, TypeScript, when prompted for which language you would like to generate.
 
+You'll see the steps taken by Speakeasy to create the SDK in the terminal:
+
+```bash Terminal
+│ Workflow - running                             
+│ Workflow - success                             
+│ └─Target: sdk - success                        
+│   └─Source: Bookstore API - success            
+│     └─Validating Document - success            
+│     └─Diagnosing OpenAPI - success             
+│     └─Tracking OpenAPI Changes - success       
+│       └─Snapshotting OpenAPI Revision - success
+│       └─Storing OpenAPI Revision - success     
+│   └─Validating gen.yaml - success              
+│   └─Generating Typescript SDK - success        
+│     └─Setup Environment - success              
+│     └─Load and Validate Document - success     
+│     └─Generate SDK - success                   
+│     └─Compile SDK - success                    
+│     └─Setup Environment - success              
+│     └─Load and Validate Document - success     
+│     └─Generate SDK - success                   
+│   └─Generating Code Samples - success          
+│     └─Snapshotting Code Samples - success      
+│       └─Snapshotting Code Samples - success    
+│       └─Uploading Code Samples - success 
+```
+
+Speakeasy [validates](/docs/core-concepts#validation) the OpenAPI document to check that it's ready for code generation. Validation issues will be printed in the terminal. The generated SDK will be saved as a folder in your project.
+
+If you get ESLint styling errors, run the speakeasy quickstart command from outside your project.
+
+Speakeasy also suggests improvements for your SDK, using [Speakeasy Suggest](/docs/prep-openapi/maintenance), which is an AI-powered tool in Speakeasy Studio. You can see suggestions by opening the link to your Speakeasy Studio workspace in the terminal:
+
+![Speakeasy Suggestions in Speakeasy Studio](./assets/springboot/speakeasy-suggestions.png)
+
 After running this command, you'll find the generated SDK code in the specified output directory. This SDK can be used by clients to interact with your Spring Boot API in a type-safe manner.
+
+In the SDK `README.md` file, you'll find documentation about your Speakeasy SDK. TypeScript SDKs generated with Speakeasy include an installable [Model Context Protocol (MCP) server](https://www.speakeasy.com/docs/model-context-protocol) where the various SDK methods are exposed as tools that can be invoked by AI applications.
+Your SDK documentation includes instructions for installing the MCP server.
+
+Note that the SDK is not ready for production use. To get it production-ready, follow the steps outlined in your Speakeasy workspace.
 
 # Customize the SDK
 
-Let's add retry logic to the SDK's `listPublications` operation to handle network errors gracefully. We'll do this using an OpenAPI extension that [Speakeasy provides](/docs/customize-sdks/retries), `x-speakeasy-retries`.
+The example app added retry logic to the SDK's `listPublications` operation to handle network errors gracefully. This was done using one of the OpenAPI extensions that [Speakeasy provides](/docs/speakeasy-reference/extensions), `x-speakeasy-retries`.
 
-Instead of modifying the OpenAPI document directly, we'll add this extension to the Spring Boot controller and regenerate the OpenAPI document and SDK.
+Instead of modifying the OpenAPI document directly, this extension was added to the Spring Boot controller and the OpenAPI document and SDK were regenerated.
 
-First, add these imports to `src/main/java/com/bookstore/PublicationsController.java`:
+These imports were added to `src/main/java/com/bookstore/PublicationsController.java`:
 
 
 ```java PublicationsController.java
@@ -510,7 +550,7 @@ import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 ```
 
-Then modify the `listPublications` operation to include the retry configuration:
+The `listPublications` operation was modified to include the retry configuration:
 
 
 ```java PublicationsController.java mark=2:7
@@ -536,13 +576,13 @@ Then modify the `listPublications` operation to include the retry configuration:
     }
 ```
 
-Now that we've added the `x-speakeasy-retries` extension to the `listPublications` operation, we can regenerate the OpenAPI document:
+The OpenAPI document was then regenerated:
 
 ```bash Terminal
 curl http://localhost:8080/api-docs.yaml -o openapi.yaml
 ```
 
-The OpenAPI document will include the retry configuration for the `listPublications` operation:
+The OpenAPI document includes the retry configuration for the `listPublications` operation:
 
 ```yaml openapi.yaml
 x-speakeasy-retries:
@@ -557,16 +597,22 @@ x-speakeasy-retries:
   retryConnectionErrors: true
 ```
 
-Now we can use Speakeasy to recreate the SDK:
+After re-creating the SDK using Speakeasy:
 
 ```bash
 speakeasy quickstart
 ```
 
-The created SDK will now include retry logic for the `listPublications` operation, automatically handling network errors and `5XX` responses.
+The created SDK now includes retry logic for the `listPublications` operation, automatically handling network errors and `5XX` responses.
 
 
 ### Issues and feedback
 
 Need some assistance or have a suggestion? Reach out to our team at [support@speakeasy.com](mailto:support@speakeasy.com).
+
+If you haven't already, take a look at our [blog](/blog) to learn more about OpenAPI, SDK generation, and more including:
+
+  - [Native JSONL support in your SDKs](/blog/release-jsonl-support)
+  - [Comprehensive SDK Testing](/blog/release-sdk-testing)
+  - [Model Context Protocol: TypeScript SDKs for the Agentic AI ecosystem](/blog/release-model-context-protocol)
 
