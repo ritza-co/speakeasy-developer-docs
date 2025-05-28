@@ -460,6 +460,7 @@ Finally, let's examine how controller methods translate into API endpoints. Here
         content:
           application/json:
             schema:
+              type: object
               oneOf:
                 - $ref: '#/components/schemas/Book'
                 - $ref: '#/components/schemas/Magazine'
