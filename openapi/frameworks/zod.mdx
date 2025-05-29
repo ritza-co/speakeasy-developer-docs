@@ -385,11 +385,6 @@ const document = createDocument({
   components: {
     schemas: {
       burgerSchema,
-      BurgerCreate,
-      BurgerId,
-      Order,
-      OrderCreate,
-      OrderId,
     },
   },
 });
@@ -416,6 +411,22 @@ const BurgerIdSchema = z3
   });
 ```
 
+Update the `burgerSchema` to use the `BurgerIdSchema`.
+
+```typescript index.ts
+const burgerSchema = z3.object({
+  id: BurgerIdSchema,
+  name: z3.string().min(1).max(50).openapi({
+    description: "The name of the burger.",
+    example: "Veggie Burger",
+  }),
+  description: z3.string().max(255).optional().openapi({
+    description: "The description of the burger.",
+    example: "A delicious bean burger with avocado.",
+  }),
+});
+```
+
 ### 10. Add a Schema for Creating Burgers
 
 We'll add a schema for creating burgers that doesn't include an ID. We'll use this schema to define the request body for the create burger path.
@@ -427,7 +438,7 @@ const burgerCreateSchema = burgerSchema.omit({ id: true }).openapi({
 });
 ```
 
-### 11. Add Order Schemas and Operations
+### 11. Add Order Schemas
 
 To match the final OpenAPI output, let's add schemas and endpoints for orders.
 
@@ -464,7 +475,7 @@ const orderSchema = z3.object({
     description: "The status of the order.",
     example: "pending",
   }),
-  note: z3.string().openapi({
+  note: z3.string().optional().openapi({
     description: "A note for the order.",
     example: "No onions.",
   }),
@@ -672,11 +683,11 @@ const document = createDocument({
   components: {
     schemas: {
       burgerSchema,
-      BurgerCreate,
-      BurgerId,
-      Order,
-      OrderCreate,
-      OrderId,
+      burgerCreateSchema,
+      BurgerIdSchema,
+      orderSchema,
+      orderCreateSchema,
+      OrderIdSchema,
     },
   },
 });
