@@ -20,13 +20,13 @@ This eliminates the task of keeping hand-written OpenAPI specs in sync with your
 
 
 <Callout title="Important: Library compatibility" type="warning">
-This guide uses [zod-openapi](https://github.com/samchungy/zod-openapi), which is actively maintained and offers better TypeScript integration than the older zod-to-openapi library. Currently, zod-openapi requires Zod v3 compatibility, which is why we use a dual import strategy throughout this tutorial. 
+This guide uses [zod-openapi](https://github.com/samchungy/zod-openapi), which is actively maintained and offers better TypeScript integration than the older zod-to-openapi library. Currently, zod-openapi requires Zod v3 compatibility, which is why we use a dual import strategy throughout this tutorial.
 
 While Zod v4 introduces new features like `z.strictObject()` and `z.email()`, you'll need to use the standard Zod import for OpenAPI schemas and the `/v4` subpath for new features until zod-openapi adds full v4 support. Check the [zod-openapi releases](https://github.com/samchungy/zod-openapi/releases) for the latest compatibility updates.
 </Callout>
 
 
-## Zod OpenAPI Overview 
+## Zod OpenAPI Overview
 
 [Zod OpenAPI](https://github.com/samchungy/zod-openapi) is a TypeScript library that helps developers define OpenAPI schemas as Zod schemas. The stated goal of the project is to cut down on code duplication, and it does a wonderful job of this.
 
@@ -41,7 +41,7 @@ Zod OpenAPI is maintained by one of the contributors to an earlier library calle
 <Callout title="Zod v4" type="info">
 This guide demonstrates a **dual import strategy** for using both Zod v3 and v4 in the same project. This approach is necessary because `zod-openapi` currently requires Zod v3 compatibility, while you may want to use Zod v4 features elsewhere in your application.
 
-Unlike most libraries, Zod is directly embedded in hundreds of other libraries' public APIs. A normal `zod@4.0.0` release would force every one of those libraries to publish breaking changes simultaneously—a massive "version avalanche." 
+Unlike most libraries, Zod is directly embedded in hundreds of other libraries' public APIs. A normal `zod@4.0.0` release would force every one of those libraries to publish breaking changes simultaneously—a massive "version avalanche."
 
 The subpath approach (inspired by Go modules) lets libraries support both versions with one dependency, providing a gradual migration path for the entire ecosystem.
 
@@ -164,7 +164,7 @@ The following should be installed on your machine:
 ### 1. Create Your Zod Project
 
 <Callout title="Complete Example Available" type="info">
-The source code for our complete example is available in the [`speakeasy-api/examples`](https://github.com/speakeasy-api/examples.git) repository. The project contains a pre-generated Python SDK with instructions on how to generate more SDKs. You can clone this repository to test how changes to the Zod schema definition result in changes to the generated SDK.
+The source code for our complete example is available in the [`speakeasy-api/examples`](https://github.com/speakeasy-api/examples.git) repository in the `zod-openapi` directory. The project contains a pre-generated Python SDK with instructions on how to generate more SDKs. You can clone this repository to test how changes to the Zod schema definition result in changes to the generated SDK.
 </Callout>
 
 
@@ -202,9 +202,9 @@ Save this TypeScript code in a new file called `index.ts`. Note the dual import 
 
 ```typescript index.ts
 // Import Zod v3 compatible instance for zod-openapi
-import { z as z3 } from "zod"; 
+import { z as z3 } from "zod";
 // Import Zod v4 for new features and future migration
-import { z as z4 } from "zod/v4"; 
+import { z as z4 } from "zod/v4";
 
 // For now, we'll use z3 for OpenAPI schemas since zod-openapi requires it
 const burgerSchema = z3.object({
@@ -219,8 +219,8 @@ const burgerSchema = z3.object({
 We'll add the `openapi` method to Zod by calling `extendZodWithOpenApi` once. Update `index.ts` to import `extendZodWithOpenApi` from `zod-openapi`, then call `extendZodWithOpenApi` on the z3 instance.
 
 ```typescript index.ts
-import { z as z3 } from "zod"; 
-import { z as z4 } from "zod/v4"; 
+import { z as z3 } from "zod";
+import { z as z4 } from "zod/v4";
 import { extendZodWithOpenApi } from "zod-openapi";
 
 // Extend the Zod v3 compatible instance for zod-openapi
@@ -241,8 +241,8 @@ Next, we'll use the new `openapi` method provided by `extendZodWithOpenApi` to r
 We'll also add an OpenAPI generator, `OpenApiGeneratorV31`, and log the generated component to the console as YAML.
 
 ```typescript index.ts
-import { z as z3 } from "zod"; 
-import { z as z4 } from "zod/v4"; 
+import { z as z3 } from "zod";
+import { z as z4 } from "zod/v4";
 
 import { extendZodWithOpenApi } from "zod-openapi";
 extendZodWithOpenApi(z3);
@@ -264,13 +264,11 @@ With Zod OpenAPI, we'll call the `.openapi` method on each field, and add an exa
 
 We'll also add a description to the `Burger` component itself.
 
-{/* Speakeasy will generate documentation and usage examples based on the descriptions and examples we added, but first, we'll need to generate an OpenAPI schema. */}
-
 Edit `index.ts` and edit `burgerSchema` to add OpenAPI metadata.
 
 ```typescript index.ts
-import { z as z3 } from "zod"; 
-import { z as z4 } from "zod/v4"; 
+import { z as z3 } from "zod";
+import { z as z4 } from "zod/v4";
 
 import { extendZodWithOpenApi } from "zod-openapi";
 extendZodWithOpenApi(z3);
@@ -387,11 +385,6 @@ const document = createDocument({
   components: {
     schemas: {
       burgerSchema,
-      BurgerCreate,
-      BurgerId,
-      Order,
-      OrderCreate,
-      OrderId,
     },
   },
 });
@@ -418,6 +411,22 @@ const BurgerIdSchema = z3
   });
 ```
 
+Update the `burgerSchema` to use the `BurgerIdSchema`.
+
+```typescript index.ts
+const burgerSchema = z3.object({
+  id: BurgerIdSchema,
+  name: z3.string().min(1).max(50).openapi({
+    description: "The name of the burger.",
+    example: "Veggie Burger",
+  }),
+  description: z3.string().max(255).optional().openapi({
+    description: "The description of the burger.",
+    example: "A delicious bean burger with avocado.",
+  }),
+});
+```
+
 ### 10. Add a Schema for Creating Burgers
 
 We'll add a schema for creating burgers that doesn't include an ID. We'll use this schema to define the request body for the create burger path.
@@ -429,7 +438,7 @@ const burgerCreateSchema = burgerSchema.omit({ id: true }).openapi({
 });
 ```
 
-### 11. Add Order Schemas and Operations
+### 11. Add Order Schemas
 
 To match the final OpenAPI output, let's add schemas and endpoints for orders.
 
@@ -466,7 +475,7 @@ const orderSchema = z3.object({
     description: "The status of the order.",
     example: "pending",
   }),
-  note: z3.string().openapi({
+  note: z3.string().optional().openapi({
     description: "A note for the order.",
     example: "No onions.",
   }),
@@ -674,11 +683,11 @@ const document = createDocument({
   components: {
     schemas: {
       burgerSchema,
-      BurgerCreate,
-      BurgerId,
-      Order,
-      OrderCreate,
-      OrderId,
+      burgerCreateSchema,
+      BurgerIdSchema,
+      orderSchema,
+      orderCreateSchema,
+      OrderIdSchema,
     },
   },
 });
