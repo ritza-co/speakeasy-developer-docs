@@ -35,7 +35,7 @@ To guide us through this journey, we'll use a simple example FastAPI application
 
 We'll look at how we optimized this FastAPI application and refined our models and routes so that the generated OpenAPI document is intuitive and easy to use. We will also explore how we can use this schema to generate SDKs using Speakeasy. The source code for our example API is available in the [framework-fastapi](https://github.com/speakeasy-api/examples/tree/main/framework-fastapi) folder of the Speakeasy Examples repository.
 
-The repository consists of two directories: `app` and `sdk`.
+The `framework-fastapi` directory consists of two directories: `app` and `sdk`.
 
 The `app` directory contains the FastAPI server definition: `app/main.py`. This is where we'll look at what we customized.
 
@@ -72,9 +72,11 @@ After installing the plugin we added a "/scalar" route, in `app/main.py`, that r
 ```python
 from scalar_fastapi import get_scalar_api_reference
 
-...
+# ...
+
 app = FastAPI()
-...
+
+# ...
 
 @app.get("/scalar", include_in_schema=False)
 async def scalar_html():
@@ -83,8 +85,6 @@ async def scalar_html():
         title=app.title + " - Scalar",
     )
 
-@app.post(
-    "/burger/",
 ```
 
 ### Server Configuration
@@ -440,7 +440,41 @@ webhooks:
 
 ## Speakeasy Integration
 
-Now that we have a customized OpenAPI document, we can use Speakeasy to generate SDKs based on it. Let's take a look at how the information we detailed in the OpenAPI document affects how Speakeasy generates SDKs.
+Now that we have a customized OpenAPI document, we can use Speakeasy to generate SDKs based on it. You can generate an SDK by running the `gen.sh` bash script, which runs the `speakeasy generate` command. Alternatively, you can use the Speakeasy quick start command for a guided SDK setup:
+
+```bash Terminal
+speakeasy quickstart
+```
+
+Following the prompts, provide the OpenAPI document location, name your SDK, and select the SDK language.
+In the terminal, you’ll see the steps taken by Speakeasy to create the SDK:
+
+```
+│   └─Source: APItizing Burgers API - success
+│     └─Validating Document - success
+│     └─Diagnosing OpenAPI - success
+│     └─Tracking OpenAPI Changes - success
+│       └─Snapshotting OpenAPI Revision - success
+│       └─Storing OpenAPI Revision - success
+│   └─Validating gen.yaml - success
+│   └─Generating Python SDK - success
+│     └─Setup Environment - success
+│     └─Load and Validate Document - success
+│     └─Generate SDK - success
+│     └─Compile SDK - success
+│     └─Setup Environment - success
+│     └─Load and Validate Document - success
+│     └─Generate SDK - success
+│   └─Generating Code Samples - success
+│     └─Snapshotting Code Samples - success
+│       └─Snapshotting Code Samples - success
+│       └─Uploading Code Samples - success
+```
+
+Speakeasy [validates](/docs/concepts#validation) the OpenAPI document to check that it’s ready for code generation. Validation issues will be printed in the terminal. The generated SDK will be saved as a folder in your project.
+Speakeasy also suggests improvements for your SDK, using [Speakeasy Suggest](/docs/prep-openapi/maintenance), which is an AI-powered tool in Speakeasy Studio. You can see suggestions by opening the link to your Speakeasy Studio workspace in the terminal.
+
+Let's take a look at how the information we detailed in the OpenAPI document affects how Speakeasy generates SDKs.
 
 After we added our local server information, this is how it generates in the `openapi.yaml` file:
 
@@ -448,7 +482,7 @@ After we added our local server information, this is how it generates in the `op
 # This server configuration will be used by Speakeasy when generating SDKs
 openapi: 3.1.0
 info:
-  title: FastAPI Example
+  title: APItizing Burgers API
   version: 0.1.0
 servers:
   - description: Local server
@@ -876,8 +910,8 @@ async def create_burger_validated(
     price: Annotated[float, Form()]
 ):
     burger_data = BurgerFormData(
-        name=name, 
-        description=description, 
+        name=name,
+        description=description,
         price=price
     )
     return burger_data
