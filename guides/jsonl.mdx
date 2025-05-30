@@ -1,5 +1,5 @@
 ---
-title: "Why API producers should care about JSONL"
+title: "Why API Producers Should Care About JSONL"
 description: "Learn how JSONL can help you implement streaming responses in your API."
 date: 2025-05-21
 image: "/assets/build-a-mcp-server-tutorial.png"
@@ -10,6 +10,8 @@ tags:
   - API Advice
 featured_image: "/assets/build-a-mcp-server-tutorial.png"
 ---
+
+# Why API producers should care about JSONL
 
 When end users expect near-instant responses (as they do), API producers reach for streaming responses.
 
@@ -39,7 +41,7 @@ It looks like this:
 
 As we'll discuss in more detail below, JSONL's many benefits boil down to one main point:
 
-JSONL data can be processed or emitted record by record as it is read from a file, or received over a network, without needing to load the entire dataset into memory first.
+JSONL data can be processed or emitted record by record while it is read from a file or received over a network without needing to load the entire dataset into memory first.
 
 This makes JSONL inherently streamable.
 
@@ -51,7 +53,7 @@ There is no need to parse the entire dataset before you begin processing JSONL. 
 
 ### JSONL uses less memory on the server and client
 
-Because only one line (representing a single JSON object or value) needs to be in memory for parsing at any given time, JSONL has a low memory footprint compared to the JSON footprint for parsing a large standard array. This makes it feasible to work with terabyte-scale datasets on machines with limited memory.
+Because only one line (representing a single JSON object or value) needs to be in memory for parsing at any given time, JSONL has a low memory footprint compared to the footprint for parsing a large standard JSON array. This makes it feasible to work with terabyte-scale datasets on machines with limited memory.
 
 ### We don't need to know the size of the dataset beforehand
 
@@ -93,9 +95,9 @@ JSONL is a simple format, and as such, it doesn't have a formal specification. H
 
 Here's the TL;DR:
 
-1. JSONL is always UTF-8 encoded.
-2. Each line is a valid JSON value.
-3. Lines are separated by a newline (`\n`) character.
+- JSONL is always UTF-8 encoded.
+- Each line is a valid JSON value.
+- Lines are separated by a newline (`\n`) character.
 
 While not prescriptive, the JSON Lines website also adds that the recommended file extension is `.jsonl` and that the MIME type may be `application/jsonl` (though this is not formalized yet, and `application/x-ndjson` is also used).
 
@@ -263,29 +265,31 @@ To see this in action, you can use your own Vercel project or deploy one of Verc
 
 ### Deploying the Vercel AI Chatbot
 
-1. Log in to your Vercel account.
-2. Click on the **New Project** button.
-3. Select the **AI Chatbot** template.
-4. Follow the prompts to deploy the project.
+First, let's deploy the AI Chatbot:
+
+- Log in to your Vercel account.
+- Click on the **New Project** button.
+- Select the **AI Chatbot** template.
+- Follow the prompts to deploy the project.
 
 ### Gathering your environment variables
 
 In Vercel, create a new token for your account. This token will be used to authenticate your API requests.
 
-1. Go to your Vercel account settings.
-2. Click on the **Tokens** tab.
-3. Click **Create**.
-4. Copy the token and save it in a secure place.
+- Go to your Vercel account settings.
+- Click on the **Tokens** tab.
+- Click **Create**.
+- Copy the token and save it in a secure place.
 
 Next, we need to get your Vercel project ID and deployment ID:
 
-1. Go to your Vercel project dashboard.
-2. Click on the **Settings** tab.
-3. Copy the project ID from the URL and save it.
-4. Now, click on the **Deployments** tab.
-5. Click on the **Latest Deployment** link.
-6. Copy the deployment ID from the URL (prefix it with `dpl_`).
-7. Save the prefixed deployment ID in a secure place.
+- Go to your Vercel project dashboard.
+- Click on the **Settings** tab.
+- Copy the project ID from the URL and save it.
+- Now, click on the **Deployments** tab.
+- Click on the **Latest Deployment** link.
+- Copy the deployment ID from the URL (prefix it with `dpl_`).
+- Save the prefixed deployment ID in a secure place.
 
 ### Setting up your environment variables
 
@@ -355,9 +359,9 @@ You've seen how powerful consuming JSONL streams can be, especially with tools l
 
 These are the core principles an API producer should follow when streaming JSONL:
 
-1. **Set the correct headers:** Make sure to set the `Content-Type` header to `application/jsonl`.
-2. **Iterate and Serialize:** Process your data record by record (for example, from a database query, an LLM token stream, or any other iterable source). Convert each record into a JSON string.
-3. **Write, newline, flush, repeat:** Write the JSON string to the response output stream, follow it with a newline character (`\n`), and flush the output buffer. Flushing ensures the data is sent to the client immediately, rather than being held back by the server or application framework.
+- **Set the correct headers:** Make sure to set the `Content-Type` header to `application/jsonl`.
+- **Iterate and Serialize:** Process your data record by record (for example, from a database query, an LLM token stream, or any other iterable source). Convert each record into a JSON string.
+- **Write, newline, flush, repeat:** Write the JSON string to the response output stream, follow it with a newline character (`\n`), and flush the output buffer. Flushing ensures the data is sent to the client immediately, rather than being held back by the server or application framework.
 
 ### Python example
 
@@ -412,18 +416,18 @@ if __name__ == '__main__':
 
 To run this example:
 
-1. Save it as a Python file (for example, `app.py`).
-2. Install Flask using `pip install Flask`.
-3. Run the app using `python app.py`.
-4. In another terminal, use `curl` to access the stream: 
+- Save it as a Python file (for example, `app.py`).
+- Install Flask using `pip install Flask`.
+- Run the app using `python app.py`.
+- In another terminal, use `curl` to access the stream:
 
-    ```
-    curl -N http://127.0.0.1:5000/stream-data
-    ```
+  ```
+  curl -N http://127.0.0.1:5000/stream-data
+  ```
 
-    **Note:** Using the `-N` or `--no-buffer` flag with curl is important for seeing the output as it arrives.
+  **Note:** Using the `-N` or `--no-buffer` flag with curl is important for seeing the output as it arrives.
 
-5. Watch as each JSON object is printed on a new line. The objects appear one by one, just as intended with JSONL.
+- Watch as each JSON object is printed on a new line. The objects appear one by one, just as intended with JSONL.
 
 This server-side approach is memory efficient because you're not building a massive list of objects in memory. You process and send each one, then discard it from server memory (or at least, from the application's direct memory for that response).
 
@@ -520,10 +524,10 @@ time curl -s -o /dev/null -w "TTFB (Traditional JSON): %{time_starttransfer} s\n
 
 In these code blocks:
 
-- The `-N` or `--no-buffer` for `curl` disables buffering of the output stream, allowing us to see streaming behavior.
-- The `-s` silences progress output from `curl`.
-- The `-o /dev/null` discards the actual response body so it doesn't clutter the terminal (we're interested in timings here).
-- The `-w "..."` formats the output from `curl` after the transfer:
+- The `-N` or `--no-buffer` option for `curl` disables buffering of the output stream, allowing us to see streaming behavior.
+- The `-s` option silences progress output from `curl`.
+- The `-o /dev/null` option discards the actual response body so it doesn't clutter the terminal (we're interested in timings here).
+- The `-w "..."` option formats the output from `curl` after the transfer:
 
   - `%{time_starttransfer}` is the TTFB.
   - `%{time_total}` is the total transaction time measured by `curl` itself.
@@ -541,19 +545,19 @@ In our tests, we saw the following results:
 
 ## What about subjective observations?
 
-We've seen the numbers, but we know that the perception of something as "fast" or "slow" is subjective. So let's look at the qualitative differences in how data arrives.
+We've seen the numbers, but we know that the perception of something as "fast" or "slow" is subjective. So let's look at the qualitative differences in how the data arrives.
 
 ### Observing the stream
 
-To visually see the difference in how data arrives, run `curl` without discarding the output.
+To visually see the difference in how the data arrives, run `curl` without discarding the output.
 
-- For JSONL streaming (see data appear line by line):
+- For JSONL streaming:
 
   ```bash
   curl -N http://127.0.0.1:5000/stream-data
   ```
 
-  You'll see data appear line by line. Each JSON line prints about 0.5 seconds after the previous line.
+  You'll see the data appear line by line. Each JSON line prints about half a second after the previous line.
 
 - For traditional JSON:
 
@@ -561,7 +565,7 @@ To visually see the difference in how data arrives, run `curl` without discardin
   curl http://127.0.0.1:5000/traditional-data
   ```
 
-  You'll see there is a pause of about 3 seconds, then the entire JSON array is printed at once.
+  You'll see there is a pause of about three seconds, then the entire JSON array is printed at once.
 
 ## Interpreting the benchmark
 
