@@ -13,7 +13,7 @@ featured_image: "/assets/build-a-mcp-server-tutorial.png"
 
 When end users expect near-instant responses (as they do), API producers reach for streaming responses.
 
-![An image macro of Pablo Escobar from the series Narcos sitting on a porch swing looking pensive, representing the waiting time after sending data in an application. The meme text reads: ME EXACTLY 100MS AFTER CLICKING SEND IN YOUR .](./assets/jsonl/pablo-waiting.jpg)
+![An image macro shows Pablo Escobar (from the series, Narcos) waiting in three different locations. The meme text reads, "ME EXACTLY 100MS AFTER CLICKING SEND IN YOUR APP," implying the meme represents users' frustration with app waiting periods.](./assets/jsonl/pablo-waiting.jpg)
 
 Yet, many APIs still force users to wait for complete responses before displaying anything, creating that dreaded spinner experience that kills engagement and conversion rates.
 
@@ -21,7 +21,7 @@ We believe that streaming responses will become the norm for most APIs, especial
 
 In this post, we'll directly address the common misconception that streaming is a complex and time-consuming feature to implement. If you're struggling to implement streaming, the problem is likely that you're ignoring the simplest tool in your arsenal: JSONL.
 
-We'll compare traditional request-response implementations with streaming alternatives, demonstrating not just the user experience benefits but also the surprisingly minimal code changes required. If your team has been putting off streaming support because it seems like a major project, we hope this guide will show you the faster path forward.
+We'll compare traditional request-response implementations with streaming alternatives, demonstrating not just the user experience benefits of streaming but also the surprisingly minimal code changes it requires. If your team has been putting off streaming support because it seems like a major project, we hope this guide will show you a faster path forward.
 
 ## What is JSONL?
 
@@ -39,7 +39,7 @@ It looks like this:
 
 As we'll discuss in more detail below, JSONL's many benefits boil down to one main point:
 
-JSONL data can be processed or emitted record by record as it is read from a file or received over a network, without needing to load the entire dataset into memory first.
+JSONL data can be processed or emitted record by record as it is read from a file, or received over a network, without needing to load the entire dataset into memory first.
 
 This makes JSONL inherently streamable.
 
@@ -47,49 +47,49 @@ Let's break that down a bit:
 
 ### JSONL can be parsed line by line
 
-There is no need to parse the entire dataset before you can start processing JSONL. This means you can start sending data to your users as soon as you have it, rather than waiting for the entire response to be ready. And users can start consuming data the moment they receive it, rather than waiting for the entire response to be sent. Each chunk you send is a complete response, after all.
+There is no need to parse the entire dataset before you begin processing JSONL. This means you can start sending data to your users as soon as you have it, rather than waiting for the entire response to be ready. And users can start consuming data the moment they receive it, rather than waiting for the entire response to be sent. Each chunk you send is a complete response, after all.
 
 ### JSONL uses less memory on the server and client
 
-Because only one line (representing a single JSON object or value) needs to be in memory for parsing at any given time, JSONL has a low memory footprint compared to parsing a large standard JSON array. This makes it feasible to work with terabyte-scale datasets on machines with limited memory.
+Because only one line (representing a single JSON object or value) needs to be in memory for parsing at any given time, JSONL has a low memory footprint compared to the JSON footprint for parsing a large standard array. This makes it feasible to work with terabyte-scale datasets on machines with limited memory.
 
 ### We don't need to know the size of the dataset beforehand
 
-Adding more records to a JSONL file is straightforward and efficient. New JSON entries can be appended as new lines to the end of the file without requiring parsing or modification of existing data. This is ideal for logging systems or any application where data is continuously generated.
+Adding more records to a JSONL file is straightforward and efficient. You can append new JSON entries as new lines to the end of the file without needing to parse or modify the existing data. This is ideal for logging systems or any application where data is continuously generated.
 
-### It can be parallelized
+### JSONL can be parallelized
 
-Because each line in a JSONL file is independent, processing can be easily parallelized. This means you can take advantage of multicore processors to process multiple lines simultaneously, significantly speeding up data processing tasks.
+Because each line in a JSONL file is independent, processing is easily parallelized. This means you can take advantage of multicore processors to process multiple lines simultaneously, significantly speeding up data processing tasks.
 
-### It plays well with Unix tools
+### JSONL plays well with Unix tools
 
-The line-based nature of JSONL makes it compatible with a wide range of standard Unix command-line utilities like `grep`, `sed`, `awk`, `head`, and `tail`. This makes it easy to explore and filter data without needing to load it into a specialized tool or library. For example, you can use `grep` to quickly find all records that match a certain pattern, or `head` to view the first few lines of a large dataset.
+The line-based nature of JSONL makes it compatible with a wide range of standard Unix command-line utilities like `grep`, `sed`, `awk`, `head`, and `tail`. This makes it easy to explore and filter data without needing to load it into a specialized tool or library. For example, you can use `grep` to quickly find all records that match a certain pattern or `head` to view the first few lines of a large dataset.
 
-### It is human-readable
+### JSONL is human-readable
 
-Subjectively, JSONL is easier to read than a large JSON array. Each line represents a single record, making it easy to scan through the data without being overwhelmed by the sheer volume of information. This can be especially helpful when debugging or exploring data. Copy a line, and you know you have a complete record - no risk of missing a closing bracket or comma.
+Subjectively, JSONL is easier to read than a large JSON array. Each line represents a single record, so you can scan through the data without being overwhelmed by the sheer volume of information. This is especially helpful when debugging or exploring data. Copy a line, and you know you have a complete record - there's no risk of missing a closing bracket or comma.
 
 ### Error handling is easier
 
 When processing a JSONL file line by line, an error encountered while parsing one line (for example, a malformed JSON object) does not necessarily invalidate the remaining lines in the file. Parsers can be designed to skip or log problematic lines and continue processing the rest of the data.
 
-### Takes your dog for a walk
+### It takes your dog for a walk
 
 Just checking whether you're still with us. But seriously, it does make your code cleaner, which can lead to more relaxing time off. Who knows what else it might do for you?
 
 ## Why is JSONL important _now_?
 
-![An animated scene from Toy Story. Buzz Lightyear gestures widely. The text overlay reads AI at the top and AI EVERYWHERE at the bottom, suggesting the ubiquity of artificial intelligence technology.](./assets/jsonl/buzz-lightyear-ai.jpg)
+![An image macro shows a screenshot from Toy Story. Buzz Lightyear gestures widely, with his other arm around a despondent Woody, and the text overlay reads "AI" at the top and "AI EVERYWHERE" at the bottom, suggesting the ubiquity of AI technology.](./assets/jsonl/buzz-lightyear-ai.jpg)
 
-Large Language Models (LLMs) generate text in chunks. This means that as they produce output, it can be streamed to users in real-time, rather than waiting for the entire response to be generated.
+Large Language Models (LLMs) generate text in chunks. This means that as LLMs produce output, they can stream text to users in real time, rather than waiting for the entire response to be generated.
 
-Users expect this kind of responsiveness, and APIs that don't provide it risk losing users to competitors who do.
+Users expect this kind of responsiveness, and APIs that don't provide it risk losing users to competitors that do.
 
-Streaming allows AI agents to respond to or act on data as it arrives, rather than waiting for long and expensive text completions to finish. This makes AI agents far more efficient and agile.
+Streaming allows AI agents to respond to or act on data as it arrives, rather than requiring them to wait for long and expensive text completions to finish. This makes AI agents far more efficient and agile.
 
 ## This seems too fast and loose, where's the spec?
 
-JSONL is a simple format, and as such, it doesn't have a formal specification. However, the [JSON Lines website](https://jsonlines.org/) provides a good overview of the format:
+JSONL is a simple format, and as such, it doesn't have a formal specification. However, the [JSON Lines website](https://jsonlines.org/) provides a good overview of the format.
 
 Here's the TL;DR:
 
@@ -99,9 +99,9 @@ Here's the TL;DR:
 
 While not prescriptive, the JSON Lines website also adds that the recommended file extension is `.jsonl` and that the MIME type may be `application/jsonl` (though this is not formalized yet, and `application/x-ndjson` is also used).
 
-So it seems more like a convention than a specification. But the fact that it is so simple and widely used means that you can rely on it being supported by most programming languages and libraries.
+So, it seems more like a convention than a specification. But the fact that it is so simple and widely used means that you can rely on it being supported by most programming languages and libraries.
 
-## Streaming vs. traditional request-response
+## Streaming vs traditional request-response
 
 We'll ask an OpenAI model to generate some text, then do the same thing with streaming, and see what is sent over the wire.
 
@@ -109,7 +109,7 @@ We'll ask an OpenAI model to generate some text, then do the same thing with str
 
 This example assumes you have a working OpenAI API key set as an environment variable called `OPENAI_API_KEY`.
 
-If you don't have one, you can sign up for a free account at [OpenAI](https://platform.openai.com/signup), [get a new API key](https://platform.openai.com/api-keys), then run the following command to set your API key:
+If you don't have one, you can sign up for a free [OpenAI account](https://platform.openai.com/signup), [get a new API key](https://platform.openai.com/api-keys), then run the following command to set your API key:
 
 ```bash
 # Set your OpenAI API key here
@@ -118,7 +118,7 @@ export OPENAI_API_KEY=sk-...
 
 ### Traditional request-response
 
-In a traditional request-response model, you would send a single request to the OpenAI API and wait for the entire response to be generated before processing it. This is how it looks in practice:
+In a traditional request-response model, you would send a single request to the OpenAI API and wait for the entire response to be generated before processing it. Let's see how this looks in practice.
 
 Run the following command to send a request to the OpenAI API and receive a response:
 
@@ -162,11 +162,13 @@ The response will look something like this:
 
 We're most interested in the `content` field, which contains the actual text generated by the model. See how the entire response is wrapped in a JSON object? This means that the entire response must be generated before it can be sent to the client.
 
-For this tiny example, this isn't a big deal. But imagine if the model was generating a full-length novel or a long technical document. There would be a significant delay before the user sees any output, and they would have to wait for the entire response to be generated before they could start reading it.
+For this tiny example, that isn't a big deal. But imagine if the model were generating a full-length novel or a long technical document. There would be a significant delay before the user saw any output, and they would have to wait for the entire response to be generated before they could start reading it.
 
 ### Streaming
 
-Now let's try the same thing with streaming. In this case, the OpenAI API will send the response in chunks as it is generated, allowing us to start processing it immediately.
+Now let's try the same thing with streaming.
+
+When we use this command, the OpenAI API will send the response in chunks as it is generated, allowing us to start processing it immediately:
 
 ```bash
 curl https://api.openai.com/v1/responses \
@@ -253,20 +255,20 @@ If you run this command (you may need to install `coreutils` if the `stdbuf` com
   <source src="./assets/jsonl/curl-stream.webm" type="video/webm" />
 </video>
 
-But as you can see, dealing with the SSE wrapper adds some complexity. Now, what if your API wants to stream a sequence of JSON objects without the additional SSE framing? What if you just want to send one JSON object after another, as effortlessly as possible? That's precisely where JSONL shines as the "simplest tool".
+But as you can see, dealing with the SSE wrapper adds some complexity. Now, what if your API wants to stream a sequence of JSON objects without the additional SSE framing? What if you just want to send one JSON object after another as effortlessly as possible? That's precisely where JSONL shines as the "simplest tool".
 
-## Streaming with JSONL: Vercel runtime logs
+## Streaming with JSONL
 
-To see this in action, you can use your own Vercel project, or deploy one of Vercel's boilerplate projects. For this example, we'll use the [Vercel AI Chatbot](https://github.com/vercel/ai-chatbot) project.
+To see this in action, you can use your own Vercel project or deploy one of Vercel's boilerplate projects. For this example, we'll use the [Vercel AI Chatbot](https://github.com/vercel/ai-chatbot) project.
 
-### Deploy the Vercel AI Chatbot
+### Deploying the Vercel AI Chatbot
 
 1. Log in to your Vercel account.
 2. Click on the **New Project** button.
 3. Select the **AI Chatbot** template.
 4. Follow the prompts to deploy the project.
 
-### Gather your environment variables
+### Gathering your environment variables
 
 In Vercel, create a new token for your account. This token will be used to authenticate your API requests.
 
@@ -275,17 +277,17 @@ In Vercel, create a new token for your account. This token will be used to authe
 3. Click **Create**.
 4. Copy the token and save it in a secure place.
 
-Next, we'll need to get your Vercel project ID and the deployment ID.
+Next, we need to get your Vercel project ID and deployment ID:
 
 1. Go to your Vercel project dashboard.
 2. Click on the **Settings** tab.
 3. Copy the project ID from the URL and save it.
-4. Click on the **Deployments** tab.
+4. Now, click on the **Deployments** tab.
 5. Click on the **Latest Deployment** link.
 6. Copy the deployment ID from the URL (prefix it with `dpl_`).
-7. Save the deployment ID in a secure place.
+7. Save the prefixed deployment ID in a secure place.
 
-### Set up your environment variables
+### Setting up your environment variables
 
 In your terminal, run the following command to set your environment variables:
 
@@ -295,7 +297,7 @@ export VERCEL_PROJECT_ID=prj_your-vercel-project-id
 export VERCEL_DEPLOYMENT_ID=dpl_your-vercel-deployment-id
 ```
 
-### Start streaming your logs
+### Streaming your logs
 
 Now that you have your environment variables set up, you can start streaming your Vercel logs.
 
@@ -308,7 +310,7 @@ curl https://api.vercel.com/v1/projects/$VERCEL_PROJECT_ID/deployments/$VERCEL_D
   --silent
 ```
 
-This will start streaming your Vercel logs in real time. You should see something like this:
+This starts streaming your Vercel logs in real time. You should see something like this:
 
 ```jsonl
 {"level":"info","message":"Starting Vercel runtime..."}
@@ -335,9 +337,9 @@ curl https://api.vercel.com/v1/projects/$VERCEL_PROJECT_ID/deployments/$VERCEL_D
   --silent | jq -r 'select(.level == "error") | .message'
 ```
 
-This will filter the logs and only show the messages with a level of `error`. Using `jq` is a great way to process JSONL data in real time, and it works perfectly with streaming data.
+This filters the logs and only shows the `error`-level messages. Using `jq` is a great way to process JSONL data in real time, and it works perfectly with streaming data.
 
-The output will look something like this:
+The output should look something like this:
 
 ```text
 ⨯ [Error: No response is returned from route handler '/vercel/path0/app/(chat)/api/chat/route.ts'. Ensure you return a `Response` or a `NextResponse` in all branches of your handler.]
@@ -347,19 +349,19 @@ The output will look something like this:
 
 This is way easier than trying to parse an entire JSON object with a complex structure. We're querying a stream of JSON objects with the simplest of tools in real time.
 
-## Server side: Generating JSONL
+## Generating JSONL on the server side
 
 You've seen how powerful consuming JSONL streams can be, especially with tools like `jq`. But what about producing them from your own API? Good news: it's often simpler than constructing and managing large, in-memory JSON arrays.
 
-The core principles for an API producer to stream JSONL are:
+These are the core principles an API producer should follow when streaming JSONL:
 
 1. **Set the correct headers:** Make sure to set the `Content-Type` header to `application/jsonl`.
-2. **Iterate and Serialize:** Process your data record by record (e.g., from a database query, an LLM token stream, or any other iterable source). Convert each record into a JSON string.
+2. **Iterate and Serialize:** Process your data record by record (for example, from a database query, an LLM token stream, or any other iterable source). Convert each record into a JSON string.
 3. **Write, newline, flush, repeat:** Write the JSON string to the response output stream, follow it with a newline character (`\n`), and flush the output buffer. Flushing ensures the data is sent to the client immediately, rather than being held back by the server or application framework.
 
 ### Python example
 
-Let's illustrate with a simple Python Flask example. Flask is a lightweight web framework that makes streaming straightforward.
+Let's illustrate these principles with a simple Python Flask example. Flask is a lightweight web framework that makes streaming straightforward.
 
 ```python app.py
 from flask import Flask, Response
@@ -410,15 +412,22 @@ if __name__ == '__main__':
 
 To run this example:
 
-1. Save it as a Python file (e.g., `app.py`).
-2. Install Flask: `pip install Flask`
-3. Run the app: `python app.py`
-4. In another terminal, use `curl` to access the stream: `curl -N http://127.0.0.1:5000/stream-data` (The -N or --no-buffer flag with curl is important to see the output as it arrives).
-5. You'll see each JSON object printed on a new line, appearing one by one, just as intended with JSONL.
+1. Save it as a Python file (for example, `app.py`).
+2. Install Flask using `pip install Flask`.
+3. Run the app using `python app.py`.
+4. In another terminal, use `curl` to access the stream: 
 
-This server-side approach is memory efficient because you're not building a massive list of objects in memory. You process and send each one, then discard it from server memory (or at least, the application's direct memory for that response).
+    ```
+    curl -N http://127.0.0.1:5000/stream-data
+    ```
 
-### Handling Errors Mid-Stream
+    **Note:** Using the `-N` or `--no-buffer` flag with curl is important for seeing the output as it arrives.
+
+5. Watch as each JSON object is printed on a new line. The objects appear one by one, just as intended with JSONL.
+
+This server-side approach is memory efficient because you're not building a massive list of objects in memory. You process and send each one, then discard it from server memory (or at least, from the application's direct memory for that response).
+
+### Handling errors mid-stream
 
 What if something goes wrong while you're generating the stream? One common practice with JSONL is to ensure that even error messages are valid JSON objects. You could, for example, have the last line of your stream be a JSON object indicating an error:
 
@@ -426,21 +435,21 @@ What if something goes wrong while you're generating the stream? One common prac
 {"status": "error", "code": "DB_TIMEOUT", "message": "Database query timed out while generating report."}
 ```
 
-Clients can be designed to check the last line or look for objects with an "error" status. Since each line is independent, prior valid data may still be usable.
+Clients can be designed to check the last line or look for objects with an `error` status. Since each line is independent, prior valid data may still be usable.
 
 ## Will this really make a difference?
 
-The difference between JSONL and traditional JSON is that JSONL allows you to start processing data as soon as it arrives, rather than waiting for the entire dataset to be generated. Again, this is especially important in agentic applications or chat interfaces, where users expect to see results as soon as possible.
+The difference between JSONL and traditional JSON is that JSONL allows you to start processing data as soon as it arrives, rather than requiring you to wait while the entire dataset is generated. Again, this is especially important in agentic applications or chat interfaces, where users expect to see results as soon as possible.
 
-This means we should aim for the lowest possible time to first byte (TTFB), instead of optimizing for throughput. Let's see how this looks in practice.
+This means we should aim for the lowest possible **time to first byte** (TTFB), instead of optimizing for throughput. Let's see how this looks in practice.
 
-### Benchmarking JSONL vs. traditional JSON
+## Benchmarking JSONL vs traditional JSON
 
-To effectively compare the performance of JSONL and traditional JSON, we'll first modify our Python Flask application to include an endpoint that serves data in the traditional, full JSON response manner. This allows us to use the same data generation logic for both streaming (JSONL) and traditional responses.
+To effectively compare the performance of JSONL and traditional JSON, we'll first modify our Python Flask application to include an endpoint that serves data in the traditional, full-JSON-response manner. This allows us to use the same data generation logic for both streaming (JSONL) and traditional responses.
 
 ### Modifying the Flask app for benchmarking
 
-We'll add a new route, `/traditional-data`, to our `app.py`. This route will collect all data records into a list first and then send them as a single JSON array.
+We'll add a new route, `/traditional-data`, to our `app.py`. This route will first collect all data records into a list, then send them as a single JSON array.
 
 Here's the updated `app.py`:
 
@@ -489,15 +498,13 @@ if __name__ == '__main__':
     app.run(debug=True, threaded=True) # threaded=True can help with concurrent requests during testing
 ```
 
-Ensure this updated `app.py` is running. If it was already running from the previous section, it will most likely auto-reload, but you might need to stop and restart it for the new `/traditional-data` route to be active.
+Ensure this updated `app.py` is running. If it was already running from the previous section, it will most likely auto-reload, but you might need to stop and restart it to activate the new `/traditional-data` route.
 
-### Running the Benchmark
+### Running the benchmark
 
-We'll use `curl` along with its `-w` (write-out) option to capture specific timing information, especially `time_starttransfer` which is our TTFB. The `time` utility (often a shell built-in) will measure the total wall-clock time for the `curl` command.
+We'll use `curl` along with its `-w` (write-out) option to capture specific timing information, especially `time_starttransfer`, which is our TTFB. The `time` utility (often a shell built-in command) will measure the total wall-clock time for the `curl` command.
 
-1. Measuring Time To First Byte (TTFB) and Total Time
-
-Open your terminal (while `app.py` is running in another) and execute the following commands:
+Open your terminal (while `app.py` is running in another) and execute the following commands to measure the TTFB and total time.
 
 For JSONL streaming:
 
@@ -505,68 +512,74 @@ For JSONL streaming:
 time curl -N -s -o /dev/null -w "TTFB (JSONL Stream): %{time_starttransfer} s\nTotal time (curl JSONL): %{time_total} s\n" http://127.0.0.1:5000/stream-data
 ```
 
-For Traditional JSON:
+For traditional JSON:
 
 ```bash
 time curl -s -o /dev/null -w "TTFB (Traditional JSON): %{time_starttransfer} s\nTotal time (curl Traditional): %{time_total} s\n" http://127.0.0.1:5000/traditional-data
 ```
 
-- `-N` or `--no-buffer` for `curl` disables buffering of the output stream, allowing you to see streaming behavior.
-- `-s` silences progress output from `curl`.
-- `-o /dev/null` discards the actual response body so it doesn't clutter the terminal (we're interested in timings here).
-- `-w "..."` formats output from `curl` after the transfer. `%{time_starttransfer}` is the TTFB. `%{time_total}` is the total transaction time measured by `curl` itself.
+In these code blocks:
+
+- The `-N` or `--no-buffer` for `curl` disables buffering of the output stream, allowing us to see streaming behavior.
+- The `-s` silences progress output from `curl`.
+- The `-o /dev/null` discards the actual response body so it doesn't clutter the terminal (we're interested in timings here).
+- The `-w "..."` formats the output from `curl` after the transfer:
+
+  - `%{time_starttransfer}` is the TTFB.
+  - `%{time_total}` is the total transaction time measured by `curl` itself.
+
 - The `time` command prefixing `curl` gives an overall execution time from the shell's perspective.
 
 ### Results
 
 In our tests, we saw the following results:
 
-|                  | TTFB       | Total Time |
+|                  | TTFB       | Total time |
 | ---------------- | ---------- | ---------- |
 | curl JSONL       | 0.001550 s | 3.021876 s |
-| curl Traditional | 3.018902 s | 3.019132 s |
+| curl traditional | 3.018902 s | 3.019132 s |
 
-## Subjective observations
+## What about subjective observations?
 
-We've seen the numbers, but we know that whether something is "fast" or "slow" is subjective. So let's look at the qualitative differences in how data arrives.
+We've seen the numbers, but we know that the perception of something as "fast" or "slow" is subjective. So let's look at the qualitative differences in how data arrives.
 
 ### Observing the stream
 
-To visually see the difference in how data arrives, run `curl` without discarding the output:
+To visually see the difference in how data arrives, run `curl` without discarding the output.
 
-For JSONL streaming (see data appear line by line):
+- For JSONL streaming (see data appear line by line):
 
-```bash
-curl -N http://127.0.0.1:5000/stream-data
-```
+  ```bash
+  curl -N http://127.0.0.1:5000/stream-data
+  ```
 
-You'll see each JSON line print after about a 0.5-second delay from the previous one.
+  You'll see data appear line by line. Each JSON line prints about 0.5 seconds after the previous line.
 
-For Traditional JSON (see a pause, then all data at once):
+- For traditional JSON:
 
-```bash
-curl http://127.0.0.1:5000/traditional-data
-```
+  ```bash
+  curl http://127.0.0.1:5000/traditional-data
+  ```
 
-You'll see a pause of about 3 seconds, and then the entire JSON array will be printed at once.
+  You'll see there is a pause of about 3 seconds, then the entire JSON array is printed at once.
 
-## Interpreting the Benchmark
+## Interpreting the benchmark
 
 The results should clearly demonstrate:
 
-- **Vastly superior TTFB for JSONL:** The most critical takeaway. JSONL allows the server to send initial data almost immediately after it's ready, significantly improving perceived performance and enabling real-time updates for the client. In our simulation, this is because the first `time.sleep(0.5)` elapses, one record is yielded, and Flask sends it.
+- **Vastly superior TTFB for JSONL:** This is the most critical takeaway. JSONL allows the server to send initial data almost immediately after it's ready, significantly improving perceived performance and enabling real-time updates for the client. In our simulation, this is because the first `time.sleep(0.5)` elapses, one record is yielded, and Flask sends it.
 - **Client-side processing can begin sooner with JSONL:** Because each line is a complete JSON object, the client can start parsing and using the data as it arrives. With traditional JSON, the client must wait for the entire payload.
-- **Server-side memory efficiency (implied):** While this benchmark doesn't directly measure server memory, recall that the /stream-data endpoint processes one record at a time, while /traditional-data builds a list of `all_records` in memory. For large datasets, this difference is important for server stability and scalability. Our example dataset is small, but extrapolate this to millions of records, and the traditional approach becomes infeasible or very resource-intensive.
+- **JSONL improves server-side memory efficiency (implied):** While this benchmark doesn't directly measure server memory, recall that the `/stream-data` endpoint processes one record at a time, while `/traditional-data` builds a list of `all_records` in memory. For large datasets, this difference is important for server stability and scalability. Our example dataset is small, but extrapolate this to millions of records, and the traditional approach becomes infeasible or very resource-intensive.
 
-The `time.sleep(0.5)` in `generate_data_records` is key to this demonstration. It simulates the real-world scenario where records aren't all available instantaneously (e.g., they are results from an LLM generating tokens, database queries, or other microservice calls). Without such a delay in a local benchmark against a very fast data generator, the TTFB for both might appear small and hide the architectural benefit.
+The `time.sleep(0.5)` in `generate_data_records` is key to this demonstration. It simulates the real-world scenario where records aren't all available instantaneously (for example, they may be results from an LLM generating tokens, database queries, or other microservice calls). Without such a delay in a local benchmark against a very fast data generator, the TTFB for both might appear small and hide the architectural benefit.
 
-This benchmark should provide compelling evidence that when "time to first useful byte" matters, JSONL is a significantly better approach than waiting for a complete JSON dataset.
+This benchmark should provide compelling evidence that when TTFB matters, JSONL is a significantly better method than waiting for a complete JSON dataset.
 
 ## How Speakeasy enables API producers to stream responses
 
-SDKs generated by Speakeasy make it easier for your users to consume streaming responses. To use JSONL in your API, set the content type for a response to `application/jsonl` in your OpenAPI spec. Speakeasy will generate the necessary code to handle streaming responses for you.
+SDKs generated by Speakeasy make it easier for your users to consume streaming responses. To use JSONL in your API, set the content type for a response to `application/jsonl` in your OpenAPI document. Speakeasy will then generate the necessary code to handle streaming responses for you.
 
-This example OpenAPI spec shows how to set up a streaming endpoint using JSONL:
+This example OpenAPI document demonstrates how you can set up a streaming endpoint using JSONL:
 
 ```yaml
 paths:
@@ -606,7 +619,7 @@ components:
           type: string
 ```
 
-See our documentation on [enabling JSON lines responses](https://www.speakeasy.com/docs/customize/runtime/jsonl-events) for detailed information on how to best prepare your OpenAPI spec for streaming JSONL responses.
+See our documentation on [enabling JSON lines responses](https://www.speakeasy.com/docs/customize/runtime/jsonl-events) for detailed information about how best to prepare your OpenAPI document for streaming JSONL responses.
 
 Speakeasy also generates the necessary code for SSE, so your users don't need to worry about the underlying implementation details. They can focus on building their applications and consuming your API.
 
@@ -626,4 +639,4 @@ with SDK() as sdk:
             print(event, flush=True)
 ```
 
-We hope this guide has shown you that streaming JSONL responses is not only possible but also simple and efficient. By using JSONL, you can provide a better user experience, reduce server load, and make your API more responsive.
+We hope this guide has shown you that streaming JSONL responses is not only possible, but simple and efficient. By using JSONL, you can provide a better user experience, reduce server load, and make your API more responsive.
