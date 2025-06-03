@@ -128,7 +128,7 @@ In the example above, we:
 - **Use `@read_resource` to handle execution**, where we fetch real-time earnings from the Alpha Vantage API for the provided stock symbol.
 - **Return a valid JSON text response**, which is wrapped by MCP in a `TextContent` resource and can be used as context for prompts or decisions.
 
-If the resource were static – for example, if the client only tracks Apple stock – we'd return a list of `types.Resource` items instead:
+If the resource was static – for example, if the client only tracks Apple stock – we'd return a list of `types.Resource` items instead:
 
 ```python
 ...
