@@ -48,7 +48,7 @@ MCP is a fast-evolving space and can get complex, but for this guide, you only n
 
   ![MCP servers generated from OpenAPI](./assets/openapi-generator-mcp-tools.png)
 
-## Optimizing OpenAPI Documents for MCP Servers
+## Optimizing OpenAPI documents for MCP servers
 
 Being verbose in OpenAPI documents is normal when they're used to generate SDKs and API documentation. Since we, humans, will read and interact with these artifacts, it's intuitive to repeat key information across endpoint, schema, or field descriptions. This helps readers understand things in context without having to jump around the entire document.
 
@@ -70,13 +70,13 @@ Instead, it creates a workflow that allows us to elegantly control the MCP serve
 
 This change in workflow taught us how to tackle common problems when generating production-ready MCP servers. We addressed these challenges by adding customization options both in the OpenAPI document and within the MCP server generator. Let's take a closer look at the issues and our solutions.
 
-## Too Many Endpoints = Too Many tools
+## Too many endpoints = Too many tools
 
 Let's say you have 200 endpoints in your OpenAPI document. Generating an MCP server from this document will easily create around 200 tools. Now, assume you have 200 buttons in front of you, with a vague initial premise. You'd struggle to find the right button to press, whether it's taking time to analyze or taking a risk and pressing the wrong button.
 
 This is no different for LLMs. When given 200 tools, the model becomes confused because the context window gets overwhelmed. Additionally, many users rely on smaller models with even shorter context windows.
 
-### Our solution to tool Explosion
+### Our solution to tool explosion
 
 To resolve the tool explosion issue, the first solution is to prune your OpenAPI document when generating MCP servers using it. Exclude non-useful endpoints such as `health/`, `inspect/`, or any endpoints that do not address the problem you are resolving by using an MCP server.
 
@@ -93,7 +93,7 @@ x-speakeasy-mcp:
     disabled: true
 ```
 
-### OpenAPI Descriptions Are Not Made for LLMs
+### OpenAPI descriptions are not made for LLMs
 
 Some OpenAPI documents include lengthy descriptions written for humans, not large language models (LLMs). These multi-paragraph descriptions often repeat the exact details and add noise. The extra text increases token usage, and with users having many MCP servers and using smaller LLM models, it can fill up the context window before the prompt is processed. This leads the LLM to choose the wrong tool or hallucinate a response.
 
@@ -150,7 +150,11 @@ paths:
                 $ref: "#/components/schemas/UserPublicInfo"
 ```
 
-In the OpenAPI document snippet above, we have three endpoints that return information about users. The description of each of those operations is vague. To avoid confusion, each operation should have a clear, precise description that explains exactly what it does and when to use it.
+In the OpenAPI document snippet above, we have three endpoints that return information about users. The description of each of those operations is vague, which can lead to the LLM choosing the wrong endpoint when it needs to call one of them.
+
+### Our solution to vague or long OpenAPI descriptions for MCP servers
+
+To avoid confusion, each operation should have a clear, precise description that explains exactly what it does and when to use it.
 
 ```yaml
 paths:
@@ -227,7 +231,7 @@ paths:
 
 And if you don't want to pollute your OpenAPI document with extensions or non-native terminologies, you can use an [overlay](/openapi/overlays), which is essentially a separate document that modifies the OpenAPI document without directly editing the original document.
 
-## MCP Servers Struggle with Complex Formats
+## MCP servers struggle with complex formats
 
 Agents generally expect simple JSON responses, but APIs often return complex and varied payloads. For example, if you build an MCP server for an API based on the TM Forum OpenAPI specification, the payloads can be quite large and complicated. Since LLMs struggle with complex JSON formats, it's common for them to have difficulty processing such responses. For instance, an agent might see:
 
@@ -236,7 +240,7 @@ Agents generally expect simple JSON responses, but APIs often return complex and
 - Unnecessary information included in responses, such as metadata.
 - Complex structures, such as the content being returned within a nested {result} field, wrapped in an envelope like the  [ProductOffering](https://github.com/tmforum-apis/TMF620_ProductCatalog/blob/4a76d6bcef7ce63783ef2ffb93944cc9a9bbb075/TMF620-ProductCatalog-v4.1.0.swagger.json#L5780) object from the TM forum [ProductCatalog OpenAPI document](https://github.com/tmforum-apis/TMF620_ProductCatalog/blob/master/TMF620-ProductCatalog-v4.1.0.swagger.json).
 
-### Our Solution To MCP and Complex Formats
+### Our solution to MCP and complex formats
 
 Speakeasy solves this issue by automatically transforming data before sending it to the MCP server. For example, if Speakeasy detects an image or audio file, it converts it to base64 encoding before passing it to the LLM. This step is crucial for MCP server code generation because it requires understanding the data type and translating it appropriately for the MCP client.
 
@@ -244,7 +248,7 @@ Similarly, for streaming data, Speakeasy generates code that first streams all t
 
 Speakeasy also lets you customize how data is transformed. For instance, if you receive a CSV file and want to extract information and convert it to JSON, you can write an [SDK hook](/docs/customize/code/sdk-hooks). This hook runs after a successful request and before the response moves on to the next step in the SDK lifecycle.
 
-## MCP Servers Expose Everything
+## MCP servers expose everything
 
 Say you have a Salesforce MCP server, locally connected to a Claude desktop. Even with restricted controls, you're one tool call away from leaking sensitive identity information or modifying accounts in unintended ways – whether due to hallucinations, missing context, or any of the issues we've already covered.
 
@@ -256,7 +260,7 @@ However, things become complicated when you have multiple tools or descriptive a
 
 So what if you could define these rules before the MCP server and clients are even generated?
 
-#### Our Solution To MCP Servers Exposing Everything
+### Our solution to MCP server access control
 
 We have a complementary approach to resolving access control issues. By using scopes, you can restrict tool use on the server, rather than the client, and configure it instead of using a UI like Claude Desktop. Now, regardless of which client the user is using, you can have built-in protections in the server configuration.
 
@@ -294,6 +298,8 @@ Then, when starting the MCP server, specify the scopes to include, and you are g
   }
 }
 ```
+
+## Final thoughts
 
 MCP servers are powerful tools that shape how users interact with AI agents. But given limitations like static context windows, insufficient descriptions, and the difficulty of handling complex data structures, they can quickly become sources of hallucinations and errors instead of enablers of great experiences for your users.
 
