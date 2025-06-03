@@ -90,7 +90,7 @@ import requests
 app = Server("stock-earnings-server")
 
 @app.list_resource_templates()
-async def list_earnings_resources_handler() -> list[types.ResourceTemplate]:
+async def list_earnings_resources_handler(symbol: str) -> list[types.ResourceTemplate]:
     return [
         types.ResourceTemplate(
             uriTemplate="stock://{symbol}/earnings",
