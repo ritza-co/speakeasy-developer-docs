@@ -167,22 +167,18 @@ In the example above, we:
 
 #### HTTP Methods
 
-The HTTP Stream Transport uses the following HTTP methods:
+The Streamable HTTP transport uses the following HTTP methods:
 
 - **POST**: For sending client requests, notifications, and responses
 - **GET**: For establishing SSE streams for receiving server messages
-- **DELETE**: For terminating sessions (when session termination is enabled)
-- **OPTIONS**: For CORS preflight requests
+
 
 #### Configuration Options
 
-When using the HTTP Stream Transport, you can configure various options:
+When using the Streamable HTTP transport, you can configure various options:
 
 - **Port and endpoint**: The HTTP port to listen on and endpoint path
 - **Response mode**: Choose between batch (JSON) or streaming (SSE) responses
-- **Batch timeout**: Control how long to wait for responses in batch mode
-- **Message size limit**: Set maximum allowed size for incoming messages
-- **CORS configuration**: Comprehensive CORS support for web applications
 - **Session management**: Built-in session tracking with configurable options
 - **Stream resumability**: Support for resuming broken SSE connections
 
