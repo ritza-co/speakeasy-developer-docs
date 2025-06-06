@@ -1250,7 +1250,7 @@ Let's see how we can define API endpoints and operations in a framework-agnostic
 
 We'll use the [`openapi-pydantic`](https://github.com/mike-oakley/openapi-pydantic/) library to define a complete OpenAPI document with paths and operations.
 
-The benefit of using `openapi-pydantic` is that it allows you to define the API endpoints and operations in a Python dictionary while still getting the benefit of Pydantic's IDE support and type-checking.
+The benefit of using `openapi-pydantic` is that it allows you to define the API endpoints and operations in a Python dictionary while still getting the benefit of Pydantic's IDE support and type checking.
 
 The library includes convenience methods to convert Pydantic models to OpenAPI document components and to add them to the OpenAPI document.
 
@@ -1640,7 +1640,7 @@ Speakeasy will detect the changes to your OpenAPI document, generate the SDK wit
 
 Take a look at the generated SDK to see how Speakeasy groups operations by tags.
 
-In the SDK `README.md` file, you'll find documentation about your Speakeasy SDK. TypeScript SDKs generated with Speakeasy include an installable [Model Context Protocol (MCP) server](/docs/model-context-protocol) where the various SDK methods are exposed as tools that can be invoked by AI applications. Your SDK documentation includes instructions for installing the MCP server.
+In the SDK `README.md` file, you'll find documentation about your Speakeasy SDK. TypeScript SDKs generated with Speakeasy include an installable [Model Context Protocol (MCP) server](/docs/model-context-protocol) where the various SDK methods are exposed as tools that AI applications can invoke. Your SDK documentation includes instructions for installing the MCP server.
 
 Note that the SDK is not ready for production use. To get it production-ready, follow the steps outlined in your Speakeasy Studio workspace.
 
