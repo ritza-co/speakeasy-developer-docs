@@ -5,7 +5,6 @@ description: "Generating an OpenAPI document with Spring Boot and using it to cr
 
 import { Callout } from "@/mdx/components";
 
-
 # Generating an OpenAPI document and SDK from Spring Boot
 
 You have a Spring Boot API and need to generate SDKs or API documentation for other teams. Rather than writing and maintaining separate OpenAPI documents, we will walk through how to generate them directly from your Spring Boot code and then use them to create and customize an SDK.
@@ -19,7 +18,7 @@ We'll work with real code you can run locally, building a simple bookstore API t
 </Callout>
 
 
-## Step 1: Set up a Spring Boot project
+## Setting up a Spring Boot project
 
 First, create a new Spring Boot project using [Spring Initializr](https://start.spring.io/). Select the following options:
 
@@ -31,7 +30,7 @@ First, create a new Spring Boot project using [Spring Initializr](https://start.
 
 Download the project and extract it to your preferred directory.
 
-## Step 2: Add OpenAPI dependencies
+## Adding OpenAPI dependencies
 
 Open the `pom.xml` file and add the following dependency:
 
@@ -43,7 +42,7 @@ Open the `pom.xml` file and add the following dependency:
 </dependency>
 ```
 
-## Step 3: Configure application properties
+## Configuring application properties
 
 Open the `src/main/resources/application.properties` file and add the following configuration:
 
@@ -61,7 +60,7 @@ These properties configure the application name that identifies your service, th
 
 After starting your application, you can view the OpenAPI document at `http://localhost:8080/api-docs` and access the interactive Swagger UI at `http://localhost:8080/swagger-ui.html`.
 
-## Step 4: Write a Spring Boot application
+## Writing a Spring Boot application
 
 You can find all the code for this step in the example application.
 
@@ -315,8 +314,7 @@ The `@Operation` and `@ApiResponses` annotations document what the endpoint does
 
 The `@Parameter` annotation describes the requirements for input parameters, such as the ID path parameter in this example.
 
-
-## Step 5: View the generated OpenAPI document
+## Examining the generated OpenAPI document
 
 Now that we've built the Spring Boot application, let's generate and examine the OpenAPI document to understand how the Java code translates into API specifications.
 
@@ -337,7 +335,7 @@ This command saves the OpenAPI document as `openapi.yaml` in your current direct
 
 Let's explore the generated OpenAPI document to see how the Spring Boot annotations translate into an OpenAPI specification.
 
-### OpenAPI Specification version information
+### The OpenAPI Specification version information
 
 The OpenAPI document begins with version information:
 
@@ -476,7 +474,7 @@ The mapping is clear:
 - Each `@ApiResponse` maps to an entry in the responses object.
 - The `@Parameter` annotation documents the path parameter.
 
-## Step 6: Create an SDK from the OpenAPI document
+## Creating an SDK from the OpenAPI document
 
 Now that we have an OpenAPI document for the Spring Boot API, we can create an SDK using Speakeasy.
 
@@ -536,7 +534,7 @@ Your SDK documentation includes instructions for installing the MCP server.
 
 Note that the SDK is not ready for production use. To get it production-ready, follow the steps outlined in your Speakeasy workspace.
 
-## Step 7: Customize the SDK
+## Customizing the SDK
 
 The example app added retry logic to the SDK's `listPublications` operation to handle network errors gracefully. This was done using one of [Speakeasy's OpenAPI extensions](/docs/speakeasy-reference/extensions), `x-speakeasy-retries`.
 
@@ -544,14 +542,12 @@ Instead of modifying the OpenAPI document directly, this extension was added to 
 
 These imports were added to `src/main/java/com/bookstore/PublicationsController.java`:
 
-
 ```java PublicationsController.java
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 ```
 
 The `listPublications` operation was modified to include the retry configuration:
-
 
 ```java PublicationsController.java mark=2:7
     @Operation(summary = "List all publications", description = "Get a list of all publications in the store", extensions = {
@@ -605,14 +601,12 @@ speakeasy quickstart
 
 The created SDK now includes retry logic for the `listPublications` operation, automatically handling network errors and `5XX` responses.
 
-
 ### Issues and feedback
 
 Need some assistance or have a suggestion? Reach out to our team at [support@speakeasy.com](mailto:support@speakeasy.com).
 
 If you haven't already, take a look at our [blog](/blog) to learn more about OpenAPI, SDK generation, and more, including:
 
-  - [Native JSONL support in your SDKs](/blog/release-jsonl-support)
-  - [Comprehensive SDK testing](/blog/release-sdk-testing)
-  - [Model Context Protocol: TypeScript SDKs for the agentic AI ecosystem](/blog/release-model-context-protocol)
-
+- [Native JSONL support in your SDKs](/blog/release-jsonl-support)
+- [Comprehensive SDK testing](/blog/release-sdk-testing)
+- [Model Context Protocol: TypeScript SDKs for the agentic AI ecosystem](/blog/release-model-context-protocol)
