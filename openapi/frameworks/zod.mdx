@@ -1,32 +1,31 @@
 ---
-title: How To Generate an OpenAPI Spec with Zod
-description: "How to generate OpenAPI schemas and great SDK clients for your Zod-validated API"
+title: How To Generate an OpenAPI Document With Zod
+description: "How to generate OpenAPI documents and great SDK clients for your Zod-validated API."
 ---
 
 import { Callout } from "@/mdx/components";
 
-
-# How to generate an OpenAPI/Swagger spec with Zod
+# How to generate an OpenAPI document with Zod
 
 Zod is a powerful and flexible schema validation library for TypeScript. Many users define their TypeScript data parsing schemes using it.
 
-In this tutorial, we'll take a detailed look at how to set up Zod OpenAPI to generate an OpenAPI schema based on Zod schemas. Then we'll use Speakeasy to read our generated OpenAPI schema and generate a production-ready client SDK.
+In this tutorial, we'll take a detailed look at how to set up Zod OpenAPI to generate an OpenAPI document based on Zod schemas. Then we'll use Speakeasy to read our generated OpenAPI document and generate a production-ready SDK.
 
-## Why Zod + OpenAPI?
+## Why use Zod with OpenAPI?
 
-Combining Zod with OpenAPI generation offers the best of both worlds: runtime validation and automatic API documentation. Instead of writing schemas twice—once for runtime validation and again for your OpenAPI spec—you define your data models once in Zod and generate both TypeScript types and OpenAPI documentation from the same source.
+Combining Zod with OpenAPI generation offers the best of both worlds: runtime validation and automatic API documentation. Instead of writing schemas twice – once for runtime validation and again for your OpenAPI document – you define your data models once in Zod and generate both TypeScript types and OpenAPI documentation from the same source.
 
-This eliminates the task of keeping hand-written OpenAPI specs in sync with your actual API implementation. When paired with Speakeasy's SDK generation, you get type-safe client libraries that automatically stay up-to-date with your API changes.
+This eliminates the task of keeping hand-written OpenAPI documents in sync with your actual API implementation. When paired with Speakeasy's SDK generation, you get type-safe client libraries that automatically stay up to date with your API changes.
 
 
 <Callout title="Important: Library compatibility" type="warning">
-This guide uses [zod-openapi](https://github.com/samchungy/zod-openapi), which is actively maintained and offers better TypeScript integration than the older zod-to-openapi library. Currently, zod-openapi requires Zod v3 compatibility, which is why we use a dual import strategy throughout this tutorial.
+This guide uses [`zod-openapi`](https://github.com/samchungy/zod-openapi), which is actively maintained and offers better TypeScript integration than the older `zod-to-openapi` library. Currently, `zod-openapi` requires Zod v3 compatibility, which is why we use a dual import strategy throughout this tutorial.
 
-While Zod v4 introduces new features like `z.strictObject()` and `z.email()`, you'll need to use the standard Zod import for OpenAPI schemas and the `/v4` subpath for new features until zod-openapi adds full v4 support. Check the [zod-openapi releases](https://github.com/samchungy/zod-openapi/releases) for the latest compatibility updates.
+While Zod v4 introduces new features like `z.strictObject()` and `z.email()`, you'll need to use the standard Zod import for OpenAPI schemas and the `/v4` subpath for new features until `zod-openapi` adds full v4 support. Check the [`zod-openapi` releases](https://github.com/samchungy/zod-openapi/releases) for the latest compatibility updates.
 </Callout>
 
 
-## Zod OpenAPI Overview
+## Zod OpenAPI overview
 
 [Zod OpenAPI](https://github.com/samchungy/zod-openapi) is a TypeScript library that helps developers define OpenAPI schemas as Zod schemas. The stated goal of the project is to cut down on code duplication, and it does a wonderful job of this.
 
@@ -34,21 +33,21 @@ Zod schemas map to OpenAPI schemas well, and the changes required to extract Ope
 
 Zod OpenAPI is maintained by one of the contributors to an earlier library called [Zod to OpenAPI](https://github.com/asteasolutions/zod-to-openapi). If you already use Zod to OpenAPI, the syntax will be familiar and you should be able to use either library. If you'd like to convert your _Zod to OpenAPI_ code to _Zod OpenAPI_ code, the _Zod OpenAPI_ library provides helpful [documentation for migrating code](https://github.com/samchungy/zod-openapi#migration).
 
-### Key Concepts
+### Key concepts
 
-#### Schemas & z.strictObject
+#### Schemas and z.strictObject
 
 <Callout title="Zod v4" type="info">
 This guide demonstrates a **dual import strategy** for using both Zod v3 and v4 in the same project. This approach is necessary because `zod-openapi` currently requires Zod v3 compatibility, while you may want to use Zod v4 features elsewhere in your application.
 
-Unlike most libraries, Zod is directly embedded in hundreds of other libraries' public APIs. A normal `zod@4.0.0` release would force every one of those libraries to publish breaking changes simultaneously—a massive "version avalanche."
+Unlike most libraries, Zod is directly embedded in hundreds of other libraries' public APIs. A normal `zod@4.0.0` release would force every one of those libraries to publish breaking changes simultaneously – a massive "version avalanche".
 
 The subpath approach (inspired by Go modules) lets libraries support both versions with one dependency, providing a gradual migration path for the entire ecosystem.
 
 See [Colin's detailed explanation](https://github.com/colinhacks/zod/issues/4371) for the full technical reasoning.
 </Callout>
 
-Zod 4 introduces top-level helpers like `z.strictObject()` for objects that reject unknown keys and `z.email()` for email validation.
+Zod v4 introduces top-level helpers like `z.strictObject()` for objects that reject unknown keys and `z.email()` for email validation.
 
 ```typescript concept.ts
 import { z as z3 } from "zod";
@@ -63,7 +62,7 @@ const user = z4.strictObject({
 
 #### Field metadata
 
-The `.openapi()` method adds OpenAPI-specific metadata like descriptions and examples to any Zod schema. Use z3 for OpenAPI schemas.
+The `.openapi()` method adds OpenAPI-specific metadata like descriptions and examples to any Zod schema. Use `z3` for OpenAPI schemas.
 
 ```typescript concept.ts
 import { z as z3 } from "zod";
@@ -78,7 +77,7 @@ const name = z3.string().min(1).openapi({
 
 #### Operation objects
 
-Use `ZodOpenApiOperationObject` to define API endpoints with request/response schemas.
+Use `ZodOpenApiOperationObject` to define API endpoints with request and response schemas.
 
 ```typescript concept.ts
 import { z as z3 } from "zod";
@@ -97,7 +96,7 @@ const getUser: ZodOpenApiOperationObject = {
 };
 ```
 
-#### Adding Tags to Operations
+#### Adding tags to operations
 
 Tags help organize your API operations in the generated documentation and SDKs. You can add a `tags` array to each operation object:
 
@@ -112,7 +111,7 @@ const getBurger: ZodOpenApiOperationObject = {
 
 #### Speakeasy extensions
 
-Add SDK-specific behavior using `x-speakeasy-*` extensions in your OpenAPI spec.
+Add SDK-specific behavior using `x-speakeasy-*` extensions in your OpenAPI document.
 
 ```typescript concept.ts
 const config = {
@@ -124,9 +123,9 @@ const config = {
 };
 ```
 
-#### Using Zod v4 features alongside OpenAPI schemas
+#### Using Zod v4 features alongside OpenAPI documents
 
-While your OpenAPI schemas must use the z3 instance for compatibility, you can use Zod v4 features for internal validation, type checking, or other parts of your application:
+While your OpenAPI documents must use the `z3` instance for compatibility, you can use `z4` features for internal validation, type checking, or other parts of your application:
 
 ```typescript concept.ts
 // OpenAPI-compatible schemas (use z3)
@@ -148,9 +147,9 @@ const internalUserSchema = z4.strictObject({ // v4 feature
 });
 ```
 
-## Step-by-Step Tutorial: From Zod to OpenAPI to an SDK
+## Step-by-step tutorial: From Zod to OpenAPI to an SDK
 
-Now let's walk through the process of generating an OpenAPI schema and SDK for our Burgers and Orders API.
+Now let's walk through the process of generating an OpenAPI document and SDK for our Burgers and Orders API.
 
 ### Requirements
 
@@ -161,7 +160,7 @@ The following should be installed on your machine:
 - [Node.js version 18 or above](https://nodejs.org/en/download)
 - The [Speakeasy CLI](/docs/introduction#install-the-speakeasy-cli), which we'll use to generate an SDK from the OpenAPI document
 
-### 1. Create Your Zod Project
+### Creating your Zod project
 
 <Callout title="Complete Example Available" type="info">
 The source code for our complete example is available in the [`speakeasy-api/examples`](https://github.com/speakeasy-api/examples.git) repository in the `zod-openapi` directory. The project contains a pre-generated Python SDK with instructions on how to generate more SDKs. You can clone this repository to test how changes to the Zod schema definition result in changes to the generated SDK.
@@ -188,7 +187,7 @@ Next, install the dependencies:
 npm install
 ```
 
-### 2. Install TypeScript Development Tools
+### Installing TypeScript development tools
 
 For this tutorial, we'll use `tsx` for running TypeScript directly:
 
@@ -196,7 +195,7 @@ For this tutorial, we'll use `tsx` for running TypeScript directly:
 npm install -D tsx
 ```
 
-### 3. Create Your App's First Zod Schema
+### Creating your app's first Zod schema
 
 Save this TypeScript code in a new file called `index.ts`. Note the dual import strategy:
 
@@ -214,9 +213,9 @@ const burgerSchema = z3.object({
 });
 ```
 
-### 4. Extend Zod With OpenAPI
+### Extending Zod with OpenAPI
 
-We'll add the `openapi` method to Zod by calling `extendZodWithOpenApi` once. Update `index.ts` to import `extendZodWithOpenApi` from `zod-openapi`, then call `extendZodWithOpenApi` on the z3 instance.
+We'll add the `openapi` method to Zod by calling `extendZodWithOpenApi` once. Update `index.ts` to import `extendZodWithOpenApi` from `zod-openapi`, then call `extendZodWithOpenApi` on the `z3` instance.
 
 ```typescript index.ts
 import { z as z3 } from "zod";
@@ -234,7 +233,7 @@ const burgerSchema = z3.object({
 });
 ```
 
-### 5. Register and Generate a Component Schema
+### Registering and generating a component schema
 
 Next, we'll use the new `openapi` method provided by `extendZodWithOpenApi` to register an OpenAPI schema for the `burgerSchema`. Edit `index.ts` and add `.openapi({ref: "Burger"}` to the `burgerSchema` schema object.
 
@@ -256,9 +255,9 @@ const burgerSchema = z3.object({
 burgerSchema.openapi({ ref: "Burger" });
 ```
 
-### 6. Add Metadata to Components
+### Adding metadata to components
 
-To generate an SDK that offers great developer experience, we recommend adding descriptions and examples to all fields in OpenAPI components.
+To generate an SDK that offers a great developer experience, we recommend adding descriptions and examples to all fields in OpenAPI components.
 
 With Zod OpenAPI, we'll call the `.openapi` method on each field, and add an example and description to each field.
 
@@ -294,7 +293,7 @@ burgerSchema.openapi({
 });
 ```
 
-### 7. Prepare to Generate an OpenAPI Document
+### Preparing to generate an OpenAPI document
 
 Now that we know how to register components with metadata for our OpenAPI schema, let's generate a complete schema document.
 
@@ -333,7 +332,7 @@ burgerSchema.openapi({
 });
 ```
 
-### 8. Generate an OpenAPI Document
+### Generating an OpenAPI document
 
 We'll use the `createDocument` method to generate an OpenAPI document. We'll pass in the `burgerSchema` and a title for the document.
 
@@ -392,7 +391,7 @@ const document = createDocument({
 console.log(yaml.stringify(document));
 ```
 
-### 9. Add a Burger ID Schema
+### Adding a burger ID schema
 
 To make the burger ID available to other schemas, we'll define a burger ID schema. We'll also use this schema to define a path parameter for the burger ID later on.
 
@@ -427,7 +426,7 @@ const burgerSchema = z3.object({
 });
 ```
 
-### 10. Add a Schema for Creating Burgers
+### Adding a schema for creating burgers
 
 We'll add a schema for creating burgers that doesn't include an ID. We'll use this schema to define the request body for the create burger path.
 
@@ -438,7 +437,7 @@ const burgerCreateSchema = burgerSchema.omit({ id: true }).openapi({
 });
 ```
 
-### 11. Add Order Schemas
+### Adding order schemas
 
 To match the final OpenAPI output, let's add schemas and endpoints for orders.
 
@@ -490,7 +489,7 @@ const orderCreateSchema = orderSchema.omit({ id: true }).openapi({
 });
 ```
 
-### 12. Define Burger and Order Operations
+### Defining burger and order operations
 
 Now, define the operations for creating and getting burgers and orders, and listing burgers:
 
@@ -605,7 +604,7 @@ const getOrder: ZodOpenApiOperationObject = {
 };
 ```
 
-### 13. Add a Webhook That Runs When a Burger Is Created
+### Adding a webhook that runs when a burger is created
 
 We'll add a webhook that runs when a burger is created. We'll use the `ZodOpenApiOperationObject` type to define the webhook.
 
@@ -631,7 +630,7 @@ const createBurgerWebhook: ZodOpenApiOperationObject = {
 };
 ```
 
-### 14. Register All Paths, Webhooks, and Extensions
+### Registering all paths, webhooks, and extensions
 
 Now, register all schemas, paths, webhooks, and the `x-speakeasy-retries` extension:
 
@@ -695,9 +694,9 @@ const document = createDocument({
 console.log(yaml.stringify(document));
 ```
 
-### 15. Generate the OpenAPI Schema
+### Generating the OpenAPI document
 
-Run the `index.ts` file to generate the OpenAPI schema.
+Run the `index.ts` file to generate the OpenAPI document.
 
 ```bash Terminal
 npx tsx index.ts > openapi.yaml
@@ -968,11 +967,11 @@ components:
       example: 1
 ```
 
-### 16. Generate an SDK
+### Generating an SDK
 
-With our OpenAPI schema complete, we can now generate an SDK using the Speakeasy SDK generator.
+With our OpenAPI document complete, we can now generate an SDK using the Speakeasy SDK generator.
 
-#### Install the Speakeasy CLI
+#### Installing the Speakeasy CLI
 
 First, install the Speakeasy CLI:
 
@@ -984,27 +983,27 @@ brew install speakeasy-api/tap/speakeasy
 curl -fsSL https://go.speakeasy.com/cli-install.sh | sh
 ```
 
-#### Lint Your OpenAPI Spec
+#### Linting your OpenAPI document
 
-Before generating SDKs, lint your spec to catch common issues:
+Before generating SDKs, lint your OpenAPI document to catch common issues:
 
 ```bash Terminal
 speakeasy lint openapi --schema openapi.yaml
 ```
 
-#### Use AI to Improve Your Spec
+#### Using AI to improve your OpenAPI document
 
-The Speakeasy CLI now includes AI-powered suggestions to automatically improve your OpenAPI specifications:
+The Speakeasy CLI now includes AI-powered suggestions to automatically improve your OpenAPI documents:
 
 ```bash Terminal
 speakeasy suggest openapi.yaml
 ```
 
-Follow the onscreen prompts to provide the necessary configuration details for your new SDK such as the schema and output path.
+Follow the onscreen prompts to provide the necessary configuration details for your new SDK, such as the schema and output path.
 
 Read the [Speakeasy Suggest](/docs/prep-openapi/maintenance) documentation for more information on how to use Speakeasy Suggest.
 
-#### Generate Your SDK
+#### Generating your SDK
 
 Now you can generate your SDK using the quickstart command:
 
@@ -1012,26 +1011,25 @@ Now you can generate your SDK using the quickstart command:
 speakeasy quickstart
 ```
 
-Follow the onscreen prompts to provide the necessary configuration details for your new SDK such as the name, schema location and output path. Enter `openapi.yaml` (or your improved spec if you used suggestions) when prompted for the OpenAPI document location and select your preferred language when prompted.
+Follow the onscreen prompts to provide the necessary configuration details for your new SDK, such as the name, schema location, and output path. Enter `openapi.yaml` (or your improved OpenAPI document if you used suggestions) when prompted for the OpenAPI document location, and select your preferred language when prompted.
 
-## Using Your Generated SDK
+## Using your generated SDK
 
 Once you've generated your SDK, you can [publish](/docs/publish-sdk) it for use. For TypeScript, you can publish it as an npm package.
 
-TypeScript SDKs generated with Speakeasy include an installable [Model Context Protocol (MCP) server](/docs/model-context-protocol) where the various SDK methods are exposed as tools that can be invoked by AI applications. Your SDK documentation includes instructions for installing the MCP server.
+TypeScript SDKs generated with Speakeasy include an installable [Model Context Protocol (MCP) server](/docs/model-context-protocol) where the various SDK methods are exposed as tools that AI applications can invoke. Your SDK documentation includes instructions for installing the MCP server.
 
 <Callout title="Production Readiness" type="warning">
 Note that the SDK is not ready for production use immediately after generation. To get it production-ready, follow the steps outlined in your Speakeasy workspace.
 </Callout>
 
-### Adding SDK Generation to Your CI/CD Pipeline
+### Adding SDK generation to your CI/CD pipeline
 
 The Speakeasy [`sdk-generation-action`](https://github.com/speakeasy-api/sdk-generation-action) repository provides workflows for integrating the Speakeasy CLI into CI/CD pipelines to automatically regenerate SDKs when your Zod schemas change.
 
 You can set up Speakeasy to automatically push a new branch to your SDK repositories so that your engineers can review and merge the SDK changes.
 
-For an overview of how to set up automation for your SDKs, see the Speakeasy [SDK Workflow syntax reference](/docs/speakeasy-reference/workflow-file).
-
+For an overview of how to set up automation for your SDKs, see the Speakeasy [SDK workflow syntax reference](/docs/speakeasy-reference/workflow-file).
 
 ## Summary
 
@@ -1039,10 +1037,9 @@ In this tutorial, we learned how to generate OpenAPI schemas from Zod and create
 
 By following these steps, you can ensure that your API is well-documented, easy to use, and offers a great developer experience.
 
-### Further Reading
+### Further reading
 
 This guide covered the basics of generating an OpenAPI document using Zod OpenAPI. Here are some resources to help you learn more about Zod, OpenAPI, and Speakeasy:
 
-- [Zod OpenAPI documentation](https://github.com/samchungy/zod-openapi): Learn more about the zod-openapi library, including advanced features like custom serializers and middleware integration.
-- [Zod documentation](https://zod.dev/): Comprehensive guide to Zod schema validation, including the latest v4 features.
-
+- [The Zod OpenAPI documentation](https://github.com/samchungy/zod-openapi): Learn more about the `zod-openapi` library, including advanced features like custom serializers and middleware integration.
+- [The Zod documentation](https://zod.dev/): Comprehensive guide to Zod schema validation, including the latest v4 features.
