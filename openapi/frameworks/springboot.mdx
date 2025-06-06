@@ -311,7 +311,7 @@ public ResponseEntity<?> getPublication(
 }
 ```
 
-The `@Operation` and `@ApiResponses` annotations document what the endpoint does and what responses to expect. For example, `getPublication` is annotated with a to show that it returns a publication successfully (`200` status) or returns an error (`404` status) when the publication isn't found.
+The `@Operation` and `@ApiResponses` annotations document what the endpoint does and what responses to expect. For example, `getPublication` is annotated to show that it returns a publication successfully (`200` status) or returns an error (`404` status) when the publication isn't found.
 
 The `@Parameter` annotation describes the requirements for input parameters, such as the ID path parameter in this example.
 
