@@ -1,5 +1,5 @@
 ---
-title: How to generate an OpenAPI document with Hono
+title: How To Generate an OpenAPI Document With Hono
 description: "Learn how to create an OpenAPI document for your Hono API and use it to automatically generate and customize SDKs."
 ---
 
@@ -40,10 +40,10 @@ This guide assumes that you have an existing Hono app and basic familiarity with
 <Callout title="Example repository" type="info">
 The source code for the completed example is available in the
 [Speakeasy Hono example repository](https://github.com/speakeasy-api/examples/tree/main/framework-hono-ts).
-If you want to follow along step-by-step, you can clone the [Speakeasy Hono example repository]((https://github.com/speakeasy-api/examples/tree/main/framework-hono-ts/initial-app), which has the initial state of the app that we'll use to start this tutorial within the `initial-app` directory.
+If you want to follow along step-by-step, you can clone the [Speakeasy Hono example repository](https://github.com/speakeasy-api/examples/tree/main/framework-hono-ts/initial-app), which has the initial state of the app that we'll use to start this tutorial within the `initial-app` directory.
 </Callout>
 
-The following should be installed on your machine:
+Ensure the following are installed on your machine:
 
 - [Node.js version 18 or above](https://nodejs.org/en/download) (we used Node v22.15.1), which the Hono Node.js Adapter requires.
 - The [Speakeasy CLI](/docs/speakeasy-cli/getting-started), which we'll use to generate an SDK from the OpenAPI document.
@@ -89,7 +89,7 @@ export const UserInsertSchema = z
 export const patchUserSchema = UserInsertSchema.partial();
 ```
 
-The `z` object should be imported from `@hono/zod-openapi`. Note that Hono also has a [Standard Schema Validator](https://github.com/honojs/middleware/tree/main/packages/standard-validator) that lets you write schema and validate the incoming values using the same interface for multiple validation libraries that support Standard Schema. Supported validation libraries include Zod, Valibot, and ArkType.
+The `z` object should be imported from `@hono/zod-openapi`. Note that Hono also has a [Standard Schema validator](https://github.com/honojs/middleware/tree/main/packages/standard-validator) that lets you write schemas and validate the incoming values using the same interface for multiple validation libraries that support Standard Schema. Supported validation libraries include Zod, Valibot, and ArkType.
 
 Create schemas for your request-query parameters, messages, and error responses:
 
@@ -150,7 +150,7 @@ Import this type in the `src/schemas.ts` file.
 import type { ZodSchema } from './lib/types';
 ```
 
-### Replacing the `Hono` instances with `OpenAPIHono`
+### Replacing the Hono instances with OpenAPIHono
 
 Set up your app to use the `OpenAPIHono` instance of the Zod OpenAPI middleware instead of the `Hono` instance. Import the `OpenAPIHono` class in the `src/lib/createApp.ts` file:
 
@@ -342,7 +342,7 @@ import type { RouteConfig, RouteHandler } from '@hono/zod-openapi';
 export type AppRouteHandler<R extends RouteConfig> = RouteHandler<R>;
 ```
 
-The handlers are made type safe by the route types. The request and response data in the Hono [context object](https://hono.dev/docs/api/context) is type checked using the schema defined in the routes. If you use an incorrect type, for example setting `age:` to `42`, you'll get a type error.
+The handlers are made type safe by the route types. The request and response data in the Hono [context object](https://hono.dev/docs/api/context) is type checked using the schema defined in the routes. If you use an incorrect type, for example, by setting `age:` to `42`, you'll get a type error.
 
 ### Configuring the middleware for each endpoint
 
@@ -362,7 +362,7 @@ const router = createRouter()
 export default router;
 ```
 
-The `openapi` method takes the route and the handler as its arguments and configures the Zod OpenAPI middleware for each endpoint on the `OpenAPIHono` instance
+The `openapi` method takes the route and the handler as its arguments and configures the Zod OpenAPI middleware for each endpoint on the `OpenAPIHono` instance.
 
 ## Configuring and generating the OpenAPI document
 
@@ -389,7 +389,7 @@ export default function configureOpenAPI(app: OpenAPIHono) {
 }
 ```
 
-The `configureOpenAPI` function takes in an `OpenAPIHono` instance and uses the `doc31` method to generate an OpenAPI document based on the OpenAPI Specification version 3.1. This document can be viewed at the `'/doc'` endpoint. We then pass in the OpenAPI configuration object to the function to add fields to the root object of the OpenAPI document.
+The `configureOpenAPI` function takes in an `OpenAPIHono` instance and uses the `doc31` method to generate an OpenAPI document based on the OpenAPI Specification version 3.1. We can view this document at the `'/doc'` endpoint. We then pass in the OpenAPI configuration object to the function to add fields to the root object of the OpenAPI document.
 
 Now, pass in the `OpenAPIHono` app instance to the `configureOpenAPI` function in the `src/app.ts` file:
 
@@ -636,7 +636,7 @@ You can also view the details of the example data schemas:
 
 ![Scalar UI example data schema](./assets/hono/scalar-ui-data-schema.png)
 
-## Adding the OpenAPI `operationId` using Hono Zod OpenAPI
+## Adding the OpenAPI operationId using Hono Zod OpenAPI
 
 In the OpenAPI document, each HTTP request has an `operationId` that identifies the operation. The `operationId` is also used to generate method names and documentation in SDKs.
 
@@ -705,7 +705,7 @@ export const openAPIObjectConfig = {
   ],
 ```
 
-## Adding retries to your SDK with `x-speakeasy-retries`
+## Adding retries to your SDK with x-speakeasy-retries
 
 [OpenAPI document extensions](/openapi/extensions) allow us to add vendor-specific functionality to the document.
 
@@ -852,11 +852,11 @@ The Speakeasy Linter has a set of [rules](/docs/prep-openapi/linting#available-r
 
 Speakeasy has a [VS Code extension](https://marketplace.visualstudio.com/items?itemName=Speakeasy.speakeasy-vscode-extension) to help you validate your OpenAPI documents for the creation of production-grade SDKs.
 
-### Improving and Customizing the OpenAPI document using Speakeasy Overlays and Transformations
+### Improving and customizing the OpenAPI document using Speakeasy overlays and transformations
 
 Speakeasy [transformations](/docs/prep-openapi/transformations) are predefined functions that modify the OpenAPI document to improve it for SDK generation. You can use them to remove unused components, filter operations, and format the OpenAPI document.
 
-[Overlays](/docs/prep-openapi/overlays/create-overlays) let you create overlay documents that can be merged with an OpenAPI document. This lets you update and use an OpenAPI document without modifying the original OpenAPI document, which is useful when the same OpenAPI document is used in multiple places. Common use cases include adding Speakeasy extensions, adding examples, and hiding internal APIs from a public SDK.
+[Overlays](/docs/prep-openapi/overlays/create-overlays) let you create overlay documents that can be merged with an OpenAPI document, allowing you to update and use an OpenAPI document without modifying the original OpenAPI document. Overlays are useful when the same OpenAPI document is used in multiple places. Common use cases include adding Speakeasy extensions, adding examples, and hiding internal APIs from a public SDK.
 
 ### Creating an SDK from the Speakeasy CLI
 
@@ -900,7 +900,7 @@ Speakeasy [validates](/docs/core-concepts#validation) the OpenAPI document to ch
 
 If you get ESLint styling errors, run the `speakeasy quickstart` command from outside your project.
 
-Speakeasy also suggests improvements for your SDK, using [Speakeasy Suggest](/docs/prep-openapi/maintenance), which is an AI-powered tool in Speakeasy Studio. You can see suggestions by opening the link to your Speakeasy Studio workspace in the terminal:
+Speakeasy also suggests improvements for your SDK using [Speakeasy Suggest](/docs/prep-openapi/maintenance), which is an AI-powered tool in Speakeasy Studio. You can see suggestions by opening the link to your Speakeasy Studio workspace in the terminal:
 
 ![Speakeasy Studio showing SDK improvement suggestions](./assets/hono/speakeasy-studio-suggestions.png)
 
@@ -926,7 +926,7 @@ npm create vite@latest
 
 Copy the SDK folder from your Hono app to the `src` directory of your TypeScript Vite project and delete the SDK folder in your Hono project.
 
-In the SDK `README.md` file, you'll find documentation about your Speakeasy SDK. TypeScript SDKs generated with Speakeasy include an installable [Model Context Protocol (MCP) server](https://www.speakeasy.com/docs/model-context-protocol) where the various SDK methods are exposed as tools that can be invoked by AI applications.
+In the SDK `README.md` file, you'll find documentation about your Speakeasy SDK. TypeScript SDKs generated with Speakeasy include an installable [Model Context Protocol (MCP) server](https://www.speakeasy.com/docs/model-context-protocol) where the various SDK methods are exposed as tools that AI applications can invoke.
 Your SDK documentation includes instructions for installing the MCP server.
 
 Note that the SDK is not ready for production use. To get it production-ready, follow the steps outlined in your Speakeasy workspace.
@@ -1022,13 +1022,13 @@ Property 'surname' does not exist on type 'UserSelect'
 
 This guide covered the basics of generating an OpenAPI document using Hono. Here are some resources to help you learn more about OpenAPI, the Hono Zod OpenAPI middleware, and Speakeasy:
 
-- [Hono Zod OpenAPI middleware documentation](https://github.com/honojs/middleware/tree/main/packages/zod-openapi): Learn more about generating an OpenAPI document and validating values and types using Zod. The topics covered include setup, handling validation errors, configuration, RPC mode, and authorization setup.
+- [The Hono Zod OpenAPI middleware documentation](https://github.com/honojs/middleware/tree/main/packages/zod-openapi): Learn more about generating an OpenAPI document and validating values and types using Zod. The topics covered include setup, handling validation errors, configuration, RPC mode, and authorization setup.
 
-- [Speakeasy documentation](/docs): Speakeasy has extensive documentation covering how to generate SDKs from OpenAPI documents, customize SDKs, and more.
-- [Speakeasy OpenAPI reference](/openapi): View a detailed reference for the OpenAPI Specification.
+- [The Speakeasy documentation](/docs): Speakeasy has extensive documentation covering how to generate SDKs from OpenAPI documents, how to customize SDKs, and more.
+- [The Speakeasy OpenAPI reference](/openapi): View a detailed reference for the OpenAPI Specification.
 
-- [Speakeasy Blog](/blog): Read articles about OpenAPI, SDK generation, and more including:
+- [The Speakeasy Blog](/blog): Read articles about OpenAPI, SDK generation, and more, including:
 
   - [Native JSONL support in your SDKs](/blog/release-jsonl-support)
-  - [Introducing comprehensive SDK Testing](/blog/release-sdk-testing)
-  - [Model Context Protocol: TypeScript SDKs for the Agentic AI ecosystem](/blog/release-model-context-protocol)
+  - [Introducing comprehensive SDK testing](/blog/release-sdk-testing)
+  - [Model Context Protocol: TypeScript SDKs for the agentic AI ecosystem](/blog/release-model-context-protocol)
