@@ -95,11 +95,11 @@ With function calls, all integration logic lives in the LLM client. Want to add 
 With MCP, the client speaks one protocol to any number of specialized servers. Adding Slack means deploying a Slack MCP server - no client changes required. It's a plugin architecture that separates concerns: The MCP client handles conversation, MCP servers handle tool execution, and the protocol manages communication between them.
 The architectural difference becomes clear when visualized:
 
-![Function calling architecture diagram showing user, LLM client, and LLM components with direct connections to external services (Internet, Database, Mail Server, RabbitMQ). The LLM client contains all integration logic for parsing responses, handling errors, and managing API-specific concerns.](./assets/mcp-for-skeptics/function-calls.svg)
+![A function-calling architecture diagram shows user, LLM client, and LLM components with direct connections to external services (Internet, Database, Mail Server, RabbitMQ). The LLM client contains all integration logic for parsing responses, handling errors, and managing API-specific concerns.](./assets/mcp-for-skeptics/function-calls.svg)
 
 **Function calls:** All integration logic lives in the LLM client. Each new service requires client-side implementation.
 
-![MCP architecture diagram showing user, LLM client, and LLM components connected through MCP to dedicated MCP servers. Each MCP server handles specific service integrations (Browser, Database, Email, RabbitMQ) with SDK validation, maintaining clean separation between client and integration logic.](./assets/mcp-for-skeptics/mcp.svg)
+![An MCP architecture diagram shows user, LLM client, and LLM components connected through MCP to dedicated MCP servers. Each MCP server handles specific service integrations (Browser, Database, Email, RabbitMQ) with SDK validation, maintaining clean separation between client and integration logic.](./assets/mcp-for-skeptics/mcp.svg)
 
 **MCP:** The client speaks one protocol to multiple specialized servers. New integrations require no client changes.
 
