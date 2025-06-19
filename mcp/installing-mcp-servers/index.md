@@ -231,6 +231,8 @@ Installing the GitHub MCP server in VS Code requires configuring the MCP setting
 
 Open your VS Code settings and search for "MCP". Ensure you have **Chat->MCP** enabled. Under the **MCP** setting, click the "Edit in settings.json" link to open the configuration file.
 
+![Open VS Code MCP Settings](./assets/vs-settings.png)
+
 **Configure GitHub MCP Server**
 
 Add this configuration to your VS Code MCP `settings.json` file:
