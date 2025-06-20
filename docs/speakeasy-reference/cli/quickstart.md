@@ -21,9 +21,10 @@ speakeasy quickstart [flags]
                          Create a new sandbox at https://app.speakeasy.com/sandbox
   -h, --help             help for quickstart
   -o, --out-dir string   output directory for the quickstart command
+      --output string    how to display output (available options: [summary, console, mermaid]) (default "summary")
   -s, --schema string    local filepath or URL for the OpenAPI schema
       --skip-compile     skip compilation during generation after setup
-  -t, --target string    language to generate sdk for (available options: [typescript, python, go, java, terraform, csharp, unity, php, postman, ruby])
+  -t, --target string    generation target (available options: [csharp, go, java, mcp-typescript, php, postman, python, ruby, terraform, typescript, unity])
 ```
 
 ### Options inherited from parent commands
