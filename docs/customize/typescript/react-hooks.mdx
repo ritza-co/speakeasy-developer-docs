@@ -10,7 +10,7 @@ import { Callout, CodeWithTabs } from "@/mdx/components";
 Speakeasy can optionally generate React Hooks as part of your TypeScript SDK. React Hooks are built from your OpenAPI document using TanStack Query (formerly React Query), making it easier to build web applications that interact with your API.
 
 <Callout title="Availability" type="info">
-  Generated React Query Hooks are available as part of the Speakeasy [business
+  Generated React Query hooks are available as part of the Speakeasy [business
   tier](/pricing).
 </Callout>
 
@@ -201,9 +201,9 @@ With the example above, the React Hook will be called by `useProduct` and, under
 
 ### Queries and mutations
 
-By default, the `GET`, `HEAD`, and `QUERY` operations generate React Query Hooks, while other operations generate mutation hooks. This isn't always correct, since certain operations may be "read" operations exposed under the `POST` endpoint. A great example of this is the complex search APIs that take a request body with filters and other arguments.
+By default, the `GET`, `HEAD`, and `QUERY` operations generate React Query hooks, while other operations generate mutation hooks. This isn't always correct, since certain operations may be "read" operations exposed under the `POST` endpoint. A great example of this is the complex search APIs that take a request body with filters and other arguments.
 
-You can override these OpenAPI operations with the `x-speakeasy-react-hook` extension so that they come out as React Query Hooks:
+You can override these OpenAPI operations with the `x-speakeasy-react-hook` extension so that they come out as React Query hooks:
 
 ```yaml openapi.yaml
 paths:
@@ -285,7 +285,7 @@ const { data } = useProductsGetById(productId, {
 
 ### Using infinite queries for pagination
 
-For paginated endpoints, you can use infinite React Query Hooks:
+For paginated endpoints, you can use infinite React Query hooks:
 
 ```tsx
 import { useProductsListInfinite } from "your-sdk-package/dist/react-query";
