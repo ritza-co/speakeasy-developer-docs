@@ -7,7 +7,7 @@ Developers can now use Speakeasy to augment their MCP servers by adding extensio
 
 ## Setting up MCP extensions
 
-To set up MCP extensions, create a new file under the `mcp-server` directory and name it `server.extensions.ts`. The file should expose the following function contract exactly.
+To set up MCP extensions, create a new file under the `mcp-server` directory and name it `server.extensions.ts`. The file should expose the following function contract exactly:
 
 ```typescript server.extensions.ts
 import { Register } from "./extensions.js";
@@ -29,7 +29,7 @@ Below is an example of a custom [MCP tool](https://modelcontextprotocol.io/docs/
 
 You can define your custom `/resources` in separate files or define them all in the `server.extensions.ts` file. The most important thing is to ensure that the tool fits the `ToolDefinition` type exposed by Speakeasy. Although this tool has `args` defined as a Zod schema, tools can also have no arguments defined. Every tool also defines a `tool` method for execution.
 
-Speakeasy exposes a `formatResult` utility function from `tools.ts` that you can use to ensure the result is returned in the proper MCP format. Using this function is optional as long as the return matches the required type.
+Speakeasy exposes a `formatResult` utility function from `tools.ts` that you can use to ensure the result is returned in the proper MCP format. Using this function is optional, as long as the return matches the required type.
 
 ```typescript custom/getGithubFileTool.ts
 import { z } from "zod";
@@ -148,7 +148,7 @@ export function registerMCPExtensions(register: Register): void {
 
 ## Building and registering custom MCP prompts
 
-You can use [MCP prompt](https://modelcontextprotocol.io/docs/concepts/prompts) to create reusable prompt templates and workflows for MCP.
+You can use [MCP prompts](https://modelcontextprotocol.io/docs/concepts/prompts) to create reusable prompt templates and workflows for MCP.
 
 ```typescript custom/customPrompts.ts
 import { z } from "zod";
