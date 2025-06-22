@@ -22,15 +22,15 @@ Speakeasy can generate [Model Context Protocol (MCP)](https://modelcontextprotoc
 
 ## What is MCP?
 
-MCP is an open-source protocol developed by Anthropic for defining tools. It's being adopted by many AI agent platforms, like the AI assistant, [Claude](https://claude.ai/download), and the [Cursor](https://www.cursor.com/) code editor. A [full list of MCP clients](https://modelcontextprotocol.io/clients) is available on the MCP site.
+MCP is an open-source protocol developed by Anthropic for defining tools, which is being adopted by many AI agent platforms, including the AI assistant, [Claude](https://claude.ai/download), and the code editor, [Cursor](https://www.cursor.com/). A [full list of MCP clients](https://modelcontextprotocol.io/clients) is available on the MCP site.
 
 TypeScript SDKs generated with Speakeasy can include an MCP server that allows them to be integrated with any supported MCP client.
 
-## Generating an MCP server
+## How to generate an MCP server
 
 Follow these steps to generate an MCP server from your OpenAPI document:
 
-### Installing the Speakeasy CLI
+### Install the Speakeasy CLI
 
 If you haven't already, install the Speakeasy CLI:
 
@@ -58,7 +58,7 @@ choco install speakeasy
 
 </CodeWithTabs>
 
-### Generating a TypeScript SDK
+### Generate a TypeScript SDK
 
 If you haven't already generated a TypeScript SDK, run this command:
 
@@ -69,7 +69,7 @@ speakeasy quickstart
 
 Then, follow the prompts to select TypeScript as your target language and complete the SDK configuration.
 
-### Enabling MCP server generation in your configuration
+### Enable MCP server generation in your configuration
 
 Open the `.speakeasy/gen.yaml` file in your SDK directory and add the `enableMCPServer` flag:
 
@@ -86,7 +86,7 @@ typescript:
   `responseFormat: flat`.
 </Callout>
 
-### Regenerating your SDK with an MCP server
+### Regenerate your SDK with an MCP server
 
 Navigate to the folder that holds the TypeScript SDK and run the following command to regenerate your SDK with the MCP server:
 
@@ -112,11 +112,11 @@ your-sdk/src/mcp-server
 
 It also adds instructions for installing the server in a new section beneath the `SDK Installation` section in your `README.md` file, and adds a `bin` section to your `package.json` file, which points to the executable entrypoint for the server.
 
-## Using the MCP server
+## How to use an MCP server
 
 Now that you know how to generate an MCP server from an OpenAPI document, let's look at how you or your users might use one.
 
-### Basic setup
+### Set up a basic MCP server
 
 Here's an example of how to launch a basic MCP server defined in a `claude_desktop_config.json` file:
 
@@ -136,7 +136,7 @@ Here's an example of how to launch a basic MCP server defined in a `claude_deskt
 
 The `env` property makes environment variables available to the server, while the `args` after `start` allow you to customize specific attributes of the server.
 
-### Using standalone binaries
+### Use standalone binaries
 
 MCP server standalone binaries are automatically built and added to GitHub releases for published SDKs:
 
@@ -168,7 +168,7 @@ Consider the following example configuration with a standalone binary:
 }
 ```
 
-### Running MCP locally during development
+### Run MCP locally during development
 
 For local development and testing, you can run the MCP server directly without publishing:
 
@@ -190,11 +190,11 @@ For local development and testing, you can run the MCP server directly without p
   }
   ```
 
-## Customizing MCP tools
+## How to customize MCP tools
 
 You can customize how your API operations are exposed as MCP tools using the `x-speakeasy-mcp` OpenAPI extension.
 
-### Configuration options
+### Set the configuration options
 
 The `x-speakeasy-mcp` extension can be used on any operation to customize the MCP tool:
 
@@ -232,7 +232,7 @@ You can use scopes to tag tools so that users can choose which set of tools they
 
 Each MCP tool description is passed as context to MCP clients and language models. The default value is the OpenAPI operation summary and description. It's a good practice to review and customize these descriptions for better context.
 
-### Using overlays
+### Use overlays
 
 [Overlays](/openapi/overlays) are a convenient way you can add the `x-speakeasy-mcp` extension to existing OpenAPI documents without modifying them. To create an Overlay file, you can use the Speakeasy [Overlay Playground](https://overlay.speakeasy.com/).
 
@@ -255,7 +255,7 @@ actions:
 
 More advanced uses of an MCP server include the following:
 
-### Specifying scopes at runtime
+### Specify scopes at runtime
 
 When starting the MCP server, you can specify which scopes to include:
 
@@ -275,7 +275,7 @@ When starting the MCP server, you can specify which scopes to include:
 
 This example configuration only mounts tools tagged with the `read` scope, creating a read-only server.
 
-### Specifying individual tools
+### Specify individual tools
 
 You can further limit the subset of tools mounted on an MCP server by specifying individual tool names:
 
