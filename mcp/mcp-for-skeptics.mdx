@@ -6,8 +6,10 @@ description: "A skeptical introduction to the Model Context Protocol (MCP) and i
 import { Callout } from "@/mdx/components";
 
 <Callout title="Gram AI by Speakeasy">
-  Introducing [Gram](https://getgram.ai/) by Speakeasy. Gram is everything you need to power integrations for Agents
-  and LLMs. Easily create, curate and host MCP servers for internal and external use. Build custom tools and remix toolsets across 1p and 3p APIs. [Get on the waitlist](https://speakeasyapi.typeform.com/to/h6WJdwWr) today!
+  Unlock AI engineering by turning your API platform into an AI platform with
+  [Gram](https://app.getgram.ai). Generate agent tools for internal services and
+  connect to popular third-party APIs from one platform. [Join the
+  waitlist](https://app.getgram.ai) today.
 </Callout>
 
 # Why MCP is useful: An introduction to MCP for skeptics
@@ -64,7 +66,7 @@ Traditional API wrappers translate between formats. MCP transforms stateless, re
 
 - **Bidirectional communication:** MCP servers can send messages back to the LLM client, allowing it to react to events in real time. For example, a database MCP server can notify the client when a new record is added (via the MCP `notifications/resources/list_changed` message), allowing the LLM to update its understanding of the data without needing to poll or re-query.
 
-- **Session management across tools:** An LLM helping with data analysis can maintain an authenticated session with your database, keep a Jupyter Notebook kernel running, and preserve Matplotlib figure states - all simultaneously. When you ask, _"Make that graph blue instead,"_ it knows exactly which graph in which context you mean.
+- **Session management across tools:** An LLM helping with data analysis can maintain an authenticated session with your database, keep a Jupyter Notebook kernel running, and preserve Matplotlib figure states - all simultaneously. When you ask, *"Make that graph blue instead,"* it knows exactly which graph in which context you mean.
 
 MCP servers wrap real-world APIs in a way that makes them conversational partners rather than just data endpoints. That's the point.
 
@@ -93,11 +95,11 @@ With function calls, all integration logic lives in the LLM client. Want to add 
 With MCP, the client speaks one protocol to any number of specialized servers. Adding Slack means deploying a Slack MCP server - no client changes required. It's a plugin architecture that separates concerns: The MCP client handles conversation, MCP servers handle tool execution, and the protocol manages communication between them.
 The architectural difference becomes clear when visualized:
 
-![A function-calling architecture diagram shows user, LLM client, and LLM components with direct connections to external services (Internet, Database, Mail Server, RabbitMQ). The LLM client contains all integration logic for parsing responses, handling errors, and managing API-specific concerns.](./assets/mcp-for-skeptics/function-calls.svg?.url)
+![A function-calling architecture diagram shows user, LLM client, and LLM components with direct connections to external services (Internet, Database, Mail Server, RabbitMQ). The LLM client contains all integration logic for parsing responses, handling errors, and managing API-specific concerns.](./assets/mcp-for-skeptics/function-calls.svg)
 
 **Function calls:** All integration logic lives in the LLM client. Each new service requires client-side implementation.
 
-![An MCP architecture diagram shows user, LLM client, and LLM components connected through MCP to dedicated MCP servers. Each MCP server handles specific service integrations (Browser, Database, Email, RabbitMQ) with SDK validation, maintaining clean separation between client and integration logic.](./assets/mcp-for-skeptics/mcp.svg?.url)
+![An MCP architecture diagram shows user, LLM client, and LLM components connected through MCP to dedicated MCP servers. Each MCP server handles specific service integrations (Browser, Database, Email, RabbitMQ) with SDK validation, maintaining clean separation between client and integration logic.](./assets/mcp-for-skeptics/mcp.svg)
 
 **MCP:** The client speaks one protocol to multiple specialized servers. New integrations require no client changes.
 
@@ -188,9 +190,10 @@ Here's a simple TypeScript server that implements a WhatsApp MCP server:
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+
 // Assume this is a service that interacts with WhatsApp's API
 import { ChatService } from "whatsapp";
-import { z } from "zod";
 
 // Initialize the WhatsApp MCP server
 const mcpServer = new McpServer(
@@ -203,7 +206,7 @@ const mcpServer = new McpServer(
     capabilities: {
       tools: {},
     },
-  },
+  }
 );
 
 // describe input and output schemas for the tool
@@ -253,7 +256,7 @@ const getWhatsAppChatById = mcpServer.registerTool(
       ],
       structuredContent: outputSchema.parse(response),
     };
-  },
+  }
 );
 
 // Register other tools here, like sendMessage, etc.
@@ -436,6 +439,7 @@ Here's how we could implement a resource in our WhatsApp MCP server. We'd add th
 
 ```typescript
 import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+
 import { MediaRegistry } from "whatsapp";
 
 mcpServer.resource(
@@ -461,8 +465,9 @@ mcpServer.resource(
   async (uri: URL, { messageId }) => {
     const messageIdRaw = Array.isArray(messageId) ? messageId[0] : messageId;
     const messageIdString = decodeURIComponent(messageIdRaw);
-    const mediaData =
-      await messageService.downloadMessageMedia(messageIdString);
+    const mediaData = await messageService.downloadMessageMedia(
+      messageIdString
+    );
 
     return {
       contents: [
@@ -473,7 +478,7 @@ mcpServer.resource(
         },
       ],
     };
-  },
+  }
 );
 ```
 
@@ -554,7 +559,7 @@ Please provide a detailed summary.`;
         },
       ],
     };
-  },
+  }
 );
 ```
 
@@ -589,7 +594,7 @@ mcpServer.prompt(
   },
   async (args) => {
     // ... (prompt implementation as before)
-  },
+  }
 );
 ```
 
