@@ -59,7 +59,7 @@ Then, follow the prompts to select TypeScript as your target language and comple
 
 ### Enable React Hooks
 
-To enable React Hooks in your configuration, open the `.speakeasy/gen.yaml` file in your SDK directory and add the `enableReactQuery` flag to it:
+Open the `.speakeasy/gen.yaml` file in your SDK directory and add the `enableReactQuery` flag to it:
 
 ```yaml
 typescript:
@@ -70,7 +70,7 @@ typescript:
 
 ### Regenerate your SDK with React Hooks
 
-Navigate to the folder that holds the generated SDK and run the following command to regenerate your SDK with React Hooks:
+Navigate to the folder that holds the generated SDK and run the following command:
 
 ```bash
 speakeasy run
@@ -82,7 +82,7 @@ This adds a new `src/react-query` directory, which contains all the generated Re
 
 Once you've generated your SDK with React Hooks, you need to install it in your React application.
 
-- If you've published your SDK to a package registry like npm, you can install it directly:
+- If you've published your SDK to a package registry like npm, install it directly:
 
   <CodeWithTabs>
   ```bash !!tabs npm
@@ -99,7 +99,7 @@ Once you've generated your SDK with React Hooks, you need to install it in your 
 
   </CodeWithTabs>
 
-- Alternatively, if you're working with a local SDK, you can use the package manager's local path installation feature:
+- Alternatively, if you're working with a local SDK, use the package manager's local path installation feature:
 
   <CodeWithTabs>
   ```bash !!tabs npm
