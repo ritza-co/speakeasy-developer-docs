@@ -18,99 +18,109 @@ Speakeasy can optionally generate React Hooks as part of your TypeScript SDK. Re
 
 Follow these steps to generate React Hooks from your OpenAPI document:
 
-- If you haven't already, install the Speakeasy CLI:
+### Install the Speakeasy CLI
+
+If you haven't already, install the Speakeasy CLI:
+
+<CodeWithTabs>
+```bash !!tabs Homebrew
+# Homebrew (macOS)
+brew install speakeasy-api/homebrew-tap/speakeasy
+```
+
+```bash !!tabs Script
+# Script Installation (macOS and Linux)
+curl -fsSL https://go.speakeasy.com/cli-install.sh | sh
+```
+
+```bash !!tabs Winget
+# Windows Installation
+# Using winget:
+winget install speakeasy
+```
+
+```bash !!tabs Chocolatey
+# Using Chocolatey:
+choco install speakeasy
+```
+
+</CodeWithTabs>
+
+### Generate a TypeScript SDK
+
+If you haven't already generated a TypeScript SDK, run this command:
+
+```bash
+# For first-time SDK generation
+speakeasy quickstart
+```
+
+Then, follow the prompts to select TypeScript as your target language and complete the SDK configuration.
+
+### Enable React Hooks
+
+To enable React Hooks in your configuration, open the `.speakeasy/gen.yaml` file in your SDK directory and add the `enableReactQuery` flag to it:
+
+```yaml
+typescript:
+  version: x.y.z
+  # ... other options
+  enableReactQuery: true # Add this line to enable React hooks
+```
+
+### Regenerate your SDK with React Hooks
+
+Navigate to the folder that holds the generated SDK and run the following command to regenerate your SDK with React Hooks:
+
+```bash
+speakeasy run
+```
+
+This adds a new `src/react-query` directory, which contains all the generated React Hooks, to your SDK.
+
+### Install the SDK in your application
+
+Once you've generated your SDK with React Hooks, you need to install it in your React application.
+
+- If you've published your SDK to a package registry like npm, you can install it directly:
 
   <CodeWithTabs>
-  ```bash !!tabs Homebrew
-  # Homebrew (macOS)
-  brew install speakeasy-api/homebrew-tap/speakeasy
+  ```bash !!tabs npm
+  npm install your-sdk-package
   ```
 
-  ```bash !!tabs Script
-  # Script Installation (macOS and Linux)
-  curl -fsSL https://go.speakeasy.com/cli-install.sh | sh
+  ```bash !!tabs yarn
+  yarn add your-sdk-package
   ```
 
-  ```bash !!tabs Winget
-  # Windows Installation
-  # Using winget:
-  winget install speakeasy
-  ```
-
-  ```bash !!tabs Chocolatey
-  # Using Chocolatey:
-  choco install speakeasy
+  ```bash !!tabs pnpm
+  pnpm add your-sdk-package
   ```
 
   </CodeWithTabs>
 
-- If you haven't already generated a TypeScript SDK, run this command:
+- Alternatively, if you're working with a local SDK, you can use the package manager's local path installation feature:
 
-  ```bash
-  # For first-time SDK generation
-  speakeasy quickstart
+  <CodeWithTabs>
+  ```bash !!tabs npm
+  npm install ../path/to/your-sdk
   ```
 
-  Then, follow the prompts to select TypeScript as your target language and complete the SDK configuration.
-
-- To enable React Hooks in your configuration, open the `.speakeasy/gen.yaml` file in your SDK directory and add the `enableReactQuery` flag to it:
-
-  ```yaml
-  typescript:
-    version: x.y.z
-    # ... other options
-    enableReactQuery: true # Add this line to enable React hooks
+  ```bash !!tabs yarn
+  yarn add ../path/to/your-sdk
   ```
 
-- Navigate to the folder that holds the generated SDK and run the following command to regenerate your SDK with React Hooks:
-
-  ```bash
-  speakeasy run
+  ```bash !!tabs pnpm
+  pnpm add ../path/to/your-sdk
   ```
 
-  This adds a new `src/react-query` directory, which contains all the generated React Hooks, to your SDK.
-
-- Once you've generated your SDK with React Hooks, you need to install it in your React application.
-
-  - If you've published your SDK to a package registry like npm, you can install it directly:
-
-    <CodeWithTabs>
-    ```bash !!tabs npm
-    npm install your-sdk-package
-    ```
-
-    ```bash !!tabs yarn
-    yarn add your-sdk-package
-    ```
-
-    ```bash !!tabs pnpm
-    pnpm add your-sdk-package
-    ```
-
-    </CodeWithTabs>
-
-  - Alternatively, if you're working with a local SDK, you can use the package manager's local path installation feature:
-
-    <CodeWithTabs>
-    ```bash !!tabs npm
-    npm install ../path/to/your-sdk
-    ```
-
-    ```bash !!tabs yarn
-    yarn add ../path/to/your-sdk
-    ```
-
-    ```bash !!tabs pnpm
-    pnpm add ../path/to/your-sdk
-    ```
-
-    </CodeWithTabs>
+  </CodeWithTabs>
 
 ## How to use the generated React Hooks
 
 Before using React Hooks, you need to install their dependencies and configure your React Query provider.
 
-### Installing required dependencies
+### Install required dependencies
 
 The generated SDK with React Hooks has TanStack Query and Zod dependencies that should be listed in the SDK's `package.json`. However, you might need to install them explicitly in your application:
 
@@ -135,7 +145,7 @@ pnpm add @tanstack/react-query zod
   the SDK to function correctly.
 </Callout>
 
-### Setting up the React Query provider
+### Set up the React Query provider
 
 Add the TanStack Query provider to your React application:
 
@@ -157,7 +167,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 );
 ```
 
-### Basic usage example
+## Basic usage
 
 You can use the generated Hooks in your components as follows:
 
@@ -180,7 +190,7 @@ function ProductDetail({ productId }) {
 }
 ```
 
-## Customizing React Hooks
+## How to customize React Hooks
 
 The default naming convention for React Hooks follows the standalone function naming convention. For example, a standalone function called `productsGetById` will have a corresponding React Hook called `useProductsGetById`.
 
@@ -199,7 +209,7 @@ paths:
 
 With the example above, the React Hook will be called by `useProduct` and, under the hood, it will use the `productsGetById` standalone function.
 
-### Queries and mutations
+### Generate queries and mutations
 
 By default, the `GET`, `HEAD`, and `QUERY` operations generate React Query hooks, while other operations generate mutation hooks. This isn't always correct, since certain operations may be "read" operations exposed under the `POST` endpoint. A great example of this is the complex search APIs that take a request body with filters and other arguments.
 
@@ -216,7 +226,7 @@ paths:
       # ...
 ```
 
-### Disabling React Hooks for an operation
+### Disable React Hooks for an operation
 
 React Hooks may not be useful or relevant for all operations in the API. Disable React Hook generation for an operation by setting the `disabled` flag under the `x-speakeasy-react-hook` extension:
 
@@ -232,9 +242,9 @@ paths:
 
 ## Advanced usage
 
-More advanced uses of React Hooks include the following:
+You can also use React Hooks for more advanced purposes.
 
-### Implementing optimistic updates
+### Implement optimistic updates
 
 When using mutation hooks, you can use TanStack Query's optimistic update capabilities:
 
@@ -270,7 +280,7 @@ function EditProduct({ productId }) {
 }
 ```
 
-### Customizing configurations
+### Customize configurations
 
 You can pass custom TanStack Query options to your hooks:
 
@@ -283,7 +293,7 @@ const { data } = useProductsGetById(productId, {
 });
 ```
 
-### Using infinite queries for pagination
+### Use infinite queries for pagination
 
 For paginated endpoints, you can use infinite React Query hooks:
 
