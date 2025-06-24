@@ -29,7 +29,7 @@ Edit the plan modifier file to contain the required logic.
 
 ### Implementation notes
 
-A plan modifier is a type that conforms to the `terraform-plugin-framework` expected interface. A unique plan modifier is bootstrapped in the appropriate subfolder for the Terraform type that it is applied to, which is usually one of the following:
+A plan modifier is a type that conforms to the `terraform-plugin-framework`-expected interface. A unique plan modifier is bootstrapped in the appropriate subfolder for the Terraform type that it is applied to, which is usually one of the following:
 
 - `boolplanmodifiers`
 - `float64planmodifiers`
@@ -41,7 +41,7 @@ A plan modifier is a type that conforms to the `terraform-plugin-framework` expe
 - `setplanmodifiers`
 - `stringplanmodifiers`
 
-Speakeasy always creates and uses a file as `snake_case.go` for a given `x-speakeasy-plan-modifiers` value.
+Speakeasy always creates and uses a `snake_case.go` file for each `x-speakeasy-plan-modifiers` value.
 
 A plan modifier operates on the raw (untyped) Terraform value types. However, you can convert a Terraform type to a value type that Speakeasy manages (`type_mytype.go`) by using the included reflection utility. This is useful for applying modifiers to complex types, like `list`, `map`, `object`, and `set`.
 
@@ -59,7 +59,7 @@ Speakeasy regenerations do not delete user-written code. If the modifier is no l
 
 ## Specifying the resource version
 
-The `x-speakeasy-entity-version` extension specifies the version of a given resource and should **only** be used if you need to write a state migrator, for instance, if you are changing the type of a field.
+The `x-speakeasy-entity-version` extension specifies the version of a given resource and should **only** be used if you need to write a state migrator, for example, for changing the type of a field.
 
 Terraform resource versions are zero-indexed and default to `0`. For your first breaking change requiring a state migrator, set `x-speakeasy-entity-version: 1`. Each state migrator function must migrate from the previous version of the state.
 
