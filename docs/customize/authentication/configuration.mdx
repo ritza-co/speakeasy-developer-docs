@@ -15,7 +15,7 @@ import { CodeWithTabs, Callout } from "@/mdx/components";
 
 Global security allows users to configure the SDK once and then reuse the security configuration for all subsequent calls.
 
-To use global security, define the security configuration in the `security` block at the root of the SDK.
+To use global security, define the security configuration in the `security` block at the root of the SDK:
 
 ```yaml
 paths:
@@ -195,7 +195,7 @@ try {
 
 </Callout>
 
-Operation-specific security configuration overrides the default authentication settings for an endpoint. This is commonly used for operations that do not require authentication or that are part of an authentication flow, such as for obtaining a short-lived access token.
+Operation-specific security configurations override the default authentication settings for an endpoint. Per-operation configurations are commonly used for operations that do not require authentication or that are part of an authentication flow, such as for obtaining a short-lived access token.
 
 Define `security` within an operation's scope to apply operation-specific security:
 
@@ -375,7 +375,7 @@ try {
 
 The global parameters and security options for an SDK are commonly set using environment variables. Speakeasy supports this pattern with environment variable prefixes. To enable this feature, set the `envVarPrefix` variable in the language section of the SDK's `gen.yaml` file.
 
-You can then provide global parameters via environment variables in the format `{PREFIX}_{GLOBALNAME}`. The relevant documentation will automatically be included in the README.
+You can then provide global parameters via environment variables in the format `{PREFIX}_{GLOBALNAME}`. The relevant documentation will be automatically included in the README.
 
 Security options can also be set via environment variables if not provided directly to the SDK. For example, a security field like `api_key` can be set with the variable `{PREFIX}_{API_KEY}`:
 
@@ -387,7 +387,7 @@ const SDK = new SDK({
 
 <Callout title="Note" type="info">
 
-Note: In some cases, adding `envVarPrefix` may alter the structure of security options. Required global security will become optional to allow setting it via environment variables.
+In some cases, adding `envVarPrefix` may alter the structure of security options. Required global security will become optional to allow you to set it via environment variables.
 
 </Callout>
 
