@@ -25,7 +25,7 @@ Before MCP, connecting AI agents to external systems required building custom in
 - **Security challenges**: Each integration handled permissions and access differently.
 - **Maintenance overhead**: Updates to any system broke multiple custom integrations.
 
-![A diagram showing multiple AI agents at the top, Claude Desktop, VS Code, and Cursor, each requiring separate custom integrations to connect to different tools, GitHub, PostgreSQL, the user's file system, creating a complex web of M × N connections between agents and services.](./assets/what-is-mcp/before-mcp.svg?.url)
+![A diagram showing multiple AI agents at the top, Claude Desktop, VS Code, and Cursor, each requiring separate custom integrations to connect to different tools, GitHub, PostgreSQL, the user's file system, creating a complex web of M × N connections between agents and services.](./assets/what-is-mcp/before-mcp.svg)
 
 In the diagram above, we see how each application (Claude Desktop, VS Code, Cursor) requires custom integrations to access various tools (GitHub, PostgreSQL, the user's file system). This creates a complex web of M × N connections that is difficult to maintain and scale.
 
@@ -33,7 +33,7 @@ With MCP, we introduce a standardized protocol that simplifies this process.
 
 There is now a single integration point for each tool, allowing any compatible AI agent to access it without custom code.
 
-![A diagram showing a simplified architecture with multiple AI agents, Claude Desktop, VS Code, and Cursor at the top connected through a single MCP (Model Context Protocol) layer in the middle to multiple tools, GitHub, PostgreSQL, the user's file system, and services at the bottom, demonstrating how MCP reduces complexity from M × N custom integrations to M + N standardized connections.](./assets/what-is-mcp/with-mcp.svg?.url)
+![A diagram showing a simplified architecture with multiple AI agents, Claude Desktop, VS Code, and Cursor at the top connected through a single MCP (Model Context Protocol) layer in the middle to multiple tools, GitHub, PostgreSQL, the user's file system, and services at the bottom, demonstrating how MCP reduces complexity from M × N custom integrations to M + N standardized connections.](./assets/what-is-mcp/with-mcp.svg)
 
 In the diagram above, we see how MCP simplifies the architecture. Each AI agent (Claude Desktop, VS Code, Cursor) connects through a single MCP layer to access multiple tools (GitHub, PostgreSQL, the user's file system).
 
