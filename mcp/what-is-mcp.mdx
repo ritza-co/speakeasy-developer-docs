@@ -25,24 +25,23 @@ Before MCP, connecting AI agents to external systems required building custom in
 - **Security challenges**: Each integration handled permissions and access differently.
 - **More maintenance overhead**: Updates to any system broke multiple custom integrations.
 
-![A diagram shows multiple AI agents (Claude, VS Code, and Cursor), which each require separate custom integrations to connect to different tools (GitHub, PostgreSQL, and the user's file system) creating a complex web of M × N connections between agents and services.](./assets/what-is-mcp/before-mcp.svg)
+![A diagram shows multiple AI agents (Claude Desktop, VS Code, and Cursor), which each require separate custom integrations to connect to different tools (GitHub, PostgreSQL, and the user's file system) creating a complex web of M × N connections between agents and services.](./assets/what-is-mcp/before-mcp.svg)
 
-In the diagram above, we see how each application (Claude, VS Code, Cursor) requires custom integrations to access various tools (GitHub, PostgreSQL, the user's file system). This creates a complex web of M × N connections that is difficult to maintain and scale.
+In the diagram above, we see how each application (Claude Desktop, VS Code, Cursor) requires custom integrations to access various tools (GitHub, PostgreSQL, the user's file system). This creates a complex web of M × N connections that is difficult to maintain and scale.
 
 With MCP, we introduce a standardized protocol that simplifies this process.
 
 There is now a single integration point for each tool, allowing any compatible AI agent to access it without custom code.
 
-![A diagram shows a simplified architecture with multiple AI agents (Claude, VS Code, and Cursor) connected through a single MCP layer to multiple tools (GitHub, PostgreSQL, the user's file system, and services). This demonstrates how MCP reduces complexity from M × N custom integrations to M + N standardized connections.](./assets/what-is-mcp/with-mcp.svg)
+![A diagram shows a simplified architecture with multiple AI agents (Claude Desktop, VS Code, and Cursor) connected through a single MCP layer to multiple tools (GitHub, PostgreSQL, the user's file system, and services). This demonstrates how MCP reduces complexity from M × N custom integrations to M + N standardized connections.](./assets/what-is-mcp/with-mcp.svg)
 
-In the diagram above, we see how MCP simplifies the architecture. Each AI agent (Claude
-, VS Code, Cursor) connects through a single MCP layer to access multiple tools (GitHub, PostgreSQL, the user's file system).
+In the diagram above, we see how MCP simplifies the architecture. Each AI agent (Claude Desktop, VS Code, Cursor) connects through a single MCP layer to access multiple tools (GitHub, PostgreSQL, the user's file system).
 
 ## How MCP works
 
 MCP establishes a client-server architecture made up of:
 
-- **MCP clients**: AI agents, applications, or development tools (like Claude, VS Code extensions, and Cursor)
+- **MCP clients**: AI agents, applications, or development tools (like Claude Desktop, VS Code extensions, and Cursor)
 - **MCP servers**: Services that expose tools, data, or capabilities (like GitHub, databases, and APIs)
 - **A standardized protocol**: A common language both clients and servers understand
 
@@ -58,7 +57,7 @@ Depending on your role in the ecosystem, MCP provides several advantages.
 
 ### Advantages for AI agent users
 
-When using MCP-compatible AI agents, like Claude, VS Code extensions, or Cursor, you get:
+When using MCP-compatible AI agents, like Claude Desktop, VS Code extensions, or Cursor, you get:
 
 - Access to more tools and data sources without custom integrations
 - A consistent experience interaction pattern across different AI agents
@@ -84,22 +83,22 @@ When you build MCP-compatible applications or agents, you benefit from:
 
 See how MCP simplifies the process of connecting AI agents to external tools and data sources.
 
-Imagine you want to use Claude to read a GitHub issue from your company's private repository and query your PostgreSQL database for related data.
+Imagine you want to use Claude Desktop to read a GitHub issue from your company's private repository and query your PostgreSQL database for related data.
 
 **The manual process**
 
 If this were a once-off task, you would typically need to:
 
-1. Copy and paste the contents of the GitHub issue into the Claude desktop app.
+1. Copy and paste the contents of the GitHub issue into Claude Desktop.
 2. Describe the database schema to Claude.
 3. Ask Claude to write a custom query based on the pasted schema.
 4. Copy and paste the query into your database client.
-5. Copy and paste the results back into the Claude desktop app.
+5. Copy and paste the results back into Claude Desktop.
 6. Manually combine the information from the GitHub issue and database query results.
 
 **The custom integration process**
 
-If you did this often, you might write a custom integration that connects Claude to GitHub and PostgreSQL, which would require ongoing maintenance and updates. The steps involved are cumbersome and error-prone, especially if the GitHub issue or database schema changes. This would get even more complex if Claude needed to wait for long-running queries or if you wanted to access multiple tools at once.
+If you did this often, you might write a custom integration that connects Claude Desktop to GitHub and PostgreSQL, which would require ongoing maintenance and updates. The steps involved are cumbersome and error-prone, especially if the GitHub issue or database schema changes. This would get even more complex if Claude needed to wait for long-running queries or if you wanted to access multiple tools at once.
 
 **The MCP way**
 
