@@ -66,7 +66,7 @@ Alternatively, you can use the instructions for the [remote-hosted version of th
 
 ## Claude
 
-Adding MCP servers to the Claude desktop app requires manual configuration through a JSON config file. While this requires a bit more setup than a one-click install, it gives you full control over which servers and tools you enable.
+Adding MCP servers to the Claude desktop app requires manual configuration through a JSON config file. While this requires more setting up than a one-click installation, it gives you full control over which servers and tools you enable.
 
 ### Install the GitHub MCP Server in Claude
 
@@ -78,18 +78,18 @@ Let's take a look at how to install the GitHub MCP Server in Claude.
 
 #### Open the Claude settings
 
-Start by accessing the Claude settings through the main menu. On macOS, click **Claude** and select **Settings...** from the menu bar. On Windows, access the settings through the application menu.
+Start by accessing the Claude settings through the main menu. On macOS, click **Claude -> Settings...** from the menu bar. On Windows, access the settings through the application menu.
 
 #### Access the developer configuration in Claude
 
-Navigate to the **Developer** section in the left sidebar of the settings window. Click **Edit Config** to open the MCP configuration file. This will create or open the configuration file at the following location:
+Navigate to the **Developer** section in the left sidebar of the **Settings** window. Click **Edit Config** to open the MCP configuration file. This will create or open the configuration file at the following location:
 
 - **In macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **In Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
 #### Add the GitHub MCP Server configuration for Claude
 
-Replace the file contents with this configuration, substituting your actual GitHub personal access token:
+Replace the file content with the following configuration, substituting your actual GitHub personal access token:
 
 ```json
 {
@@ -114,7 +114,7 @@ Replace the file contents with this configuration, substituting your actual GitH
 
 #### Restart Claude and test the server configuration
 
-Save the configuration file, completely close the Claude app, and then reopen it. Once restarted, click **🔨** (the hammer icon) to see the available tools and test the connection by asking:
+Save the configuration file, close the Claude app completely, and then reopen it. Once restarted, click **🔨** (the hammer icon) to see the available tools and test the connection by asking:
 
 > What repositories do I have access to?
 
@@ -171,7 +171,7 @@ This opens Cursor's global MCP configuration file. Add the GitHub MCP Server con
 
 #### Use GitHub tools in Cursor
 
-Once configured, access the GitHub MCP functionality through Cursor's AI chat by clicking the chat icon or using `Cmd` + `L` or `Ctrl` + `L`. Cursor automatically discovers available MCP tools and allows you to interact with them using natural language commands.
+Once configured, access the GitHub MCP functionality through Cursor's AI chat by clicking the chat icon or using `cmd + l` or `ctrl + l`. Cursor automatically discovers available MCP tools and allows you to interact with them using natural language commands.
 
 ![A screenshot shows a GitHub MCP tool under the Tools & Integrations tab in the Cursor settings.](./assets/cursor-github-mcp-installed.png)
 
@@ -277,7 +277,7 @@ The `${input:github_token}` placeholder will prompt you to enter your GitHub per
 
 #### Start the GitHub MCP Server
 
-Open the Command Palette (`Ctrl` + `Shift` + `P` or `Cmd` + `Shift` + `P`) and type `MCP: List Servers` to see available servers.
+Open the Command Palette (`ctrl + shift + p` or `cmd + shift + p`) and type `MCP: List Servers` to see available servers.
 
 ![A screenshot shot shows the List Servers command being typed in the Command Palette.](./assets/mcp-list-servers.png)
 
@@ -285,7 +285,7 @@ From the list, click on the GitHub MCP Server to start it. VS Code will prompt y
 
 ![A screenshot shows the Start Server status in the Command Palette.](./assets/mcp-start-server.png)
 
-Enter your token and press `Enter`. The server will start and display output indicating successful startup.
+Enter your token and press `enter`. The server will start and display output indicating a successful startup.
 
 ![A screenshot shows the output indicating the server is running successfully.](./assets/vs-mcp-startup.png)
 
@@ -336,7 +336,7 @@ Here are some common problems and solutions to help you resolve any issues you e
 
 ### Authentication problems
 
-#### GitHub OAuth fails
+#### GitHub OAuth failures
 
 If you see errors like `Invalid OAuth token` or `Insufficient permissions`, you can fix these errors by using a personal access token instead of OAuth:
 
