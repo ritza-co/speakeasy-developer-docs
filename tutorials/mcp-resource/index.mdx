@@ -1,0 +1,118 @@
+# MCP Resources
+
+Many developers skip resources because they seem similar to tools as both can read data. But there's a key difference that makes resources incredibly useful for agentic workflows.
+In this tutorial, we'll set up Sentry documentation in Claude Desktop and GitHub files in VS Code so your LLM has the necessary context without requiring you to search for it every time.
+
+## Prerequisites 
+
+Before starting this tutorial, you'll need:
+
+- [Claude Desktop](https://claude.ai/download) with a Pro or Team plan (required for MCP resources).
+- [VS Code](https://code.visualstudio.com/) with [GitHub Copilot](https://github.com/copilot) enabled.
+- A GitHub account with a personal [access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token).
+- An active Sentry account (free tier works).
+
+## Tools vs. resources
+
+Both [tools](/mcp/tools) and [resources](mcp/resources) can handle read-only operations, and both can be used by you or the AI agent to fetch data for context. The key difference is how much content they return.
+Tools are well-suited for quick data lookups, retrieving a user's profile, checking status, or running a simple query. Resources are designed for larger content, such as documentation, log files, configuration data, or any substantial text that will inform the entire conversation.
+If your read-only operation returns a lot of content or a file, use a resource. If it returns a quick data point or status, use a tool to process it.
+
+## Claude Desktop + Sentry MCP
+
+Claude Desktop supports MCP resources on Pro and Team plans but doesn't support resource templating, meaning you can't pass dynamic parameters to customize what the resource fetches.
+The [Sentry MCP server](https://docs.sentry.io/product/sentry-mcp/) provides documentation for integrating Sentry with different platforms. Let's connect it to Claude's Desktop.
+
+### Configure Sentry MCP in integrations
+
+Open Claude Desktop settings and go to the Integrations section. Click **+ Add integration**. Enter the integration name and URL `https://mcp.sentry.dev/mcp`.
+
+![Configuring Sentry MCP Integration](./assets/claude-adding-sentry.png)
+
+Click **Connect** to authorize Sentry access to your organization. You'll be redirected to confirm access in your browser.
+
+![Connecting Sentry and Claude](./assets/claude-sentry-mcp-integration.png)
+
+### Add Sentry documentation as context
+
+In any chat, click the **+** button. Select **Add from Sentry** from the options.
+
+![Adding Sentry resources](./assets/claude-finding-resources.png)
+
+Choose the **Apple iOS guide** documentation from the list.
+
+![Selecting Apple iOS guide](./assets/claude-looking-for-ios-guide.png)
+
+The resource has been attached. You can then send a prompt to ask for a guide to setup Sentry for your iOS project. 
+
+### Test the setup
+
+With the resource attached, ask Claude: "How do I set up Sentry crash reporting for my iOS project?".
+
+![Testing the setup](./assets/mcp-resources-sentry-testing.png)
+
+Claude now has the Sentry iOS documentation as context and can provide specific setup instructions.
+
+## Github MCP server with VsCode
+
+VS Code with GitHub Copilot supports MCP servers and resources. Their resources let you pull files from any GitHub repository directly into your agent context.
+
+### Create the MCP configuration
+
+In your project root, create a file named `mcp.json` in the `.vscode` directory and add this configuration:
+
+```json
+{
+  "servers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${input:github_mcp_pat}"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "github_mcp_pat",
+      "description": "GitHub Personal Access Token",
+      "password": true
+    }
+  ]
+}
+```
+
+Once the file saved, VS Code will detect the configuration and prompt you to enter your GitHub Personal Access Token.
+
+### Add gitHub file as resource
+
+In any VS Code chat, click the **📎 Add Context...** button. Select **MCP Resources**.
+
+![Adding MCP resources](./assets/mcp-resources-vscode.png)
+
+Choose the **repository content** template. Enter:
+
+- Repository owner: `github`
+- Repository name: `gitHub-mcp-server`
+- File path: `LICENSE`
+
+![Selecting LICENSE file](./assets/mcp-github-content.png)
+
+### Test the setup
+
+With the `LICENSE` file attached as context, ask: *What type of license is this and what does it allow?*
+
+![Testing the setup](./assets/using-resource.png)
+
+Copilot now has the file content and can answer specific questions about it.
+
+## Conclusion
+
+In this tutorial, we set up MCP resources in Claude Desktop with Sentry documentation and in VS Code with GitHub files. You can now bring external documentation directly into your AI conversations for better context.
+
+To learn more about MCP:
+
+- [Remote MCP Servers](/mcp/remote-servers)
+- [MCP for skeptics](/mcp/mcp-for-skeptics)
+- [MCP prompts](/mcp/prompts)
