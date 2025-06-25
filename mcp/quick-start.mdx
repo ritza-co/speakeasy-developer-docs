@@ -12,13 +12,13 @@ import { Callout } from "@/mdx/components";
   waitlist](https://app.getgram.ai) today.
 </Callout>
 
-This guide walks you through connecting your first MCP server to an AI agent in under 10 minutes. We'll use Claude as our AI client to add a file to a new project directory on your computer.
+This guide walks you through connecting your first MCP server to an AI agent in under 10 minutes. We'll use Claude Desktop as our AI client to add a file to a new project directory on your computer.
 
 ## Prerequisites
 
 Ensure the following are installed on your machine:
 
-- [The Claude desktop app](https://claude.ai/download)
+- [Claude Desktop](https://claude.ai/download)
 - [Node.js](https://nodejs.org)
 
 ## Step 1: Install an MCP server
@@ -38,7 +38,7 @@ npx @wonderwhy-er/desktop-commander@latest setup
 
 **Manual installation**
 
-If you prefer to install the MCP server manually (and learn how to install other MCP servers), open Claude and follow these steps:
+If you prefer to install the MCP server manually (and learn how to install other MCP servers), open Claude Desktop and follow these steps:
 
 ![A screenshot shows highlighted areas that direct the user to click on the Claude menu item, then on Settings, then on the Developer tab, and finally on Edit Config.](./assets/quick-start/claude-mcp-config.png)
 
@@ -47,7 +47,7 @@ If you prefer to install the MCP server manually (and learn how to install other
 3. Go to the **Developer** tab.
 4. Click on **Edit Config**.
 
-This opens a Finder or File Explorer window showing the configuration file for Claude. Open the `claude_desktop_config.json` file in a text editor.
+This opens a Finder or File Explorer window showing the configuration file for Claude Desktop. Open the `claude_desktop_config.json` file in a text editor.
 
 Paste the following configuration into the file:
 
@@ -67,13 +67,13 @@ Paste the following configuration into the file:
 
 Save the configuration file.
 
-## Step 2: Restart Claude
+## Step 2: Restart Claude Desktop
 
-Close Claude completely and then reopen it. The MCP server will now be available.
+Close Claude Desktop completely and then reopen it. The MCP server will now be available.
 
 ## Step 3: Test the connection
 
-In Claude, try asking:
+In Claude Desktop, try asking:
 
 > Add a folder to `~/Desktop` called `mcp-test` and create a file called `hello.txt` with the content `Hello, MCP!`
 
@@ -90,18 +90,18 @@ In Claude, try asking:
   <source src="./assets/quick-start/mcp-test.mp4" type="video/mp4" />
 </video>
 
-As shown in the video above, Claude executes the command using the MCP server, creating the folder and file on your desktop. The file contains the text `Hello, MCP!`.
+As shown in the video above, Claude Desktop executes the command using the MCP server, creating the folder and file on your desktop. The file contains the text `Hello, MCP!`.
 
 ## What just happened?
 
-1. **Claude** sent your prompt to Claude's API along with a message indicating which tools it can use.
+1. **Claude Desktop** sent your prompt to Claude's API along with a message indicating which tools it can use.
 2. **Claude's API** responded with a message that included the MCP server's name and the commands to be executed (first, `create_directory`, then `write_file`).
-3. **Claude** sent the commands to the Desktop Commander MCP server.
+3. **Claude Desktop** sent the commands to the Desktop Commander MCP server.
 4. **Desktop Commander** executed the commands on your local file system, creating the folder and file as requested.
 
 Steps 2 to 4 are repeated for each command, allowing the AI agent to see the results of its actions and continue the conversation.
 
-In the end, you see a confirmation message in Claude notifying you that the folder and file have been created successfully:
+In the end, you see a confirmation message in Claude Desktop notifying you that the folder and file have been created successfully:
 
 > Done. I've created the mcp-test folder in your Desktop directory and added the hello.txt file with the content 'Hello, MCP!' inside it.
 
