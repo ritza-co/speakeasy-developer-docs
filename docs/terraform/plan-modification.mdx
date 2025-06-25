@@ -29,7 +29,7 @@ Edit the plan modifier file to contain the required logic.
 
 ### Implementation notes
 
-A plan modifier is a type that conforms to the interface expected by the `terraform-plugin-framework`. A unique plan modifier is bootstrapped in the appropriate subfolder for the Terraform type that it is applied to, which is usually one of the following:
+A plan modifier is a type that implements the plan modifier interface defined by the `terraform-plugin-framework`. A unique plan modifier is bootstrapped in the appropriate subfolder for the Terraform type that it is applied to, which is usually one of the following:
 
 - `boolplanmodifiers`
 - `float64planmodifiers`
