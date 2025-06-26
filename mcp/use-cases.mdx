@@ -25,7 +25,6 @@ For example, here we use the GitHub MCP server to check the status of a recent p
 > get status of my context7 pr
 
 import claudePrWebm from "./assets/use-cases/claude-pr.webm";
-import claudePrMp4 from "./assets/use-cases/claude-pr.mp4";
 
 <video
   controls={false}
@@ -36,7 +35,6 @@ import claudePrMp4 from "./assets/use-cases/claude-pr.mp4";
   className="max-w-6xl mx-auto my-10"
 >
   <source src={claudePrWebm} type="video/webm" />
-  <source src={claudePrMp4} type="video/mp4" />
 </video>
 
 Here we see Claude searching for the pull request, and responding with the status.
@@ -48,7 +46,6 @@ Next, let's use the [Desktop Commander](https://desktopcommander.app/) MCP serve
 > delete the local branch for this pr in ~/projects/personal/mcp-servers/context7 and rename local master to main
 
 import claudeBranchesWebm from "./assets/use-cases/claude-branches.webm";
-import claudeBranchesMp4 from "./assets/use-cases/claude-branches.mp4";
 
 <video
   controls={false}
@@ -59,7 +56,6 @@ import claudeBranchesMp4 from "./assets/use-cases/claude-branches.mp4";
   className="max-w-6xl mx-auto my-10"
 >
   <source src={claudeBranchesWebm} type="video/webm" />
-  <source src={claudeBranchesMp4} type="video/mp4" />
 </video>
 
 Here we see Claude deleting the local branch and renaming the master branch to main. How's that for convenience?
@@ -72,10 +68,9 @@ Context7 is one of the most popular MCP servers for software development. It can
 
 Let's see how it works in practice. We'll ask Claude for help developing an MCP server:
 
-> Show me how to elicit user input using the MCP Typescript SDK. Use Context7.
+> Show me how to elicit user input using the MCP TypeScript SDK. Use Context7.
 
 import claudeContext7Webm from "./assets/use-cases/claude-context7.webm";
-import claudeContext7Mp4 from "./assets/use-cases/claude-context7.mp4";
 
 <video
   controls={false}
@@ -86,7 +81,6 @@ import claudeContext7Mp4 from "./assets/use-cases/claude-context7.mp4";
   className="max-w-6xl mx-auto my-10"
 >
   <source src={claudeContext7Webm} type="video/webm" />
-  <source src={claudeContext7Mp4} type="video/mp4" />
 </video>
 
 Claude uses the Context7 MCP server to find the latest documentation and code samples for the MCP specification. It then generates TypeScript code samples for an MCP server and an MCP client.
@@ -104,7 +98,6 @@ Let's ask Claude to help us with a tricky math problem:
 > I want to see the first moon landing live on TV. If I leave tomorrow at 6am PST, calculate the exact number of seconds I need to go back to see the touchdown three minutes after I arrive. (I need this for my time machine, obviously). Calculate the number manually, then do the calculation again using Python. Compare the results.
 
 import claudePythonWebm from "./assets/use-cases/claude-python.webm";
-import claudePythonMp4 from "./assets/use-cases/claude-python.mp4";
 
 <video
   controls={false}
@@ -115,7 +108,6 @@ import claudePythonMp4 from "./assets/use-cases/claude-python.mp4";
   className="max-w-6xl mx-auto my-10"
 >
   <source src={claudePythonWebm} type="video/webm" />
-  <source src={claudePythonMp4} type="video/mp4" />
 </video>
 
 Claude first tries the calculation manually, then uses the MCP Run Python server to do the calculation again. The results show that **the manual calculation was off by about 53.2 days**! Imagine traveling 56 years back in time, only to find out you need to wait two months to see the moon landing.
@@ -135,7 +127,6 @@ We'll use the MCP Playwright server to automate browser tasks. This is particula
 > Find three cheap aluminium 60% mechanical keyboards in beige or grey on Aliexpress.
 
 import claudeBrowserWebm from "./assets/use-cases/claude-browser.webm";
-import claudeBrowserMp4 from "./assets/use-cases/claude-browser.mp4";
 
 <video
   controls={false}
@@ -146,7 +137,6 @@ import claudeBrowserMp4 from "./assets/use-cases/claude-browser.mp4";
   className="max-w-6xl mx-auto my-10"
 >
   <source src={claudeBrowserWebm} type="video/webm" />
-  <source src={claudeBrowserMp4} type="video/mp4" />
 </video>
 
 Claude opens the browser, searches for the keyboards, and finds three options.
