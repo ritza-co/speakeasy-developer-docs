@@ -8,7 +8,7 @@ import { Callout } from "@/mdx/components";
 <Callout title="Gram AI by Speakeasy">
   Unlock AI engineering by turning your API platform into an AI platform with
   [Gram](https://app.getgram.ai). Generate agent tools for internal services and
-  connect to popular third party APIs from one platform. [Join the
+  connect to popular third-party APIs from one platform. [Join the
   waitlist](https://app.getgram.ai) today.
 </Callout>
 
@@ -16,13 +16,13 @@ MCP enables AI agents to interact with virtually any system or service. Here are
 
 ## MCP for software development
 
-You know how, some days, you spend more time switching between GitHub issues, pull requests, and documentation than actually writing code? The [GitHub MCP server](https://github.com/github/github-mcp-server) can help you delegate these tasks to your AI coding assistant.
+You know how, some days, you spend more time switching between GitHub issues, pull requests, and documentation than actually writing code? The [GitHub MCP Server](https://github.com/github/github-mcp-server) can help you delegate these tasks to your AI coding assistant.
 
-### Managing pull requests using GitHub MCP server
+### Managing pull requests using the GitHub MCP Server
 
-For example, here we use the GitHub MCP server to check the status of a recent pull request:
+For example, here we use the GitHub MCP Server to check the status of a recent pull request:
 
-> get status of my context7 pr
+> Get the status of my Context7 PR.
 
 import claudePrWebm from "./assets/use-cases/claude-pr.webm";
 
@@ -37,13 +37,13 @@ import claudePrWebm from "./assets/use-cases/claude-pr.webm";
   <source src={claudePrWebm} type="video/webm" />
 </video>
 
-Here we see Claude searching for the pull request, and responding with the status.
+Here, we see Claude searching for the pull request and responding with the status.
 
 ### Deleting a local branch using Desktop Commander
 
 Next, let's use the [Desktop Commander](https://desktopcommander.app/) MCP server to delete the local branch associated with that pull request and do some housekeeping:
 
-> delete the local branch for this pr in ~/projects/personal/mcp-servers/context7 and rename local master to main
+> Delete the local branch for this PR in ~/projects/personal/mcp-servers/context7 and rename local master to main.
 
 import claudeBranchesWebm from "./assets/use-cases/claude-branches.webm";
 
@@ -58,13 +58,13 @@ import claudeBranchesWebm from "./assets/use-cases/claude-branches.webm";
   <source src={claudeBranchesWebm} type="video/webm" />
 </video>
 
-Here we see Claude deleting the local branch and renaming the master branch to main. How's that for convenience?
+Here, we see Claude deleting the local branch and renaming the `master` branch `main`. How's that for convenience?
 
 Sure, you could have done `gh pr status` and `git branch -d context7` yourself, but with MCP, your AI assistant could decide to do this for you, or even suggest it proactively based on your recent activity. This is just one example of how MCP can streamline your software development workflow.
 
 ### Finding documentation using Context7
 
-Context7 is one of the most popular MCP servers for software development. It can help your AI coding assistant find the most recent documentation and code examples for more than 21,000 libraries and frameworks. This helps fill in the gaps in knowledge that LLMs have due to training cutoffs. Even for older versions of libraries, Context7 can help your assistant find code snippets for specific versions of libraries. This greatly reduces hallucinations.
+Context7 is one of the most popular MCP servers for software development. It can help your AI coding assistant find the most recent documentation and code examples for more than 21,000 libraries and frameworks. This helps fill in the knowledge gaps that LLMs have due to training cutoffs. Context7 can even help your assistant find code snippets for specific, older versions of libraries. This greatly reduces hallucinations.
 
 Let's see how it works in practice. We'll ask Claude for help developing an MCP server:
 
@@ -83,7 +83,7 @@ import claudeContext7Webm from "./assets/use-cases/claude-context7.webm";
   <source src={claudeContext7Webm} type="video/webm" />
 </video>
 
-Claude uses the Context7 MCP server to find the latest documentation and code samples for the MCP specification. It then generates TypeScript code samples for an MCP server and an MCP client.
+Claude uses the Context7 MCP server to find the latest documentation and code samples for the MCP Specification. It then generates TypeScript code samples for an MCP server and an MCP client.
 
 ## MCP for number crunching
 
@@ -95,7 +95,7 @@ With [MCP Run Python](https://ai.pydantic.dev/mcp/run-python/), we can offload a
 
 Let's ask Claude to help us with a tricky math problem:
 
-> I want to see the first moon landing live on TV. If I leave tomorrow at 6am PST, calculate the exact number of seconds I need to go back to see the touchdown three minutes after I arrive. (I need this for my time machine, obviously). Calculate the number manually, then do the calculation again using Python. Compare the results.
+> I want to see the first moon landing live on TV. If I leave tomorrow at 6am PST, calculate the exact number of seconds I need to go back to see the touchdown three minutes after I arrive. (I need this for my time machine, obviously.) Calculate the number manually, then do the calculation again using Python. Compare the results.
 
 import claudePythonWebm from "./assets/use-cases/claude-python.webm";
 
@@ -114,17 +114,17 @@ Claude first tries the calculation manually, then uses the MCP Run Python server
 
 To avoid such mistakes, we recommend adding a Python server to your MCP setup, then adding the following to your system prompt or rules:
 
-> "If you need to do any calculations, always use the `run_python_code` tool to ensure accuracy."
+> If you need to do any calculations, always use the `run_python_code` tool to ensure accuracy.
 
 ## MCP for browser automation
 
 Giving an LLM access to a web browser is something to behold. It can search, navigate, take screenshots, and even fill out forms.
 
-### Browser automation using MCP Playwright
+### Browser automation using Playwright MCP
 
-We'll use the MCP Playwright server to automate browser tasks. This is particularly useful for testing web applications, scraping data, or even just finding information online. So let's ask Claude to open a browser and help us with comparative shopping:
+We'll use the Playwright MCP server to automate browser tasks. This is particularly useful for testing web applications, scraping data, or even just finding information online. So let's ask Claude to open a browser and help us with comparative shopping:
 
-> Find three cheap aluminium 60% mechanical keyboards in beige or grey on Aliexpress.
+> Find three cheap aluminium 60% mechanical keyboards in beige or grey on AliExpress.
 
 import claudeBrowserWebm from "./assets/use-cases/claude-browser.webm";
 
@@ -141,11 +141,11 @@ import claudeBrowserWebm from "./assets/use-cases/claude-browser.webm";
 
 Claude opens the browser, searches for the keyboards, and finds three options.
 
-Your AI coding assistant can use the MCP Playwright server to automate testing, or take screenshots of your site while it tries to fix CSS issues. The Playwright server can also be used to automate any web-based tasks, like filling out forms or scraping data.
+Your AI coding assistant can use the Playwright MCP server to automate testing or take screenshots of your site while it tries to fix CSS issues. The Playwright server can also be used to automate any web-based tasks, like filling out forms or scraping data.
 
 ## Getting started with these use cases
 
-You can use these examples in Claude Desktop by adding the following to your `claude_desktop_config.json` file:
+You can use these examples in Claude Desktop by adding the MCP servers to your `claude_desktop_config.json` file:
 
 ```json
 {
