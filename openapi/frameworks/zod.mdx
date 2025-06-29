@@ -7,9 +7,16 @@ import { Callout } from "@/mdx/components";
 
 # How to generate an OpenAPI document with Zod
 
-Zod is a powerful and flexible schema validation library for TypeScript. Many users define their TypeScript data parsing schemes using it.
+Zod is a powerful and flexible schema validation library for TypeScript. Many 
+users define their TypeScript data parsing schemes using it.
 
-In this tutorial, we'll take a detailed look at how to set up Zod OpenAPI to generate an OpenAPI document based on Zod schemas. Then we'll use Speakeasy to read our generated OpenAPI document and generate a production-ready SDK.
+This tutorial shows you how to generate OpenAPI documents from TypeScript schemas and create production-ready SDKs. Here's what we'll work with:
+
+- **Zod** - A TypeScript schema validation library
+- **zod-openapi** - The npm package that converts Zod schemas to OpenAPI format  
+- **Speakeasy** - The tool that generates SDKs from your OpenAPI document
+
+In this tutorial, we'll use the `zod-openapi` package to convert Zod schemas into a complete OpenAPI document, then use Speakeasy to generate a production-ready SDK from that document.
 
 ## Why use Zod with OpenAPI?
 
@@ -27,25 +34,28 @@ While Zod v4 introduces new features like `z.strictObject()` and `z.email()`, yo
 
 ## Zod OpenAPI overview
 
-[Zod OpenAPI](https://github.com/samchungy/zod-openapi) is a TypeScript library that helps developers define OpenAPI schemas as Zod schemas. The stated goal of the project is to cut down on code duplication, and it does a wonderful job of this.
+The [`zod-openapi`](https://github.com/samchungy/zod-openapi) package is a TypeScript library that helps developers define OpenAPI schemas as Zod schemas. The stated goal of the project is to cut down on code duplication, and it does a wonderful job of this.
 
 Zod schemas map to OpenAPI schemas well, and the changes required to extract OpenAPI documents from a schema defined in Zod are often small.
 
-Zod OpenAPI is maintained by one of the contributors to an earlier library called [Zod to OpenAPI](https://github.com/asteasolutions/zod-to-openapi). If you already use Zod to OpenAPI, the syntax will be familiar and you should be able to use either library. If you'd like to convert your _Zod to OpenAPI_ code to _Zod OpenAPI_ code, the _Zod OpenAPI_ library provides helpful [documentation for migrating code](https://github.com/samchungy/zod-openapi#migration).
+<Callout title="Migrating from zod-to-openapi?" type="info">
+If you're currently using the older `zod-to-openapi` library, the syntax will be familiar and you can use either library. For migration guidance, see the [zod-openapi migration documentation](https://github.com/samchungy/zod-openapi#migration).
+</Callout>
 
 ### Key concepts
 
-#### Schemas and z.strictObject
 
 <Callout title="Zod v4" type="info">
 This guide demonstrates a **dual import strategy** for using both Zod v3 and v4 in the same project. This approach is necessary because `zod-openapi` currently requires Zod v3 compatibility, while you may want to use Zod v4 features elsewhere in your application.
 
-Unlike most libraries, Zod is directly embedded in hundreds of other libraries' public APIs. A normal `zod@4.0.0` release would force every one of those libraries to publish breaking changes simultaneously – a massive "version avalanche".
+Unlike most libraries, Zod is directly embedded in hundreds of other libraries' public APIs. A normal `zod@4.0.0` release would force every one of those libraries to publish breaking changes simultaneously - a massive "version avalanche".
 
 The subpath approach (inspired by Go modules) lets libraries support both versions with one dependency, providing a gradual migration path for the entire ecosystem.
 
 See [Colin's detailed explanation](https://github.com/colinhacks/zod/issues/4371) for the full technical reasoning.
 </Callout>
+
+#### Schemas and z.strictObject
 
 Zod v4 introduces top-level helpers like `z.strictObject()` for objects that reject unknown keys and `z.email()` for email validation.
 
@@ -109,19 +119,6 @@ const getBurger: ZodOpenApiOperationObject = {
 };
 ```
 
-#### Speakeasy extensions
-
-Add SDK-specific behavior using `x-speakeasy-*` extensions in your OpenAPI document.
-
-```typescript concept.ts
-const config = {
-  info: { title: "My API", version: "1.0.0" },
-  "x-speakeasy-retries": {
-    strategy: "backoff",
-    backoff: { initialInterval: 500, maxInterval: 60000 }
-  }
-};
-```
 
 #### Using Zod v4 features alongside OpenAPI documents
 
@@ -693,6 +690,8 @@ const document = createDocument({
 
 console.log(yaml.stringify(document));
 ```
+
+Speakeasy will read the `x-speakeasy-*` extensions to configure the SDK. In this example, the `x-speakeasy-retries` extension will configure the SDK to retry failed requests. For more information on the available extensions, see the [extensions guide](../extensions.mdx).
 
 ### Generating the OpenAPI document
 
