@@ -1,7 +1,9 @@
 ---
-title: Using MCP Resources
-description: Learn real-world examples of using MCP resources with Claude Desktop, VsCode, and Sentry.
+title: Using MCP Resources in Practice
+description: Configure Sentry documentation in Claude Desktop and GitHub repositories in VS Code to give your agent or LLM direct access to relevant context without manual copy-pasting.
 ---
+
+import { Screenshot } from "@/mdx/components";
 
 Many developers skip MCP resources because they seem similar to MCP tools as both can read data. But there's a key difference that makes resources incredibly useful for agentic workflows. Resources give your LLM direct access to knowledge bases like documentation and codebases, eliminating the need to manually find and paste relevant information into every conversation. For example, instead of manually finding and copying a project's `README.md` file when asking installation questions, you can set up the README as a resource so Copilot automatically has access to the specific setup instructions during the conversation.
 
@@ -37,21 +39,22 @@ We'll connect the Sentry MCP server to Claude Desktop so that we can ask questio
 
 Open Claude Desktop settings and go to the Integrations section. Click **+ Add integration**. Enter the integration name and URL `https://mcp.sentry.dev/mcp`.
 
-![Configuring Sentry MCP Integration](./assets/claude-adding-sentry.png)
+<Screenshot url="./assets/claude-adding-sentry.png">![Configuring Sentry MCP Integration](./assets/claude-adding-sentry.png)</Screenshot>
 
 Click **Connect** to authorize Sentry access to your organization. You'll be redirected to confirm access in your browser.
 
-![Connecting Sentry and Claude](./assets/claude-sentry-mcp-integration.png)
+<Screenshot url="./assets/claude-sentry-mcp-integration.png">![Connecting Sentry and Claude](./assets/claude-sentry-mcp-integration.png)</Screenshot>
+
 
 ### Add Sentry documentation as context
 
 In any chat, click the **+** button. Select **Add from Sentry** from the options.
 
-![Adding Sentry resources](./assets/claude-finding-resources.png)
+<Screenshot url="./assets/claude-finding-resources.png">![Adding Sentry resources](./assets/claude-finding-resources.png)</Screenshot>
 
 Choose the **Apple iOS guide** documentation from the list.
 
-![Selecting Apple iOS guide](./assets/claude-looking-for-ios-guide.png)
+<Screenshot url="./assets/claude-looking-for-ios-guide.png">![Selecting Apple iOS guide](./assets/claude-looking-for-ios-guide.png)</Screenshot>
 
 The resource has been attached. You can then send a prompt to ask for a guide to setup Sentry for your iOS project. 
 
@@ -59,7 +62,7 @@ The resource has been attached. You can then send a prompt to ask for a guide to
 
 With the resource attached, ask Claude: "How do I set up Sentry crash reporting for my iOS project?".
 
-![Testing the setup](./assets/mcp-resources-sentry-testing.png)
+<Screenshot url="./assets/mcp-resources-sentry-testing.png">![Testing the setup](./assets/mcp-resources-sentry-testing.png)</Screenshot>
 
 In the image above, Claude responds with detailed iOS setup steps, including specific Swift code and configuration details. With the Sentry documentation as context, it can provide accurate, platform-specific guidance rather than generic crash reporting advice.
 
@@ -99,7 +102,7 @@ Once the file saved, VS Code will detect the configuration and prompt you to ent
 
 In any VS Code chat, click the **📎 Add Context...** button. Select **MCP Resources**.
 
-![Adding MCP resources](./assets/mcp-resources-vscode.png)
+<Screenshot url="./assets/mcp-resources-vscode.png">![Adding MCP resources](./assets/mcp-resources-vscode.png)</Screenshot>
 
 Choose the **repository content** template. Enter:
 
@@ -107,13 +110,13 @@ Choose the **repository content** template. Enter:
 - Repository name: `axios`
 - File path: `README.md`
 
-![Selecting LICENSE file](./assets/mcp-github-content.png)
+<Screenshot url="./assets/mcp-github-content.png">![Selecting LICENSE file](./assets/mcp-github-content.png)</Screenshot>
 
 ### Test the setup
 
 With the `README.md` file attached as context, write: *Give the steps you will follow to setup axios in this project.*
 
-![Testing the setup](./assets/using-resource.png)
+<Screenshot url="./assets/using-resource.png">![Testing the setup](./assets/using-resource.png)</Screenshot>
 
 In the image above, we can see that Copilot is suggesting an implementation plan for integrating axios into the current project, referencing specific methods and examples from the axios README that's now available as context.
 
