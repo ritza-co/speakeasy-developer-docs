@@ -7,16 +7,10 @@ import { Callout } from "@/mdx/components";
 
 # How to generate an OpenAPI document with Zod
 
-Zod is a powerful and flexible schema validation library for TypeScript. Many 
-users define their TypeScript data parsing schemes using it.
+Zod is a powerful and flexible schema validation library for TypeScript, which many developers use to define their TypeScript data parsing schemas.
 
-This tutorial shows you how to generate OpenAPI documents from TypeScript schemas and create production-ready SDKs. Here's what we'll work with:
+This tutorial demonstrates how to use another TypeScript library, the `zod-openapi` npm package, to convert Zod schemas into a complete OpenAPI document, and then how to use Speakeasy to generate a production-ready SDK from that document.
 
-- **Zod** - A TypeScript schema validation library
-- **zod-openapi** - The npm package that converts Zod schemas to OpenAPI format  
-- **Speakeasy** - The tool that generates SDKs from your OpenAPI document
-
-In this tutorial, we'll use the `zod-openapi` package to convert Zod schemas into a complete OpenAPI document, then use Speakeasy to generate a production-ready SDK from that document.
 
 ## Why use Zod with OpenAPI?
 
@@ -32,21 +26,21 @@ While Zod v4 introduces new features like `z.strictObject()` and `z.email()`, yo
 </Callout>
 
 
-## Zod OpenAPI overview
+## zod-openapi overview
 
 The [`zod-openapi`](https://github.com/samchungy/zod-openapi) package is a TypeScript library that helps developers define OpenAPI schemas as Zod schemas. The stated goal of the project is to cut down on code duplication, and it does a wonderful job of this.
 
-Zod schemas map to OpenAPI schemas well, and the changes required to extract OpenAPI documents from a schema defined in Zod are often small.
+Zod schemas map well to OpenAPI schemas, and the changes required to extract OpenAPI documents from a schema defined in Zod are often small.
 
 <Callout title="Migrating from zod-to-openapi?" type="info">
-If you're currently using the older `zod-to-openapi` library, the syntax will be familiar and you can use either library. For migration guidance, see the [zod-openapi migration documentation](https://github.com/samchungy/zod-openapi#migration).
+If you're currently using the older `zod-to-openapi` library, the syntax will be familiar, and you can use either library. For migration guidance, see the [`zod-openapi` migration documentation](https://github.com/samchungy/zod-openapi#migration).
 </Callout>
 
 ### Key concepts
 
 
 <Callout title="Zod v4" type="info">
-This guide demonstrates a **dual import strategy** for using both Zod v3 and v4 in the same project. This approach is necessary because `zod-openapi` currently requires Zod v3 compatibility, while you may want to use Zod v4 features elsewhere in your application.
+This guide demonstrates a **dual import strategy** for using both Zod v3 and v4 in the same project. This approach is necessary because `zod-openapi` currently requires Zod v3 compatibility, and you may want to use Zod v4 features elsewhere in your application.
 
 Unlike most libraries, Zod is directly embedded in hundreds of other libraries' public APIs. A normal `zod@4.0.0` release would force every one of those libraries to publish breaking changes simultaneously - a massive "version avalanche".
 
@@ -256,7 +250,7 @@ burgerSchema.openapi({ ref: "Burger" });
 
 To generate an SDK that offers a great developer experience, we recommend adding descriptions and examples to all fields in OpenAPI components.
 
-With Zod OpenAPI, we'll call the `.openapi` method on each field, and add an example and description to each field.
+With `zod-openapi`, we'll call the `.openapi` method on each field, and add an example and description to each field.
 
 We'll also add a description to the `Burger` component itself.
 
@@ -1038,7 +1032,7 @@ By following these steps, you can ensure that your API is well-documented, easy 
 
 ### Further reading
 
-This guide covered the basics of generating an OpenAPI document using Zod OpenAPI. Here are some resources to help you learn more about Zod, OpenAPI, and Speakeasy:
+This guide covered the basics of generating an OpenAPI document using `zod-openapi`. Here are some resources to help you learn more about Zod, OpenAPI, and Speakeasy:
 
-- [The Zod OpenAPI documentation](https://github.com/samchungy/zod-openapi): Learn more about the `zod-openapi` library, including advanced features like custom serializers and middleware integration.
+- [The `zod-openapi` documentation](https://github.com/samchungy/zod-openapi): Learn more about the `zod-openapi` library, including advanced features like custom serializers and middleware integration.
 - [The Zod documentation](https://zod.dev/): Comprehensive guide to Zod schema validation, including the latest v4 features.
