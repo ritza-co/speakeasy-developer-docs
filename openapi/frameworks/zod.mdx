@@ -26,7 +26,7 @@ While Zod v4 introduces new features like `z.strictObject()` and `z.email()`, yo
 </Callout>
 
 
-## Zod OpenAPI overview
+## zod-openapi overview
 
 The [`zod-openapi`](https://github.com/samchungy/zod-openapi) package is a TypeScript library that helps developers define OpenAPI schemas as Zod schemas. The stated goal of the project is to cut down on code duplication, and it does a wonderful job of this.
 
@@ -250,7 +250,7 @@ burgerSchema.openapi({ ref: "Burger" });
 
 To generate an SDK that offers a great developer experience, we recommend adding descriptions and examples to all fields in OpenAPI components.
 
-With Zod OpenAPI, we'll call the `.openapi` method on each field, and add an example and description to each field.
+With `zod-openapi`, we'll call the `.openapi` method on each field, and add an example and description to each field.
 
 We'll also add a description to the `Burger` component itself.
 
@@ -1032,7 +1032,7 @@ By following these steps, you can ensure that your API is well-documented, easy 
 
 ### Further reading
 
-This guide covered the basics of generating an OpenAPI document using Zod OpenAPI. Here are some resources to help you learn more about Zod, OpenAPI, and Speakeasy:
+This guide covered the basics of generating an OpenAPI document using `zod-openapi`. Here are some resources to help you learn more about Zod, OpenAPI, and Speakeasy:
 
-- [The Zod OpenAPI documentation](https://github.com/samchungy/zod-openapi): Learn more about the `zod-openapi` library, including advanced features like custom serializers and middleware integration.
+- [The `zod-openapi` documentation](https://github.com/samchungy/zod-openapi): Learn more about the `zod-openapi` library, including advanced features like custom serializers and middleware integration.
 - [The Zod documentation](https://zod.dev/): Comprehensive guide to Zod schema validation, including the latest v4 features.
