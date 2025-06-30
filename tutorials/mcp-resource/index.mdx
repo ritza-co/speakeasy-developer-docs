@@ -1,7 +1,15 @@
-# MCP Resources
+---
+title: Using MCP Resources
+description: Learn real-world examples of using MCP resources with Claude Desktop, VsCode, and Sentry.
+---
 
-Many developers skip resources because they seem similar to tools as both can read data. But there's a key difference that makes resources incredibly useful for agentic workflows.
-In this tutorial, we'll set up Sentry documentation in Claude Desktop and GitHub files in VS Code so your LLM has the necessary context without requiring you to search for it every time.
+Many developers skip MCP resources because they seem similar to MCP tools as both can read data. But there's a key difference that makes resources incredibly useful for agentic workflows. Resources give your LLM direct access to knowledge bases like documentation and codebases, eliminating the need to manually find and paste relevant information into every conversation. For example, instead of manually finding and copying a project's `README.md` file when asking installation questions, you can set up the README as a resource so Copilot automatically has access to the specific setup instructions during the conversation.
+
+In this tutorial, we will:
+
+- Set up Sentry with Claude Desktop so you can ask specific integration questions and get answers that reference current Sentry documentation and best practices.
+
+- Set up GitHub MCP server with VS Code so Copilot can read the axios `README.md` and suggest implementation steps based on the actual library documentation.
 
 ## Prerequisites 
 
@@ -15,13 +23,15 @@ Before starting this tutorial, you'll need:
 ## Tools vs. resources
 
 Both [tools](/mcp/tools) and [resources](mcp/resources) can handle read-only operations, and both can be used by you or the AI agent to fetch data for context. The key difference is how much content they return.
-Tools are well-suited for quick data lookups, retrieving a user's profile, checking status, or running a simple query. Resources are designed for larger content, such as documentation, log files, configuration data, or any substantial text that will inform the entire conversation.
-If your read-only operation returns a lot of content or a file, use a resource. If it returns a quick data point or status, use a tool to process it.
+Tools are well-suited for quick data lookups, retrieving a user's profile, checking status, or running a simple query. Resources are designed for extensive reference material, such as comprehensive documentation, complete log files, entire configuration files, or substantial codebases that remain available as context throughout the entire conversation with the LLM.
+If your read-only operation returns extensive text or complete files or media material, use a resource. If it returns a specific data point or status update, use a tool to process it.
 
 ## Claude Desktop + Sentry MCP
 
 Claude Desktop supports MCP resources on Pro and Team plans but doesn't support resource templating, meaning you can't pass dynamic parameters to customize what the resource fetches.
-The [Sentry MCP server](https://docs.sentry.io/product/sentry-mcp/) provides documentation for integrating Sentry with different platforms. Let's connect it to Claude's Desktop.
+The [Sentry MCP server](https://docs.sentry.io/product/sentry-mcp/) provides documentation for integrating Sentry with different platforms.
+
+We'll connect the Sentry MCP server to Claude Desktop so that we can ask questions about Sentry iOS integration directly in our conversations to get accurate setup instructions and troubleshooting help without leaving our development environment.
 
 ### Configure Sentry MCP in integrations
 
@@ -51,11 +61,11 @@ With the resource attached, ask Claude: "How do I set up Sentry crash reporting 
 
 ![Testing the setup](./assets/mcp-resources-sentry-testing.png)
 
-Claude now has the Sentry iOS documentation as context and can provide specific setup instructions.
+In the image above, Claude responds with detailed iOS setup steps, including specific Swift code and configuration details. With the Sentry documentation as context, it can provide accurate, platform-specific guidance rather than generic crash reporting advice.
 
 ## Github MCP server with VsCode
 
-VS Code with GitHub Copilot supports MCP servers and resources. Their resources let you pull files from any GitHub repository directly into your agent context.
+VS Code with GitHub Copilot supports MCP servers and resources. We'll set up the GitHub MCP server in VS Code so that we can include the [axios](https://github.com/axios/axios) `README.md` file as context and ask Copilot for implementation help that references the actual library examples and API methods.
 
 ### Create the MCP configuration
 
@@ -93,19 +103,19 @@ In any VS Code chat, click the **📎 Add Context...** button. Select **MCP Reso
 
 Choose the **repository content** template. Enter:
 
-- Repository owner: `github`
-- Repository name: `gitHub-mcp-server`
-- File path: `LICENSE`
+- Repository owner: `axios`
+- Repository name: `axios`
+- File path: `README.md`
 
 ![Selecting LICENSE file](./assets/mcp-github-content.png)
 
 ### Test the setup
 
-With the `LICENSE` file attached as context, ask: *What type of license is this and what does it allow?*
+With the `README.md` file attached as context, write: *Give the steps you will follow to setup axios in this project.*
 
 ![Testing the setup](./assets/using-resource.png)
 
-Copilot now has the file content and can answer specific questions about it.
+In the image above, we can see that Copilot is suggesting an implementation plan for integrating axios into the current project, referencing specific methods and examples from the axios README that's now available as context.
 
 ## Conclusion
 
