@@ -13,13 +13,13 @@ In this tutorial, we will:
 
 - Set up GitHub MCP server with VS Code so Copilot can read the axios `README.md` and suggest implementation steps based on the actual library documentation.
 
-## Prerequisites 
+## Prerequisites
 
 Before starting this tutorial, you'll need:
 
 - [Claude Desktop](https://claude.ai/download) with a Pro or Team plan (required for MCP resources).
 - [VS Code](https://code.visualstudio.com/) with [GitHub Copilot](https://github.com/copilot) enabled.
-- A GitHub account with a personal [access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token).
+- A GitHub account with a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token).
 - An active Sentry account (free tier works).
 
 ## Tools vs. resources
@@ -37,11 +37,11 @@ We'll connect the Sentry MCP server to Claude Desktop so that we can ask questio
 
 ### Configure Sentry MCP in integrations
 
-Open Claude Desktop settings and go to the Integrations section. Click **+ Add integration**. Enter the integration name and URL `https://mcp.sentry.dev/mcp`.
+Open Claude Desktop settings by clicking on your username in the bottom left and then choosing Settings in the pop up menu. Go to the Integrations section and click **+ Add integration**. Enter the integration name and set the URL to `https://mcp.sentry.dev/mcp`.
 
 <Screenshot url="./assets/claude-adding-sentry.png">![Configuring Sentry MCP Integration](./assets/claude-adding-sentry.png)</Screenshot>
 
-Click **Connect** to authorize Sentry access to your organization. You'll be redirected to confirm access in your browser.
+Click **Connect** to authorize Sentry access to your organization. You'll be redirected to confirm access in your browser. You will need to be logged in to your Claude account in your browser to initiate the authorization flow.
 
 <Screenshot url="./assets/claude-sentry-mcp-integration.png">![Connecting Sentry and Claude](./assets/claude-sentry-mcp-integration.png)</Screenshot>
 
@@ -56,7 +56,7 @@ Choose the **Apple iOS guide** documentation from the list.
 
 <Screenshot url="./assets/claude-looking-for-ios-guide.png">![Selecting Apple iOS guide](./assets/claude-looking-for-ios-guide.png)</Screenshot>
 
-The resource has been attached. You can then send a prompt to ask for a guide to setup Sentry for your iOS project. 
+The resource has been attached. You can then send a prompt to ask for a guide to set up Sentry for your iOS project.
 
 ### Test the setup
 
@@ -66,7 +66,7 @@ With the resource attached, ask Claude: "How do I set up Sentry crash reporting 
 
 In the image above, Claude responds with detailed iOS setup steps, including specific Swift code and configuration details. With the Sentry documentation as context, it can provide accurate, platform-specific guidance rather than generic crash reporting advice.
 
-## Github MCP server with VsCode
+## GitHub MCP server with VS Code
 
 VS Code with GitHub Copilot supports MCP servers and resources. We'll set up the GitHub MCP server in VS Code so that we can include the [axios](https://github.com/axios/axios) `README.md` file as context and ask Copilot for implementation help that references the actual library examples and API methods.
 
@@ -96,11 +96,11 @@ In your project root, create a file named `mcp.json` in the `.vscode` directory 
 }
 ```
 
-Once the file saved, VS Code will detect the configuration and prompt you to enter your GitHub Personal Access Token.
+Once the file is saved, VS Code will detect the configuration and show a Start button above the configuration. Click this button to start the MCP server, and you will be prompted to enter your GitHub personal access token.
 
-### Add gitHub file as resource
+### Add GitHub file as resource
 
-In any VS Code chat, click the **📎 Add Context...** button. Select **MCP Resources**.
+In any Copilot chat panel in VS Code, click the **📎 Add Context...** button. Select **MCP Resources**.
 
 <Screenshot url="./assets/mcp-resources-vscode.png">![Adding MCP resources](./assets/mcp-resources-vscode.png)</Screenshot>
 
@@ -114,7 +114,7 @@ Choose the **repository content** template. Enter:
 
 ### Test the setup
 
-With the `README.md` file attached as context, write: *Give the steps you will follow to setup axios in this project.*
+With the `README.md` file attached as context, write: *Give the steps you will follow to set up axios in this project.*
 
 <Screenshot url="./assets/using-resource.png">![Testing the setup](./assets/using-resource.png)</Screenshot>
 
