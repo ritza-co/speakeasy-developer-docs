@@ -9,17 +9,17 @@ The Model Context Protocol (MCP) Specification is clear about what is expected f
 
 However, your OAuth server most likely doesn't comply with MCP's requirements. The MCP Specification expects authorization servers to implement a narrow set of OAuth features that most OAuth servers don't support.
 
-This mismatch between current OAuth implementations and what MCP expects is a common point of friction holding back enterprise adoption of MCP. If you're still in the exploratory phase of MCP development for your product, you may not have bumped into this problem yet. The OAuth situation usually only rears its head when you get to the point where you consider the practical steps a user will take when authenticating with your service and authorizing the MCP server to act on their behalf.
+This mismatch between current OAuth implementations and what MCP expects is a common point of friction holding back enterprise adoption of MCP. If you're still in the exploratory phase of MCP development for your product, you may not have bumped into this problem yet. The OAuth situation usually only rears its head when you get to the point at which you consider the practical steps a user will take when authenticating with your service and authorizing the MCP server to act on their behalf.
 
 In this guide, we'll explain this mismatch in plain terms, offer alternatives, and hopefully help you find your way.
 
 ## The perfect world that doesn't exist
 
-In an ideal universe, here's how MCP OAuth would work: Your company already has an OAuth server[^1] that perfectly complies with the MCP specification. All you need to do is host a well-formed `/.well-known/oauth-protected-resource` file on your MCP server, and you're done! The MCP client handles the entire OAuth flow automatically.
+In an ideal universe, here's how MCP OAuth would work: Your company already has an OAuth server[^1] that perfectly complies with the MCP Specification. All you need to do is host a well-formed `/.well-known/oauth-protected-resource` file on your MCP server, and you're done! The MCP client handles the entire OAuth flow automatically.
 
 > **Aside**: If this actually describes your situation, congratulations! You work for one of approximately three companies on Earth where this is true. For the rest of us mortals, keep reading.
 
-The MCP specification has very specific requirements for OAuth implementation. Your OAuth provider needs to support:
+The MCP Specification has very specific requirements for OAuth implementation. Your OAuth provider needs to support:
 
 - OAuth 2.1 with mandatory PKCE[^2]
 - **Dynamic Client Registration (DCR)**[^3]
@@ -28,21 +28,21 @@ The MCP specification has very specific requirements for OAuth implementation. Y
 
 That second requirement, Dynamic Client Registration, is where everything falls apart.
 
-## The Dynamic Client Registration problem
+## The DCR problem
 
 When creating an OAuth client, the usual workflow is for the developer to manually get a `client_id` and `client_secret` from the authorization server, then configure their application with these credentials.
 
-This traditional approach is aimed at developers, not end-users. It assumes that the developer has access to the OAuth server's management interface and can create an application manually.
+This traditional approach is aimed at developers, not end users. It assumes that the developer has access to the OAuth server's management interface and can create an application manually.
 
-The idea of end-users finding your application's OAuth registration page, filling out a form, and getting a client ID and secret is not how the MCP specification envisions OAuth. Instead, it expects that MCP clients can dynamically register themselves as OAuth clients without manual intervention.
+The idea of end users finding your application's OAuth registration page, filling out a form, and getting a client ID and secret is not how the MCP Specification envisions OAuth. Instead, it expects that MCP clients can dynamically register themselves as OAuth clients without manual intervention.
 
 Here's the crux of the issue: MCP clients have no standardized way to handle client IDs or client secrets[^4]. They need to be able to register themselves dynamically as OAuth clients to perform the authentication dance.
 
-But here's the thing, and I cannot stress this enough: **most OAuth providers do not support Dynamic Client Registration** (and yours probably doesn't either).
+But here's the thing, and I cannot stress this enough: **Most OAuth providers do not support Dynamic Client Registration** (and yours probably doesn't either).
 
 Google? Nope. GitHub? Not a chance. Microsoft Azure AD? Don't even think about it. Your company's homegrown OAuth solution that Bob from IT built five years ago? Definitely not.
 
-If you're thinking, "But wait, I've seen MCP servers with OAuth!", you're right, but they're not doing what you think they're doing.
+If you're thinking, "But wait, I've seen MCP servers with OAuth!" you're right, but they're not doing what you think they're doing.
 
 ## The OAuth proxy solution
 
@@ -73,9 +73,9 @@ This is quite a bit of responsibility for a proxy to take on, and the implicatio
 Building an OAuth proxy isn't just a weekend project. You need to handle:
 
 - **PKCE verification**[^7] (because MCP requires OAuth 2.1)
-- **Token lifecycle management** (storing, refreshing, revoking)
+- **Token lifecycle management** (storing, refreshing, and revoking)
 - **Security considerations** (you're now responsible for token security)
-- **Custom adapters** for each OAuth provider you want to support
+- **Custom adapters** (for each OAuth provider you want to support)
 - **Performance optimization** (every auth check now has additional hops)
 
 The fun doesn't stop there.
@@ -84,7 +84,7 @@ Most current implementations store a single `client_id` and `client_secret` for 
 
 This means every user of your MCP server is effectively acting under the same OAuth application. Depending on your use case, this might be fine, or it might be a compliance nightmare.
 
-Up until now, your customers have been using your OAuth server with their own client IDs and secrets, but now they all share the same credentials. This can lead to issues with rate limiting, token revocation, and auditing.
+Up until now, your customers have been using your OAuth server with their own client IDs and secrets; but now they all share the same credentials. This can lead to issues with rate limiting, token revocation, and auditing.
 
 Simply plopping a Cloudflare OAuth proxy in front of your MCP server doesn't magically solve these problems. You may need to make significant changes to your own systems to accommodate this new architecture.
 
@@ -94,25 +94,25 @@ The [Cloudflare AI repository](https://github.com/cloudflare/ai/tree/main/demos)
 
 After analyzing the complete [Cloudflare provider source implementation](https://github.com/cloudflare/workers-oauth-provider/blob/main/src/oauth-provider.ts), several key architectural patterns emerge that are consistent across all examples:
 
-The Cloudflare wrapper exposes its own complete OAuth , including `.well-known/oauth-authorization-server`, `register`, `authorize`, and `token` endpoints. The MCP client never directly interacts with the downstream OAuth provider and remains unaware of the actual provider's server details.
+- The Cloudflare wrapper exposes its own complete OAuth, including `.well-known/oauth-authorization-server`, `register`, `authorize`, and `token` endpoints. The MCP client never directly interacts with the downstream OAuth provider and remains unaware of the actual provider's server details.
 
-All server metadata returned in `well-known/oauth-authorization-server` points exclusively to the Cloudflare server. The authorization codes and access tokens received by the MCP client are proxy tokens generated by the Cloudflare wrapper, completely isolated from the underlying WorkOS tokens.
+- All server metadata returned in `well-known/oauth-authorization-server` point exclusively to the Cloudflare server. The authorization codes and access tokens received by the MCP client are proxy tokens generated by the Cloudflare wrapper, completely isolated from the underlying WorkOS tokens.
 
-The Cloudflare provider uses Cloudflare KV for persistent storage of grant data, authorization codes, and provider access tokens.
+- The Cloudflare provider uses Cloudflare KV for persistent storage of grant data, authorization codes, and provider access tokens.
 
-Despite the proxy architecture, the proxy still redirects users to the authentic OAuth consent screen of the underlying provider.
+- Despite the proxy architecture, the proxy still redirects users to the authentic OAuth consent screen of the underlying provider.
 
-The Cloudflare provider handles PKCE (Proof Key for Code Exchange) verification, ensuring OAuth 2.1 security standards are maintained throughout the proxy flow.
+- The Cloudflare provider handles PKCE verification, ensuring OAuth 2.1 security standards are maintained throughout the proxy flow.
 
-Custom WorkOS adapters integrate with the Cloudflare OAuth wrapper through `OAUTH_PROVIDER.parseAuthRequest` and `OAUTH_PROVIDER.completeAuthorization` functions. The `completeAuthorization` method allows the Cloudflare wrapper to complete a token exchange with the real OAuth server, store the resulting token in KV storage, and subsequently initiate the MCP client callback. The final token exchange occurs exclusively between the MCP client and the Cloudflare wrapper.
+- Custom WorkOS adapters integrate with the Cloudflare OAuth wrapper through `OAUTH_PROVIDER.parseAuthRequest` and `OAUTH_PROVIDER.completeAuthorization` functions. The `completeAuthorization` method allows the Cloudflare wrapper to complete a token exchange with the real OAuth server, store the resulting token in KV storage, and subsequently initiate the MCP client callback. The final token exchange occurs exclusively between the MCP client and the Cloudflare wrapper.
 
 ## How MCP servers use OAuth today
 
-So who's actually using OAuth with MCP servers today? The answer reveals a lot about the state of the ecosystem.
+So who is actually using OAuth with MCP servers today? The answer reveals a lot about the state of the ecosystem.
 
 Many companies claiming to support "OAuth" for their MCP servers are actually doing something much simpler. GitHub, for example, has extensive documentation about hosting MCP servers remotely. But when you get to the [authentication section](https://github.com/github/github-mcp-server/blob/main/docs/host-integration.md#authentication-and-authorization), you'll find this note: "Dynamic Client Registration is NOT supported by Remote GitHub MCP Server at this time."
 
-Instead, they expect users to obtain a personal access token separately and pass it directly in headers to their MCP server. This is OAuth in name only - there's no OAuth flow happening through the MCP client at all. This is actually a perfectly valid approach! Sometimes the simplest solution is best. But it's not what the MCP specification envisions.
+Instead, they expect users to obtain a personal access token separately and pass it directly in headers to their MCP server. This is OAuth in name only - there's no OAuth flow happening through the MCP client at all. This is actually a perfectly valid approach! Sometimes the simplest solution is best. But it's not what the MCP Specification envisions.
 
 The companies that are supporting true MCP OAuth are almost universally using the Cloudflare Workers proxy pattern or have built something similar themselves.
 
@@ -124,7 +124,7 @@ Every API call to your MCP server now involves additional hops through the proxy
 
 Security gets more complex. You're now responsible for securing the proxy infrastructure itself, protecting the token mapping database, ensuring proper token rotation and expiration, and all the edge cases that come with handling OAuth tokens.
 
-You also may need to update your logging and monitoring practices. When all users share the same OAuth application credentials, and depending on your current setup, you might lose granular visibility into who's doing what. Your audit logs show one application making all the requests.
+You also may need to update your logging and monitoring practices. When all users share the same OAuth application credentials, depending on your current setup, you may lose granular visibility into who's doing what. Your audit logs show one application making all the requests.
 
 These are not trivial changes. They require careful planning, additional resources, and a deep understanding of both OAuth and MCP.
 
@@ -132,7 +132,7 @@ These are not trivial changes. They require careful planning, additional resourc
 
 This brings us to MCP auth's biggest challenge: the mismatch between developer expectations and reality.
 
-Developers coming to MCP expect OAuth to work like it does everywhere else: get your client credentials, configure your app, and done. Instead, they find themselves in a quagmire of proxy architectures, token mapping strategies, and the intricacies of Dynamic Client Registration.
+Developers coming to MCP expect OAuth to work like it does everywhere else: get your client credentials, configure your app, and done. Instead, they find themselves in a quagmire of proxy architectures, token mapping strategies, and the intricacies of DCR.
 
 What should be a simple authentication problem has turned into an architectural redesign that touches security, performance, and compliance.
 
@@ -150,10 +150,10 @@ For now, teams implementing MCP need to carefully evaluate their authentication 
 
 [^3]: Dynamic Client Registration (DCR) allows applications to register themselves as OAuth clients programmatically, without manual configuration. Imagine if every app could automatically add itself to your Google account's authorized apps list - that's DCR.
 
-[^4]: Client IDs and client secrets are like username/password pairs for applications (not users). They identify which application is requesting access to user data.
+[^4]: Client IDs and client secrets are like username-and-password pairs for applications (not users). They identify which application is requesting access to user data.
 
 [^5]: Cloudflare Workers are serverless functions that run at the edge of Cloudflare's network. Think of them as tiny programs that can intercept and modify web requests.
 
-[^6]: Cloudflare KV is a key-value storage system, essentially a simple database for storing data like tokens and their mappings.
+[^6]: Cloudflare KV is a key-value storage system. Essentially, it's a simple database for storing data like tokens and their mappings.
 
 [^7]: PKCE verification ensures that the same client that started the OAuth flow is the one completing it, preventing certain types of attacks.
