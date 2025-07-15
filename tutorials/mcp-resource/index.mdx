@@ -1,78 +1,103 @@
 ---
-title: Using MCP Resources in Practice
-description: Configure Sentry documentation in Claude Desktop and GitHub repositories in VS Code to give your agent or LLM direct access to relevant context without manual copy-pasting.
+title: Using MCP resources to provide AI assistants with persistent context
+description: Learn how to use MCP resources to provide AI assistants with persistent context that remains automatically available throughout conversations.
 ---
 
 import { Screenshot } from "@/mdx/components";
 
-Many developers skip MCP resources because they seem similar to MCP tools as both can read data. But there's a key difference that makes resources incredibly useful for agentic workflows. Resources give your LLM direct access to knowledge bases like documentation and codebases, eliminating the need to manually find and paste relevant information into every conversation. For example, instead of manually finding and copying a project's `README.md` file when asking installation questions, you can set up the README as a resource so Copilot automatically has access to the specific setup instructions during the conversation.
+MCP resources give LLMs direct access to static, read-only data without requiring user approval for each request. Resource data can include documentation, configuration files, schemas, logs, or any reference material an LLM may need to consult during the conversation. Unlike MCP tools, which require user confirmation before execution, resources are treated as safe reference material that can be accessed freely.
 
-In this tutorial, we will:
+For example, instead of manually copying a project's `README.md` file when asking an LLM installation questions, you can expose the README as a resource. The LLM can then access setup instructions directly whenever needed during the conversation, without interrupting the flow to ask for permission.
 
-- Set up Sentry with Claude Desktop so you can ask specific integration questions and get answers that reference current Sentry documentation and best practices.
+This tutorial will show you how to use MCP resources to:
 
-- Set up GitHub MCP server with VS Code so Copilot can read the axios `README.md` and suggest implementation steps based on the actual library documentation.
+- [Add Sentry documentation as context in Claude Desktop](#using-the-sentry-mcp-server-with-claude-desktop) for iOS integration guidance.
+- [Add GitHub repository files as context in VS Code](#using-the-github-mcp-server-with-vs-code) for implementation guidance based on actual library documentation.
 
-## Prerequisites
+## MCP tools vs MCP resources
 
-Before starting this tutorial, you'll need:
+While both [MCP tools](/mcp/tools) and [MCP resources](/mcp/resources) can handle read-only operations, the key difference between them lies in their interaction models. Tools are treated as operations that may have side effects or require deliberate execution. Resources, by contrast, allow immediate access without user intervention. In most MCP clients (such as Claude Desktop, Copilot, or Cursor AI), tools require explicit approval or confirmation before execution, but resources can be accessed directly by the LLM without interrupting the conversation flow. 
+
+Use MCP tools for:
+
+- Operations that modify state or have side effects.
+- Accessing sensitive data that requires user consent.
+- Dynamic operations with user-specific parameters (searches, queries).
+- External API calls or processes that might incur costs.
+- Actions where the user should be aware that something is happening.
+
+Use MCP resources for:
+
+- Configuration files, documentation, and schemas.
+- Static reference data (catalogs, directories).
+- Content the LLM might access multiple times during reasoning.
+- Read-only data that should always be available to the LLM.
+
+## Using the Sentry MCP Server with Claude Desktop
+
+While [Claude Desktop](https://claude.ai/download) supports MCP resources on Pro and Team plans, it doesn't support resource templating, so you can't pass parameters to specify what content to retrieve dynamically.
+
+The [Sentry MCP Server](https://docs.sentry.io/product/sentry-mcp/) provides access to your Sentry project data and Sentry documentation, enabling AI-assisted debugging and development workflows. 
+
+We'll connect Claude Desktop to the Sentry MCP Server so Claude can reference Sentry's documentation when answering questions about integrating Sentry into an iOS project.
+
+### Prerequisites
+
+You'll need:
 
 - [Claude Desktop](https://claude.ai/download) with a Pro or Team plan (required for MCP resources).
-- [VS Code](https://code.visualstudio.com/) with [GitHub Copilot](https://github.com/copilot) enabled.
-- A GitHub account with a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token).
-- An active Sentry account (free tier works).
+- A [Sentry account](https://sentry.io/signup/) (free tier works).
 
-## Tools vs. resources
+### Add the Sentry MCP integration
 
-Both [tools](/mcp/tools) and [resources](mcp/resources) can handle read-only operations, and both can be used by you or the AI agent to fetch data for context. The key difference is how much content they return.
-Tools are well-suited for quick data lookups, retrieving a user's profile, checking status, or running a simple query. Resources are designed for extensive reference material, such as comprehensive documentation, complete log files, entire configuration files, or substantial codebases that remain available as context throughout the entire conversation with the LLM.
-If your read-only operation returns extensive text or complete files or media material, use a resource. If it returns a specific data point or status update, use a tool to process it.
+In Claude Desktop, click your username at the bottom left of the sidebar and select **Settings** from the popup. (If the sidebar isn't visible, click the menu icon in the top-left corner first.)
 
-## Claude Desktop + Sentry MCP
+In **Settings**, click **Integrations** and then **+ Add integration**. Give the integration a name, set the URL to `https://mcp.sentry.dev/mcp`, and click **Add**.
 
-Claude Desktop supports MCP resources on Pro and Team plans but doesn't support resource templating, meaning you can't pass dynamic parameters to customize what the resource fetches.
-The [Sentry MCP server](https://docs.sentry.io/product/sentry-mcp/) provides documentation for integrating Sentry with different platforms.
+<Screenshot url="./assets/claude-adding-sentry.png">![Configuring the Sentry MCP integration](./assets/claude-adding-sentry.png)</Screenshot>
 
-We'll connect the Sentry MCP server to Claude Desktop so that we can ask questions about Sentry iOS integration directly in our conversations to get accurate setup instructions and troubleshooting help without leaving our development environment.
-
-### Configure Sentry MCP in integrations
-
-Open Claude Desktop settings by clicking on your username in the bottom left and then choosing Settings in the pop up menu. Go to the Integrations section and click **+ Add integration**. Enter the integration name and set the URL to `https://mcp.sentry.dev/mcp`.
-
-<Screenshot url="./assets/claude-adding-sentry.png">![Configuring Sentry MCP Integration](./assets/claude-adding-sentry.png)</Screenshot>
-
-Click **Connect** to authorize Sentry access to your organization. You'll be redirected to confirm access in your browser. You will need to be logged in to your Claude account in your browser to initiate the authorization flow.
+In the **Integrations** tab, click **Connect** next to the integration. You'll be redirected to your browser to authorize Claude to access your Sentry organization. Note that you need to be logged in to your Claude account in your browser to complete the authorization.
 
 <Screenshot url="./assets/claude-sentry-mcp-integration.png">![Connecting Sentry and Claude](./assets/claude-sentry-mcp-integration.png)</Screenshot>
 
-
 ### Add Sentry documentation as context
 
-In any chat, click the **+** button. Select **Add from Sentry** from the options.
+In any chat, click the **+** button and select **Add from Sentry MCP** from the options.
 
 <Screenshot url="./assets/claude-finding-resources.png">![Adding Sentry resources](./assets/claude-finding-resources.png)</Screenshot>
 
-Choose the **Apple iOS guide** documentation from the list.
+Choose `apple-ios-guide` from the list.
 
 <Screenshot url="./assets/claude-looking-for-ios-guide.png">![Selecting Apple iOS guide](./assets/claude-looking-for-ios-guide.png)</Screenshot>
 
-The resource has been attached. You can then send a prompt to ask for a guide to set up Sentry for your iOS project.
-
 ### Test the setup
 
-With the resource attached, ask Claude: "How do I set up Sentry crash reporting for my iOS project?".
+With the resource attached, ask Claude a question like: 
+
+```
+How do I set up Sentry crash reporting for my iOS project?
+```
 
 <Screenshot url="./assets/mcp-resources-sentry-testing.png">![Testing the setup](./assets/mcp-resources-sentry-testing.png)</Screenshot>
 
-In the image above, Claude responds with detailed iOS setup steps, including specific Swift code and configuration details. With the Sentry documentation as context, it can provide accurate, platform-specific guidance rather than generic crash reporting advice.
+Claude responds with detailed iOS setup steps, including specific Swift code and configuration details. With the Sentry documentation as context, it provides platform-specific guidance rather than generic crash reporting advice.
 
-## GitHub MCP server with VS Code
+## Using the GitHub MCP Server with VS Code
 
-VS Code with GitHub Copilot supports MCP servers and resources. We'll set up the GitHub MCP server in VS Code so that we can include the [axios](https://github.com/axios/axios) `README.md` file as context and ask Copilot for implementation help that references the actual library examples and API methods.
+VS Code with GitHub Copilot has support for MCP servers and resources. 
+
+We'll set up the GitHub MCP Server in VS Code so that we can include the [Axios](https://github.com/axios/axios) `README.md` file as context and ask Copilot for implementation help that references the actual library examples and API methods.
+
+### Prerequisites
+
+You'll need:
+
+- [VS Code](https://code.visualstudio.com/) with [GitHub Copilot](https://github.com/copilot) enabled.
+- A GitHub account with a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token).
 
 ### Create the MCP configuration
 
-In your project root, create a file named `mcp.json` in the `.vscode` directory and add this configuration:
+In your project root, create a file named `mcp.json` in the `.vscode` directory. Add this configuration:
 
 ```json
 {
@@ -96,15 +121,15 @@ In your project root, create a file named `mcp.json` in the `.vscode` directory 
 }
 ```
 
-Once the file is saved, VS Code will detect the configuration and show a Start button above the configuration. Click this button to start the MCP server, and you will be prompted to enter your GitHub personal access token.
+Once saved, VS Code will detect the configuration and display a **Start** button above it. Click this button to start the MCP server, and you will be prompted to enter your GitHub personal access token.
 
-### Add GitHub file as resource
+### Add a GitHub file as a resource
 
-In any Copilot chat panel in VS Code, click the **📎 Add Context...** button. Select **MCP Resources**.
+In any Copilot chat panel in VS Code, click **📎 Add Context...** and select **MCP Resources**.
 
 <Screenshot url="./assets/mcp-resources-vscode.png">![Adding MCP resources](./assets/mcp-resources-vscode.png)</Screenshot>
 
-Choose the **repository content** template. Enter:
+Select the **Repository Content** template and enter:
 
 - Repository owner: `axios`
 - Repository name: `axios`
@@ -114,18 +139,24 @@ Choose the **repository content** template. Enter:
 
 ### Test the setup
 
-With the `README.md` file attached as context, write: *Give the steps you will follow to set up axios in this project.*
+With the `README.md` file attached as context, write: 
+
+```
+Give the steps you will follow to set up axios in this project.
+```
 
 <Screenshot url="./assets/using-resource.png">![Testing the setup](./assets/using-resource.png)</Screenshot>
 
-In the image above, we can see that Copilot is suggesting an implementation plan for integrating axios into the current project, referencing specific methods and examples from the axios README that's now available as context.
+Copilot suggests implementation steps for adding Axios to the project, using specific methods and examples from the Axios `README`.
 
-## Conclusion
+## Next steps
 
-In this tutorial, we set up MCP resources in Claude Desktop with Sentry documentation and in VS Code with GitHub files. You can now bring external documentation directly into your AI conversations for better context.
+Using MCP resources to provide direct access to reference material eliminates the need to manually find and copy relevant information into every conversation.
 
-To learn more about MCP:
+MCP resources work with any static, read-only content that you'd always want the LLM to access, such as documentation, configuration files, logs, or reference datasets. Consider what information you regularly consult that could be exposed as resources to streamline your AI workflows without requiring approval prompts or causing side effects.
 
-- [Remote MCP Servers](/mcp/remote-servers)
-- [MCP for skeptics](/mcp/mcp-for-skeptics)
-- [MCP prompts](/mcp/prompts)
+Learn more about MCP:
+
+- [Deploying remote MCP servers](/mcp/remote-servers).
+- [MCP for skeptics](/mcp/mcp-for-skeptics).
+- [How to define, expose, and use prompts in MCP servers](/mcp/prompts).
