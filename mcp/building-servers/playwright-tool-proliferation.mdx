@@ -1,0 +1,359 @@
+---
+title: "Why Less is More: The Playwright Proliferation Problem with MCP"
+description: "How choosing the right tools fixes choice overload in browser automation"
+---
+
+import GramCallout from "../.partials/gram-callout.mdx";
+
+<GramCallout />
+
+Flask creator Armin Ronacher [recently voiced a frustration](https://x.com/mitsuhiko/status/1942531115371131270) familiar to many MCP users:
+
+![Tweet from Armin Ronacher](../assets/playwright-tool-proliferation/armin-tweet.png)
+
+When asked which tools he actually uses, [Armin's response was telling](https://x.com/mitsuhiko/status/1942533476592300215): *"Most of the time it's navigate, press key, handle dialog, click, type, select, wait for, page snapshot."*
+
+That's only 8 tools out of the Playwright MCP server's 26 available tools.
+
+## What is Playwright?
+
+[Playwright](https://playwright.dev) is a framework that allows AI agents to access a browser. Microsoft built it as a "universal remote control" for web browsers, with which you can control Chrome, Firefox, Safari, and Edge using the exact same code. Originally designed for testing web applications, Playwright has been extended with an MCP server that allows AI agents to interact with websites programmatically.
+
+What makes Playwright special is its reliability. Traditional browser automation tools suffer from flaky tests that fail randomly, usually because they don't wait for pages to fully load. Playwright solves this by automatically waiting for elements to be ready before interacting with them. It can also handle complex scenarios like multi-tab browsing, mobile device emulation, and even intercepting network requests to mock APIs.
+
+But here's the thing: Playwright was built for developers writing code, not for AI agents making decisions on the fly. That's where the MCP server comes in.
+
+### How the Playwright MCP server actually works
+
+The Playwright MCP server acts as a bridge between AI agents and Playwright's browser usage capabilities. Instead of Claude Desktop trying to figure out Playwright's complex APIs directly, the MCP server translates requests from the agent into browser actions and returns the resultant state back to the browser.
+
+![Playwright MCP architecture](../assets/playwright-tool-proliferation/playwright-mcp-architecture.png)
+
+The diagram above shows how Claude connects to your browser through the Playwright MCP server. Here's the flow when you ask Claude to "click the login button":
+
+1. **Claude** (the MCP Client) has access to the **Tools** section, which exposes browser automation capabilities like Navigate, Click, and Snapshot
+2. Claude selects the appropriate tool (in this case, Click) and sends an **action** to the **Playwright MCP** server
+3. The MCP server translates this into commands for the **Playwright Framework**  
+4. Playwright **interacts with** your actual **Browser** to perform the click
+5. The browser sends a **response** back up through the same chain to Claude
+
+Claude never directly touches the browser, it just selects from a curated set of tools that the MCP server exposes and manipulates the browser through the Playwright library.
+
+
+### The tool proliferation problem
+
+To understand why Armin Ronacher felt overwhelmed, let's examine exactly what Claude sees when it connects to the Playwright MCP server. The screenshot below shows the full tool inventory in VS Code:
+
+![Playwright MCP tools in VS Code](../assets/playwright-tool-proliferation/vscode-playwright.png)
+
+This is what confronts every AI agent trying to automate a browser. Let's break down this overwhelming toolset:
+
+**Core Browser Control (6 tools)**
+- `browser_navigate` - Go to URLs
+- `browser_navigate_back` - Browser back button  
+- `browser_navigate_forward` - Browser forward button
+- `browser_close` - Close browser
+- `browser_resize` - Change browser size
+- `browser_install` - Install browser binaries
+
+**Element Interaction (6 tools)**
+- `browser_click` - Click elements
+- `browser_type` - Type text
+- `browser_press_key` - Keyboard input
+- `browser_hover` - Mouse hover
+- `browser_drag` - Drag and drop
+- `browser_select_option` - Dropdown selection
+
+**Page Analysis (4 tools)**
+- `browser_snapshot` - Accessibility tree capture
+- `browser_take_screenshot` - Visual screenshot
+- `browser_wait_for` - Wait for conditions
+- `browser_handle_dialog` - Popup management
+
+**Advanced Features (6+ tools)**
+- `browser_console_messages` - Console log access
+- `browser_network_requests` - Network monitoring
+- `browser_pdf_save` - PDF generation
+- `browser_file_upload` - File handling
+- `browser_tab_*` - Tab management (4 tools)
+- `browser_generate_playwright_test` - Code generation
+
+**Total: 26 tools** for what should be straightforward browser automation.
+
+### When more tools mean more problems
+
+Here's a real e-commerce test that demonstrates the problem. We gave Claude Code this specific prompt and gave it browser access using the Playwright MCP server:
+
+```
+Perform an e-commerce purchase test:
+1. Go to https://www.saucedemo.com
+2. Login with username "standard_user" and password "secret_sauce"  
+3. Add "Sauce Labs Backpack" to cart
+4. Add "Sauce Labs Bike Light" to cart
+5. Go to cart and verify both items are there
+6. Proceed to checkout
+7. Fill checkout form: First Name "John", Last Name "Doe", Zip "12345"
+8. Complete the purchase
+9. Verify the success message appears
+10. Logout 
+```
+
+**What happened with all tools available:**
+
+Claude wasted time taking **unnecessary screenshots** at every step. Notice in the workflow below how it repeatedly says "Let me take a screenshot to better see the current state" and "Let me take another screenshot to see the current state" - even after simple actions like clicking "Add to cart" buttons:
+
+![Inefficient Playwright workflow with too many tools](../assets/playwright-tool-proliferation/playwright-mcp-inefficient.png)
+
+The agent got distracted by visual verification tools when it should have been focused on form automation. Screenshots arent entirely necessary when the agent is receiving the page structure as a response.
+
+Let's see what happens when we curate the toolset to just 3 essential tools:
+
+We restricted Claude to only these tools:
+- `browser_navigate` - Go to URLs
+- `browser_click` - Click elements  
+- `browser_type` - Type text
+
+With this focused toolset, Claude executed the same e-commerce workflow efficiently without any unnecessary verification steps:
+
+![Efficient Playwright workflow with curated tools](../assets/playwright-tool-proliferation/playwright-mcp-efficient.png)
+
+**The difference is dramatic:** No wasted screenshots, no decision paralysis between similar tools.
+
+With 26 tools available, every interaction becomes a multiple-choice question:
+- Need to see the page? `browser_snapshot` or `browser_take_screenshot`?
+- Want to wait? `browser_wait_for` or just proceed?
+- Should I check `browser_console_messages` for errors?
+- Is `browser_network_requests` relevant here?
+
+This cognitive overhead slows down an agent's ability to complete a task by making it more difficult to reason about the best tool to use. But how to solve this? First, let's understand how agents use interfaces.
+
+## How agents use interfaces
+
+Let's take a look at how an agent approaches a seemingly simple task: "Search for 'Claude MCP servers' on Google."
+
+![Claude search for 'Claude MCP servers' on Google](../assets/playwright-tool-proliferation/claude-search-google.png)
+
+### Step 1: Navigate and understand
+
+The agent starts by navigating to Google, then takes a snapshot to understand the page structure. With 26 tools available, it has to choose between `browser_navigate`, `browser_navigate_back`, or `browser_navigate_forward` just to get started.
+
+### Step 2: Locate and interact
+
+Next, it needs to find the search box. Should it use `browser_click` first, then `browser_type`? Or just `browser_type` directly? What about `browser_hover` to ensure the element is ready?
+
+### Step 3: Submit and verify
+
+Finally, it submits the search. Options include `browser_press_key` with "Enter", `browser_click` on the search button, or even `browser_select_option` if there's a dropdown involved.
+
+
+Here's what becomes obvious: even a simple Google search forces the agent through unnecessary decision points. Every step becomes a multiple-choice question when it should be straightforward execution.
+
+The agent knows it needs to understand the page, interact with elements, and verify results. But instead of having clear tools for each phase, it's stuck with overlapping options that basically do the same thing.
+
+## The solution to tool proliferation
+
+There are essentially two ways to tackle tool proliferation: client-side curation and server-side design.
+
+### Client-side curation: What users can do now
+
+Most MCP clients offer some form of tool filtering. Claude Desktop lets you manually disable tools, while other clients provide similar interfaces. However this puts the burden on users to figure out which tools they actually need.
+
+The problem with client-side curation is that it requires users to understand the differences between `browser_snapshot` and `browser_take_screenshot`, or when they might need `browser_console_messages` versus just figuring out the issue using basic navigation. 
+
+However not even all clients support tool curation, for example Claude Code and Gemini CLI don't support tool curation at all. Another issue is that clients like Copilot have a limit to how many tools can be provided to the agent at once. 
+
+![VS Code tool limit](../assets/playwright-tool-proliferation/vscode-tool-limit.png)
+
+And besides that, selecting tools manually is tedious, especially when you may not be sure which tools you actually need for a task.
+
+![Playwright MCP tools in VS Code](../assets/playwright-tool-proliferation/vscode-playwright.png)
+
+Even when clients support tool selection, manual curation has drawbacks. **Configuration fatigue** sets in when there are too many tools to manage manually, and in most clients a **lack of persistence** means settings don't save between sessions. **No sharing** capabilities prevent teams from sharing curated configurations, and **context switching** becomes problematic since different tools could have vastly different use cases.
+
+ 
+### Server-side design: What MCP builders should do
+
+The better approach is building focused MCP servers from the ground up. Instead of exposing every possible Playwright capability, server builders should create purpose-built servers for specific use cases.
+
+Here's how the thinking shifts:
+
+**Traditional approach**: "Let's expose all of Playwright's APIs as tools"
+- Results in 26 tools covering every edge case
+- Forces users to learn complex tool relationships
+- Creates decision paralysis for simple tasks
+
+**Focused approach**: "Let's solve specific automation problems"
+- Essential automation: 8 core tools for 90% of tasks
+- Testing workflows: Core tools + debugging capabilities  
+- Advanced automation: Specialized tools for complex scenarios
+
+The key difference is that different users need different tools, but the same user rarely needs all tools for a single task. 
+
+The core of this is discussed in more detail in our blog post on [The Art of Tool Curation](https://docs.getgram.ai/blog/tool-curation).
+
+## How to build more focused MCP servers
+
+Here are some practical ways to curate browser automation tools into effective toolsets.
+
+### Map tool dependencies
+
+Start by identifying tool dependencies in browser workflows:
+
+```
+Successful page interaction depends on:
+├── Navigation (from navigate)
+├── Page understanding (from snapshot)
+└── Element readiness (from wait_for)
+
+Form automation depends on:
+├── Page structure (from snapshot)
+├── Element interaction (from click, type, select)
+└── Submission handling (from press_key, handle_dialog)
+```
+
+This is a good starting point for figuring out which tools are needed for a specific task and deciding which tools are essential and which are not. This way, 
+
+### Group tools for specific use cases
+
+Create different toolsets for different browser automation scenarios:
+
+**Web scraping toolset:**
+*Focus: data extraction*
+
+- `navigate`, `snapshot`, `wait_for`
+- `click`, `type` (for pagination/forms)
+- `take_screenshot` (for verification)
+
+**Form automation toolset:**
+*Focus: data entry*
+
+- `navigate`, `snapshot`
+- `click`, `type`, `select`, `press_key`
+- `handle_dialog`, `wait_for`
+
+**Testing toolset:**
+*Focus: validation*
+
+- `navigate`, `snapshot`, `take_screenshot`
+- `click`, `type`, `wait_for`
+- `console_messages`, `network_requests`
+
+### Provide rich context with MCP extensions
+
+Adding on to this, you can use tool descriptions to provide more context for the agent to use when deciding which tool to use. For example, you can use Speakeasy's MCP extensions to help organize tools and provide context for the agent to use when deciding which tool to use.
+
+```yaml
+paths:
+  /browser/navigate:
+    post:
+      operationId: browserNavigate
+      summary: Navigate to URL
+      description: Navigate to any URL to start browser automation
+      x-speakeasy-mcp:
+        disabled: false
+        name: navigate
+        scopes: [core, navigation]
+        description: |
+          Essential starting point for all browser automation workflows.
+          Use this before any page interaction to establish the context.
+        
+  /browser/snapshot:
+    post:
+      operationId: browserSnapshot  
+      summary: Capture page accessibility tree
+      description: Capture the current page's accessibility tree for analysis
+      x-speakeasy-mcp:
+        disabled: false
+        name: snapshot
+        scopes: [core, discovery]
+        description: |
+          Critical discovery tool that provides structured data for element
+          interaction. Prefer this over screenshots for element discovery.
+        
+  /browser/click:
+    post:
+      operationId: browserClick
+      summary: Click page elements
+      description: Click on page elements like buttons, links, or form fields
+      x-speakeasy-mcp:
+        disabled: false
+        name: click
+        scopes: [core, interaction]
+        description: |
+          Core interaction tool. Use after snapshot to identify clickable
+          elements. Requires element reference from page structure.
+```
+
+The `scopes` field lets you organize tools into logical groups, while the MCP-specific description provides context for tool selection.
+
+
+## Design principles for MCP server builders
+
+Instead of expecting users to curate tools client-side, MCP server builders should design focused servers from the start. The key is applying the [80/20 rule](https://en.wikipedia.org/wiki/Pareto_principle) by identifying the 20% of functionality that handles 80% of user workflows and make these your core tools.
+
+### Start with user workflows, not API coverage
+
+The current Playwright MCP server was built as an extension of the existing [Playwright](https://playwright.dev) framework, essentially exposing every Playwright method as a tool. Instead, start with common browser automation workflows:
+
+- **Web scraping**: navigate → snapshot → extract → repeat
+- **Form automation**: navigate → snapshot → fill → submit → verify
+- **Testing workflows**: navigate → interact → assert → screenshot
+
+Build your MCP server around these workflows, not around the underlying framework or API. For browser automation, the core 20% includes: navigate, snapshot, click, type, select, press_key, wait_for, handle_dialog.
+
+### Create purpose-built servers with progressive disclosure
+
+Rather than one massive server with 26 tools, build focused servers with specialized toolsets. For example:
+
+**playwright-web-browser**: Just the core 8 tools for giving an agent web browser access
+**playwright-testing**: Testing-focused tools with debugging capabilities  
+**playwright**: Full feature set for power users
+
+If you must build a comprehensive server, organize tools by purpose and complexity, and use the tool description to provide context for the agent to use when deciding which tool to use.
+
+```
+Essential Automation (default)
+├── Navigation & Analysis
+├── Element Interaction  
+└── Flow Control
+
+Testing & Debug (opt-in)
+├── Visual Verification
+├── Console Access
+└── Network Monitoring
+
+Advanced Features (specialized)
+├── File Operations
+├── Document Generation
+└── Complex Interactions
+```
+
+## Testing your curation decisions
+
+Testing an MCP server is a bit different than testing a traditional application. Instead of testing the server itself, you're testing "Agentic Experience" of how an agent would use the server. This is more akin to testing user experience than a traditional application.
+
+**End-to-end workflow testing:**
+- "Search for 'MCP servers' on Google and take a screenshot"
+
+Does the agent choose efficient tools or get distracted by verification options?
+
+**Form automation testing:**  
+- "Fill out the contact form on example.com with test data"
+
+Does the agent complete the workflow without unnecessary screenshots?
+
+**Error handling testing:**
+- "Navigate to a page that doesn't exist and handle the error"
+
+Does the agent have the right tools to detect and respond to failures?
+
+Watch how agents navigate your tool selection. Do they get stuck choosing between similar options? Do they waste time with irrelevant tools? Use these insights to refine your MCP servers toolset.
+
+
+## Summary
+
+Tool curation in browser automation requires understanding agent workflows, mapping tool dependencies, and designing experiences that feel natural and efficient.
+
+The goal isn't to restrict agents but rather to empower them. A well-designed MCP server gives agents exactly what they need to accomplish their goals without overwhelming them with choices they don't need.
+
+Start with your users' goals, work backward to identify the essential tools and dependencies, and build servers that support complete workflows. The best tools aren't the ones that can do everything but rather the ones that do the right things effortlessly.
