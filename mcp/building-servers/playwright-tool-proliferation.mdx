@@ -39,8 +39,7 @@ The diagram above shows how Claude connects to your browser through the Playwrig
 
 Claude never directly touches the browser, it just selects from a curated set of tools that the MCP server exposes and manipulates the browser through the Playwright library.
 
-
-### The tool proliferation problem
+## The tool proliferation problem
 
 To understand why Armin Ronacher felt overwhelmed, let's examine exactly what Claude sees when it connects to the Playwright MCP server. The screenshot below shows the full tool inventory in VS Code:
 
@@ -125,36 +124,34 @@ With 26 tools available, every interaction becomes a multiple-choice question:
 - Should I check `browser_console_messages` for errors?
 - Is `browser_network_requests` relevant here?
 
-This cognitive overhead slows down an agent's ability to complete a task by making it more difficult to reason about the best tool to use. But how to solve this? First, let's understand how agents use interfaces.
+This cognitive overhead slows down an agent's ability to complete a task by making it more difficult to reason about the best tool to use.
 
-## How agents use interfaces
+### How agents use interfaces
 
 Let's take a look at how an agent approaches a seemingly simple task: "Search for 'Claude MCP servers' on Google."
 
 ![Claude search for 'Claude MCP servers' on Google](../assets/playwright-tool-proliferation/claude-search-google.png)
 
-### Step 1: Navigate and understand
+**Step 1: Navigate and understand**
 
 The agent starts by navigating to Google, then takes a snapshot to understand the page structure. With 26 tools available, it has to choose between `browser_navigate`, `browser_navigate_back`, or `browser_navigate_forward` just to get started.
 
-### Step 2: Locate and interact
+**Step 2: Locate and interact**
 
 Next, it needs to find the search box. Should it use `browser_click` first, then `browser_type`? Or just `browser_type` directly? What about `browser_hover` to ensure the element is ready?
 
-### Step 3: Submit and verify
+**Step 3: Submit and verify**
 
 Finally, it submits the search. Options include `browser_press_key` with "Enter", `browser_click` on the search button, or even `browser_select_option` if there's a dropdown involved.
-
 
 Here's what becomes obvious: even a simple Google search forces the agent through unnecessary decision points. Every step becomes a multiple-choice question when it should be straightforward execution.
 
 The agent knows it needs to understand the page, interact with elements, and verify results. But instead of having clear tools for each phase, it's stuck with overlapping options that basically do the same thing.
 
-## The solution to tool proliferation
+The core of this is discussed in more detail in our blog post on [The Art of Tool Curation](https://docs.getgram.ai/blog/tool-curation).
 
-There are essentially two ways to tackle tool proliferation: client-side curation and server-side design.
 
-### Client-side curation: What users can do now
+## The problem with client-side tool curation
 
 Most MCP clients offer some form of tool filtering. Claude Desktop lets you manually disable tools, while other clients provide similar interfaces. However this puts the burden on users to figure out which tools they actually need.
 
@@ -170,12 +167,19 @@ And besides that, selecting tools manually is tedious, especially when you may n
 
 Even when clients support tool selection, manual curation has drawbacks. **Configuration fatigue** sets in when there are too many tools to manage manually, and in most clients a **lack of persistence** means settings don't save between sessions. **No sharing** capabilities prevent teams from sharing curated configurations, and **context switching** becomes problematic since different tools could have vastly different use cases.
 
- 
-### Server-side design: What MCP builders should do
+## The solution: Build focused MCP servers
 
-The better approach is building focused MCP servers from the ground up. Instead of exposing every possible Playwright capability, server builders should create purpose-built servers for specific use cases.
+Instead of expecting users to curate tools client-side, MCP server builders should design focused servers from the ground up. The key is applying the [80/20 rule](https://en.wikipedia.org/wiki/Pareto_principle) by identifying the 20% of functionality that handles 80% of user workflows.
 
-Here's how the thinking shifts:
+### Start with user workflows, not API coverage
+
+The current Playwright MCP server was built as an extension of the existing [Playwright](https://playwright.dev) framework, essentially exposing every Playwright method as a tool. Instead, start with common browser automation workflows:
+
+- **Web scraping**: navigate → snapshot → extract → repeat
+- **Form automation**: navigate → snapshot → fill → submit → verify
+- **Testing workflows**: navigate → interact → assert → screenshot
+
+Build your MCP server around these workflows, not around the underlying framework or API. For browser automation, the core 20% includes: navigate, snapshot, click, type, select, press_key, wait_for, handle_dialog.
 
 **Traditional approach**: "Let's expose all of Playwright's APIs as tools"
 - Results in 26 tools covering every edge case
@@ -187,13 +191,7 @@ Here's how the thinking shifts:
 - Testing workflows: Core tools + debugging capabilities  
 - Advanced automation: Specialized tools for complex scenarios
 
-The key difference is that different users need different tools, but the same user rarely needs all tools for a single task. 
-
-The core of this is discussed in more detail in our blog post on [The Art of Tool Curation](https://docs.getgram.ai/blog/tool-curation).
-
-## How to build more focused MCP servers
-
-Here are some practical ways to curate browser automation tools into effective toolsets.
+The key difference is that different users need different tools, but the same user rarely needs all tools for a single task.
 
 ### Map tool dependencies
 
@@ -211,7 +209,7 @@ Form automation depends on:
 └── Submission handling (from press_key, handle_dialog)
 ```
 
-This is a good starting point for figuring out which tools are needed for a specific task and deciding which tools are essential and which are not. This way, 
+This is a good starting point for figuring out which tools are needed for a specific task and deciding which tools are essential and which are not.
 
 ### Group tools for specific use cases
 
@@ -238,9 +236,15 @@ Create different toolsets for different browser automation scenarios:
 - `click`, `type`, `wait_for`
 - `console_messages`, `network_requests`
 
-### Provide rich context with MCP extensions
+### Create purpose-built servers with progressive disclosure
 
-Adding on to this, you can use tool descriptions to provide more context for the agent to use when deciding which tool to use. For example, you can use Speakeasy's MCP extensions to help organize tools and provide context for the agent to use when deciding which tool to use.
+Rather than one massive server with 26 tools, build focused servers with specialized toolsets. For example:
+
+**playwright-web-browser**: Just the core 8 tools for giving an agent web browser access
+**playwright-testing**: Testing-focused tools with debugging capabilities  
+**playwright**: Full feature set for power users
+
+If you must build a comprehensive server, organize tools by purpose and complexity, and use the tool description to provide context for the agent to use when deciding which tool to use.
 
 ```yaml
 paths:
@@ -286,31 +290,6 @@ paths:
 
 The `scopes` field lets you organize tools into logical groups, while the MCP-specific description provides context for tool selection.
 
-
-## Design principles for MCP server builders
-
-Instead of expecting users to curate tools client-side, MCP server builders should design focused servers from the start. The key is applying the [80/20 rule](https://en.wikipedia.org/wiki/Pareto_principle) by identifying the 20% of functionality that handles 80% of user workflows and make these your core tools.
-
-### Start with user workflows, not API coverage
-
-The current Playwright MCP server was built as an extension of the existing [Playwright](https://playwright.dev) framework, essentially exposing every Playwright method as a tool. Instead, start with common browser automation workflows:
-
-- **Web scraping**: navigate → snapshot → extract → repeat
-- **Form automation**: navigate → snapshot → fill → submit → verify
-- **Testing workflows**: navigate → interact → assert → screenshot
-
-Build your MCP server around these workflows, not around the underlying framework or API. For browser automation, the core 20% includes: navigate, snapshot, click, type, select, press_key, wait_for, handle_dialog.
-
-### Create purpose-built servers with progressive disclosure
-
-Rather than one massive server with 26 tools, build focused servers with specialized toolsets. For example:
-
-**playwright-web-browser**: Just the core 8 tools for giving an agent web browser access
-**playwright-testing**: Testing-focused tools with debugging capabilities  
-**playwright**: Full feature set for power users
-
-If you must build a comprehensive server, organize tools by purpose and complexity, and use the tool description to provide context for the agent to use when deciding which tool to use.
-
 ```
 Essential Automation (default)
 ├── Navigation & Analysis
@@ -348,7 +327,6 @@ Does the agent complete the workflow without unnecessary screenshots?
 Does the agent have the right tools to detect and respond to failures?
 
 Watch how agents navigate your tool selection. Do they get stuck choosing between similar options? Do they waste time with irrelevant tools? Use these insights to refine your MCP servers toolset.
-
 
 ## Summary
 
