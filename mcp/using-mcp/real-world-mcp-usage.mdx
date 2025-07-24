@@ -1,5 +1,5 @@
 ---
-title: "How companies are using MCP in production today"
+title: "Real-world MCP: How companies are using it in production today"
 description: Discover how organizations across industries are deploying the Model Context Protocol to connect AI systems to real-world data and tools in production environments.
 ---
 
@@ -8,19 +8,17 @@ import GramCallout from "../.partials/gram-callout.mdx";
 
 <GramCallout />
 
-# How companies are using MCP in production today
+# Real-world MCP: How companies are using it in production today
 
-When Anthropic released the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) in November 2024, the usual suspects started building. But here's the thing: instead of being a demo on GitHub, MCP quietly started showing up in actual production systems.
+When Anthropic released the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) in November 2024, the usual suspects wasted no time experimenting. But here's the thing: instead of being stuck as a demo on GitHub, MCP quietly started showing up in real-world production systems.
 
-In this article, we'll look at how [Block](https://block.xyz/) has deployed MCP tools to thousands of employees, with engineers reporting 8-10 hours saved per week. [Solana](https://solana.com/) developers are using MCP to manage DeFi protocols through conversational interfaces. While [Stripe](https://stripe.com/) is using MCP to monetize AI tools.
+We investigated how companies are implementing MCP in production, from [Zed](https://zed.dev/) building its Agent Panel around MCP from day one, to [Solana](https://solana.com/) developers using MCP to manage DeFi protocols through conversational interfaces, to [Stripe](https://stripe.com/) using MCP to monetize AI tools, and more.
 
 Here's what we learned.
 
 ## Block's MCP implementation
 
-[Block](https://block.xyz/) (formerly [Square](https://squareup.com/)) operates [Cash App](https://cash.app/) and Square payment systems. Cash App handles billions in payments, while Square provides payment processing through card readers used by merchants. When you make a payment at many businesses, Block's infrastructure processes the transaction.
-
-Block built [`goose`](https://github.com/block/goose) and used [Claude in Databricks](https://www.anthropic.com/customers/block) as their default model. What started as a coding assistant now powers work across the entire company. About 4,000 of Block's 10,000 employees actively use goose across 15 different job roles, from sales and design to customer success and operations.
+Between [Cash App](https://cash.app/) and [Square](https://squareup.com/), [Block](https://block.xyz/) handles [billions of dollars in payments](https://www.businessofapps.com/data/cash-app-statistics/) and processes transactions for [over four million merchants](https://squareup.com/us/en/about#:~:text=More%20than%20four%20million%20sellers,and%20the%20largest%20international%20chains.). They built [`goose`](https://github.com/block/goose) using [Claude in Databricks](https://www.anthropic.com/customers/block) as their default model. What started as a coding assistant now powers work across the entire company. About 4,000 of Block's 10,000 employees actively use goose across 15 different job roles, from sales and design to customer success and operations.
 
 This system democratizes data access at Block. Employees who don't know SQL can now solve their own data problems by describing what they need in plain English. Security analysts create detection rules by describing threats naturally instead of wrestling with complex query syntax.
 
@@ -31,16 +29,14 @@ Three-quarters of Block's engineers report saving 8-10 hours per week using goos
 
 ## Zed made MCP feel native
 
-[Zed](https://zed.dev/) is a code editor built in Rust by the team that previously created [Atom](https://atom.io/) at [GitHub](https://github.com/). It's designed for performance when working with large codebases, using native compilation rather than [Electron](https://www.electronjs.org/) to avoid the performance issues common in other editors.
+The team behind performance-focused code editor [Zed](https://zed.dev/) built its Agent Panel around MCP from the start, rather than adding AI features to an existing architecture.
 
-Zed built their Agent Panel around MCP from the start, rather than adding AI features to an existing architecture.
-
-Take their database integration. You can type `/pg-schema users` and get the schema for your users table instantly.
+Take Zed's database integration. You can type `/pg-schema users` and get the schema for your users table instantly.
 
 ![Zed Postgres](../assets/real-world-mcp-usage/zed-postgres.png)
 
 
-But it gets more interesting with their Neon integration, which lets you safely modify production databases:
+But it gets more interesting with Zed's Neon integration, which lets you safely modify production databases:
 
 ```
 User: "Can you add a created_at column to the table?"
@@ -57,13 +53,13 @@ The technical implementation is clean. MCP servers run as separate processes tha
 
 ## Replit's MCP playground
 
-[Replit](https://replit.com/) is a cloud-based development environment that handles the setup and hosting for coding projects. It supports multiple programming languages and lets you run code directly in the browser without installing anything locally.
+[Replit](https://replit.com/) is a cloud-based development environment platform that handles the setup and hosting for coding projects. It supports multiple programming languages and lets you run code directly in the browser without installing anything locally.
 
 Recently, Replit has pivoted to agent-powered coding, positioning itself as an AI-first development platform where you can vibe code entire applications with zero setup, as all the infrastructure is managed by Replit.
 
 Replit has built MCP templates that come with pre-configured servers. You can start a new environment and have working AI integrations without installing or configuring anything yourself.
 
-Their "Learn About MCP Template" includes YouTube processing, filesystem access, and external API integration out of the box. The configuration lives in a simple JSON file:
+Replit's "Learn About MCP Template" includes YouTube processing, filesystem access, and external API integration out of the box. The configuration lives in a simple JSON file:
 
 ```json
 {
@@ -101,12 +97,11 @@ Replit Agent takes this further by automatically integrating services like Email
 
 ## Code intelligence platforms embrace MCP
 
-[Sourcegraph](https://sourcegraph.com/) and [Codeium](https://codeium.com/) both saw MCP as a way to differentiate their code intelligence platforms. The implementations are telling—they show how established companies are using MCP not just for novelty, but for genuine competitive advantage.
+[Sourcegraph](https://sourcegraph.com/) and [Codeium](https://codeium.com/) both saw MCP as a way to differentiate these code intelligence platforms. The implementations are telling, showing how established companies are using MCP not just for novelty, but for genuine competitive advantage.
 
 ![Code Intelligence Diagram](../assets/real-world-mcp-usage/code-intelligence-diagram.png)
 
-Sourcegraph implements MCP through [OpenCtx](https://openctx.org/) (their own standard for external context), with [Cody](https://sourcegraph.com/cody) acting as the MCP client. Their [Batch Changes MCP Server](https://github.com/sourcegraph/test-mcp) automates large-scale modifications across repositories, while their React Props server helps developers understand component usage patterns across entire codebases.
-
+Sourcegraph implements MCP through [OpenCtx](https://openctx.org/) (Sourcegraph's own standard for external context), with [Cody](https://sourcegraph.com/cody) acting as the MCP client. Sourcegraph also has a [Batch Changes MCP Server](https://github.com/sourcegraph/test-mcp) that automates large-scale modifications across repositories, and a React Props server that helps developers understand component usage patterns across entire codebases.
 
 The workflow feels natural: Cody can analyze your database schema to suggest query optimizations, pull GitHub issues directly into your editor context, or search across multiple repositories with semantic understanding. It's code intelligence that actually understands the broader context of your work.
 
@@ -130,15 +125,15 @@ Codeium took a different approach with [Windsurf IDE](https://codeium.com/windsu
 }
 ```
 
-They built UI panels for managing MCP servers, one-click setup for popular servers, and proper sandboxing. It's the kind of polish that suggests MCP integration is becoming table stakes for development tools.
+Windsurf also features UI panels for managing MCP servers, one-click setup for popular servers, and proper sandboxing. It's the kind of polish that suggests MCP integration is becoming table stakes for development tools.
 
 ## Solana blockchain data access
 
 Several developers have built MCP servers that make Solana blockchain data accessible to AI assistants. While you can't execute transactions, these tools turn complex blockchain queries into simple conversations.
 
-The most documented implementation comes from [QuickNode's comprehensive tutorial](https://www.quicknode.com/guides/ai/solana-mcp-server). Their MCP server handles some typical blockchain analysis tasks: checking wallet balances, retrieving token accounts, examining transaction details, and querying account information. What makes it practical is the integration with [Solana Kit](https://github.com/sendaifun/solana-agent-kit), which handles all the RPC complexity behind a clean interface. 
+The most documented implementation comes from [QuickNode's comprehensive tutorial](https://www.quicknode.com/guides/ai/solana-mcp-server). This MCP server handles some typical blockchain analysis tasks: checking wallet balances, retrieving token accounts, examining transaction details, and querying account information. What makes it practical is the integration with [Solana Kit](https://github.com/sendaifun/solana-agent-kit), which handles all the RPC complexity behind a clean interface. 
 
-The [`solscan-mcp-server`](https://mcp.so/server/solscan-mcp/Valennmg) takes a different approach by building on [Solscan's](https://solscan.io/) API infrastructure. This gives you access to richer data analysis capabilities like token metadata (names, symbols, logos), market data from various exchanges, holder distribution analytics, and detailed DeFi activity tracking. The server can tell what tokens a wallet holds, how those holdings have changed over time and what DeFi protocols the wallet has interacted with.
+The [`solscan-mcp-server`](https://mcp.so/server/solscan-mcp/Valennmg) takes a different approach by building on [Solscan's](https://solscan.io/) API infrastructure. This gives you access to richer data analysis capabilities like token metadata (names, symbols, logos), market data from various exchanges, holder distribution analytics, and detailed DeFi activity tracking. The server** **can tell what tokens a wallet holds, how those holdings have changed over time and what DeFi protocols the wallet has interacted with.
 
 ![Solscan MCP Demo](../assets/real-world-mcp-usage/solscan-demo.mp4)
 
