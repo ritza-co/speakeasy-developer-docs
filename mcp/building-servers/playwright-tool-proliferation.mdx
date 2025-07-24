@@ -31,7 +31,7 @@ The Playwright MCP server acts as a bridge between AI agents and Playwright's br
 
 ![Playwright MCP architecture](../assets/playwright-tool-proliferation/playwright-mcp-architecture.png)
 
-The diagram above shows how Claude connects to your browser through the Playwright MCP server. Here's the flow when you ask Claude to, *"Click the login button"*:
+The diagram above shows how Claude connects to your browser through the Playwright MCP server. Here's the flow when you ask Claude to  *"Click the login button"*:
 
 1. **Claude** (the MCP client) has access to the **Tools** section, which exposes browser automation capabilities like Navigate, Click, and Snapshot.
 2. Claude selects the appropriate tool (in this case, Click) and sends an **action** to the **Playwright MCP** server.
@@ -51,8 +51,8 @@ This is what confronts every AI agent trying to automate a browser. Let's break 
 
 **Core browser control (6 tools)**
 - `browser_navigate`: Go to URLs
-- `browser_navigate_back`: Select browser back button  
-- `browser_navigate_forward`: Select browser forward button
+- `browser_navigate_back`: Select the browser back button  
+- `browser_navigate_forward`: Select the browser forward button
 - `browser_close`: Close browser
 - `browser_resize`: Change browser size
 - `browser_install`: Install browser binaries
@@ -79,7 +79,7 @@ This is what confronts every AI agent trying to automate a browser. Let's break 
 - `browser_tab_*`: Tab management (4 tools)
 - `browser_generate_playwright_test`: Code generation
 
-This results in a **total 26 tools** for what should be straightforward browser automation.
+This results in a **total of 26 tools** for what should be straightforward browser automation.
 
 ### When more tools mean more problems
 
@@ -164,7 +164,7 @@ Manually selecting tools becomes tedious, especially when you're unsure which to
 
 ![Playwright MCP tools in VS Code](../assets/playwright-tool-proliferation/vscode-playwright.png)
 
-Not to mention that not all clients support tool curation. For example, Claude Code and Gemini CLI don't offer tool curation at all. And ther clients, like Copilot, limit how many tools you can provide to the agent at once.
+Not to mention that not all clients support tool curation. For example, Claude Code and Gemini CLI don't offer tool curation at all. And other clients, like Copilot, limit how many tools you can provide to the agent at once.
 
 ![VS Code tool limit](../assets/playwright-tool-proliferation/vscode-tool-limit.png)
 
