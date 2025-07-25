@@ -85,17 +85,19 @@ This results in a **total of 26 tools** for what should be straightforward brows
 
 Here's a real e-commerce test that demonstrates the problem. We gave Claude Code this specific prompt and gave it browser access using the Playwright MCP server:
 
-> Perform an e-commerce purchase test:
-> 1. Go to https://www.saucedemo.com
-> 2. Login with username "standard_user" and password "secret_sauce"  
-> 3. Add "Sauce Labs Backpack" to cart
-> 4. Add "Sauce Labs Bike Light" to cart
-> 5. Go to cart and verify both items are there
-> 6. Proceed to checkout
-> 7. Fill checkout form: First Name "John", Last Name "Doe", Zip "12345"
-> 8. Complete the purchase
-> 9. Verify the success message appears
-> 10. Logout 
+```
+Perform an e-commerce purchase test:
+1. Go to https://www.saucedemo.com
+2. Login with username "standard_user" and password "secret_sauce"  
+3. Add "Sauce Labs Backpack" to cart
+4. Add "Sauce Labs Bike Light" to cart
+5. Go to cart and verify both items are there
+6. Proceed to checkout
+7. Fill checkout form: First Name "John", Last Name "Doe", Zip "12345"
+8. Complete the purchase
+9. Verify the success message appears
+10. Logout 
+```
 
 **Here's what happened when all the tools were available:**
 
