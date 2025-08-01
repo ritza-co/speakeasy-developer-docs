@@ -31,7 +31,7 @@ Or, you can just trigger this whole thing using just a reaction emoji 🚀. Then
 
 MCP standardizes how AI agents access different tools. Instead of writing custom integrations for Slack, Postiz, and future tools you want to add, you get one consistent interface that agents can use intelligently across any platform. Since MCP is an open protocol, it works with any AI model or agent framework.
 
-Gram eliminates the need to implement MCP protocol code by automatically converting your OpenAPI specification into a hosted MCP server. You focus on building your API while Gram handles the MCP server creation and hosting.
+Gram eliminates the need to implement MCP protocol code by automatically converting your OpenAPI document into a hosted MCP server. You focus on building your API while Gram handles the MCP server creation and hosting.
 
 Here's the automated flow:
 
@@ -66,10 +66,10 @@ You can find the complete Slack API server code at [github.com/ritza-co/speakeas
 
 We'll build this integration in four stages:
 
-- Build a Slack API wrapper that exposes message and thread data through HTTP endpoints
-- Deploy an MCP server on Gram using our API's OpenAPI specification
-- Configure Postiz MCP integration for social media scheduling
-- Create an AI agent that connects both MCP servers and handles the automated workflow
+- Build a Slack API wrapper that exposes message and thread data through HTTP endpoints.
+- Deploy an MCP server on Gram using our API's OpenAPI document.
+- Configure Postiz MCP integration for social media scheduling.
+- Create an AI agent that connects both MCP servers and handles the automated workflow.
 
 ## Building Your Slack Integration
 
@@ -88,7 +88,7 @@ We'll build this API in four stages:
 - Setting up the Python project with dependencies.
 - Defining the FastAPI application and Pydantic models for data validation.
 - Implementing the endpoint logic with proper Slack SDK integration.
-- Enriching the OpenAPI specification with `x-gram` extensions that help Gram generate better MCP tool descriptions for our AI agent.
+- Enriching the OpenAPI document with `x-gram` extensions that help Gram generate better MCP tool descriptions for our AI agent.
 
 When complete, we'll have a REST API that our MCP server will expose as standardized tools, allowing the AI agent to retrieve Slack threads and analyze them for social media content creation.
 
@@ -851,11 +851,9 @@ Great! We have added the FastAPI Slack API. Last step, let's add a script that w
 
 ### Generating OpenAPI files
 
-We need to export our API specification in formats that Gram can import to create our MCP server. This script generates both JSON and YAML versions of our OpenAPI specification. At the root of the project, create a file called `generate_openapi.py`.
+We need to export our OpenAPi document in formats that Gram can import to create our MCP server. This script generates both JSON and YAML versions of our OpenAPI document. At the root of the project, create a file called `generate_openapi.py`.
 
 ```python
-"""Save this FastAPI app's OpenAPI specification to JSON and YAML"""
-
 import json
 import yaml
 from pathlib import Path
@@ -894,7 +892,7 @@ def save_openapi_to_yaml():
 
 
 if __name__ == "__main__":
-    print("🚀 Generating OpenAPI specification files...")
+    print("🚀 Generating OpenAPI document files...")
     
     save_openapi_to_json()
     save_openapi_to_yaml()
@@ -912,7 +910,7 @@ uv run python generate_openapi.py
 This outputs:
 
 ```txt
-🚀 Generating OpenAPI specification files...
+🚀 Generating OpenAPI document files...
 Generated openapi.json
 Generated openapi.yaml
 ```
@@ -937,7 +935,7 @@ Copy the HTTPS forwarding URL from ngrok – we'll use this when configuring our
 
 ## Turning Your API into an MCP Server
 
-Now we'll use Gram to convert our FastAPI specification into a hosted MCP server that AI agents can connect to. Gram eliminates the need to implement MCP protocol code manually by generating servers from OpenAPI documents.
+Now we'll use Gram to convert your OpenAPI document into a hosted MCP server that AI agents can connect to. Gram eliminates the need to implement MCP protocol code manually by generating servers from OpenAPI documents.
 
 Gram works with three key concepts: tool definitions that describe each API endpoint to LLMs, tool variations that let you customize descriptions, and toolsets that group related tools together. The `x-gram` extensions we added earlier will automatically enhance how Gram presents our tools to AI agents.
 
