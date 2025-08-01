@@ -3,6 +3,8 @@ title: "Use MCP to turn your best Slack threads into social posts"
 description: "Learn how to use MCP servers with OpenAI Agents, Slack API, Gram and Postiz to create social media posts from Slack threads."
 ---
 
+import { Screenshot } from "@/mdx/components";
+
 # Use MCP to turn your best Slack threads into social posts
 
 Teams generate valuable insights in Slack discussions daily such as technical breakthroughs, market observations, customer feedback that would make excellent social media content. But extracting these insights from lengthy threads and manually creating posts is time-consuming.
@@ -35,7 +37,13 @@ MCP standardizes how LLMs access different tools. Instead of writing custom inte
 
 Here's the automated flow:
 
-![Automated Workflow](/Users/koladev/ritza/speakeasy-developer-docs/mcp/using-mcp/assets/mcp-slack-workflow.png)
+<Screenshot
+  variant="cli"
+  image={{
+    src: "./assets/mcp-slack-workflow.png",
+    alt: "Automated Workflow",
+  }}
+/>
 
 ## Prerequisites
 
@@ -932,7 +940,12 @@ In another terminal, expose the API:
 ngrok http 127.0.0.1:8000
 ```
 
-![Ngrk running in a terminal](./assets/ngrok-terminal-running.png)
+<Screenshot
+  image={{
+    src: "./assets/ngrok-terminal-running.png",
+    alt: "Ngrok running in a terminal",
+  }}
+/>
 
 Copy the HTTPS forwarding URL from ngrok – you'll use the URL when configuring the MCP server in Gram. With the API running and OpenAPI files generated, you're ready to create the MCP server.
 
@@ -946,11 +959,21 @@ Gram works with three key concepts: tool definitions that describe each API endp
 
 Navigate to the **Toolsets** page in your Gram dashboard.
 
-![Navigate](./assets/gram-nav-to-toolsets.png)
+<Screenshot
+  image={{
+    src: "./assets/gram-nav-to-toolsets.png",
+    alt: "Navigate to Toolsets page",
+  }}
+/>
 
 Then, click on the **+ ADD API** button to add an API source. Upload the `openapi.json` file you generated and give your API source a descriptive name like **Slack MCP API**.
 
-![Adding an API source](./assets/gram-adding-api-source.png)
+<Screenshot
+  image={{
+    src: "./assets/gram-adding-api-source.png",
+    alt: "Adding an API source",
+  }}
+/>
 
 ### Create a toolset
 
@@ -958,13 +981,23 @@ Click the **+ ADD TOOLSET** button on the Toolsets page. A modal will appear ask
 
 You can see the tool definitions you created from the **Slack MCP API** API source: search messages, get threads, get users, list slack channels, get channel messages. Click **Enable All** to include all tools in your toolset.
 
-![Adding Toolset](./assets/gram-adding-toolsets.png) 
+<Screenshot
+  image={{
+    src: "./assets/gram-adding-toolsets.png",
+    alt: "Adding Toolset",
+  }}
+/>
 
 ### Create a new environment
 
 Navigate to the Environments page and click **+ NEW ENVIRONMENT**. Enter "slack" as the environment name. Once created, you'll be redirected to the environment configuration page. Click **NEW VARIABLE** to add environment variables.
 
-![Adding environment variables](/Users/koladev/ritza/speakeasy-developer-docs/mcp/using-mcp/assets/adding-environment-variable.png)
+<Screenshot
+  image={{
+    src: "./assets/adding-environment-variable.png",
+    alt: "Adding environment variables",
+  }}
+/>
 
 Add your Slack user token as `SLACK_API_HTTP_BEARER` . And add the ngrok URL as `SLACK_API_SERVER_URL`. These new variables will allow Gram to authenticate with Slack and route requests to your running API.
 
@@ -972,7 +1005,12 @@ Add your Slack user token as `SLACK_API_HTTP_BEARER` . And add the ngrok URL as 
 
 You'll need a Gram API key to connect your agent to the MCP server. In your Gram dashboard, go to Settings and click **Create API Key**.
 
-![Creating a Gram API key](./assets/creating-gram-api-key.png)
+<Screenshot
+  image={{
+    src: "./assets/creating-gram-api-key.png",
+    alt: "Creating a Gram API key",
+  }}
+/>
 
 Copy the API key in your `.env` file of your FastAPI project. The `.env` file should currently look like this:
 
@@ -996,7 +1034,12 @@ First, ensure you have at least one social media account connected in Postiz. Ad
 
 On the Postiz dashboard, navigate to the Settings page and select **Public API**. You'll see an MCP section displaying your unique MCP server URL. This URL provides direct access to Postiz's posting and scheduling functionality through the MCP protocol.
 
-![Postiz MCP configuration](./assets/postiz-mcp-config.png)
+<Screenshot
+  image={{
+    src: "./assets/postiz-mcp-config.png",
+    alt: "Postiz MCP configuration",
+  }}
+/>
 
 Copy the MCP URL and save it to your `.env` file in your FastAPI project as `POSTIZ_MCP_URL`. Your environment variables should now look like this:
 
@@ -1180,7 +1223,12 @@ Before testing the integration, you need to configure Slack so it can reach the 
 
 5. Add the `reaction_added` event.
 
-![Slack Event Configuration](/Users/koladev/ritza/speakeasy-developer-docs/mcp/using-mcp/assets/slack-event-configuration.png)
+<Screenshot
+  image={{
+    src: "./assets/slack-event-configuration.png",
+    alt: "Slack Event Configuration",
+  }}
+/>
 
 Save the changes, and you are now ready to test the integration. 
 
@@ -1208,7 +1256,12 @@ Now let's test the complete automated workflow. Find a Slack thread with valuabl
 
 When you add the rocket emoji, Slack will immediately send an event to your `/events` endpoint. You can monitor the activity in your ngrok terminal, where you'll see incoming requests from Slack's servers. 
 
-![Ngrok Terminal](/Users/koladev/ritza/speakeasy-developer-docs/mcp/using-mcp/assets/ngrok-terminal.png)
+<Screenshot
+  image={{
+    src: "./assets/ngrok-terminal.png",
+    alt: "Ngrok Terminal",
+  }}
+/>
 
 The agent will then make requests to your Gram-hosted MCP server to retrieve the thread content, analyze it for social media potential, create platform-appropriate posts, and schedule them through the Postiz MCP server. Your FastAPI server will log the rocket reaction detection and trigger the AI agent workflow.
 
@@ -1232,7 +1285,12 @@ If you need further adjustments, feel free to ask!
 
 Check your Postiz dashboard to see the scheduled posts. The agent will have created Twitter-optimized content based on the thread's key insights and scheduled them for publication.
 
-![Postiz scheduled posts](./assets/postiz-scheduled-posts.png)
+<Screenshot
+  image={{
+    src: "./assets/postiz-scheduled-posts.png",
+    alt: "Postiz scheduled posts",
+  }}
+/>
 
 We now have a fully automated system that converts Slack discussions into social media content with just an emoji reaction. The integration uses two MCP servers: our custom Slack server hosted on Gram and Postiz's direct MCP integration, orchestrated by an OpenAI agent that handles the entire workflow intelligently.
 
