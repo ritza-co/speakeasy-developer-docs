@@ -1,157 +1,81 @@
 ---
 title: "Use MCP to turn your best Slack threads into social posts"
-description: "Learn how to use MCP servers with Claude, Slack API, Gram and Postiz to create social media posts from Slack threads."
+description: "Learn how to use MCP servers with OpenAI Agents, Slack API, Gram and Postiz to create social media posts from Slack threads."
 ---
 
 # Use MCP to turn your best Slack threads into social posts
 
-Great conversation within teams tend to happen in discussions channels. Your developer, marketing person, CEO or anybody, adding information, interesting data and this hit you: so many stuff said in that discussion can make interesting social media posts.
+Teams generate valuable insights in Slack discussions daily such as technical breakthroughs, market observations, customer feedback that would make excellent social media content. But extracting these insights from lengthy threads and manually creating posts is time-consuming.
 
-You see that and you decided to pick each of the interesting messages, and post those on social media. The is seems easy if the thread is not long, and then you find the discussion is 50 messages. Let's say your team is capable of putitng out epiphanies like that every week. Now, you have tons of ideas for social media posts, but you need to go through every threads or discussions to extract interesitng posts, which can take time and let's not start with the manual posting or scheduling. 
+What if you could simply add a 🚀 emoji to any valuable message and have AI automatically create and schedule social media posts? With MCP servers, this automation becomes straightforward.
 
-But this should'nt be the case. With the evolution of AI and the adoption of MCP servers to allow AI to interact with producrts and services, you can build interesting integrations, such as one that will help you just say from Claude Desktop that you want to schedule your best threads as social media posts on X (formerly Twitter) for example. 
-
-In this article, you will learn how to build an MCP server for Slack to search for messages and threads, host this MCP server on Gram, and then learn how to add the Slack MCP server and the Postiz MCP server to Claude, to allow the interactions. 
-
-## Prerequisites
-
-To follow along this article, you will need to have: 
-
-- [Gram](https://getgram.ai) access
-- Claude Desktop installed on your machine
-- A Postiz account (They offer a 7 days trial)
-- Ngrok to quickly expose your API for testing reasons, otherwise you can host it using any provider you want.
-- Slack Bot token with the following scopes: 
-
-     - `channels:history`
-     - `channels:read`
-     - `search:read`
-     - `users:read`
-     - `groups:history`
-
-You can also find the code for the Slack API server used in this article at https://github.com/ritza-co/speakeasy-examples/slack-mcp-server-api. By following the README.md, you can get an application ready and jump straight to the [Hosting on Gram](#hosting-on-gram) section.
-
-Creating our MCP integration will go the following way:
-
-- Creating an API for retrieving Slack messages and exposing it. 
-- Creating an MCP server to interact with on Gram. 
-- Configure our Slack MCP server on Claude Desktop.
-- Configure Postiz MCP server on Claude Desktop.
-
-But before that, let's understand why we must use MCP. 
+In this article, you'll build a Slack MCP server using Gram, connect it with Postiz for social media scheduling, and create an AI agent that transforms your best discussions into engaging social content with just an emoji reaction.
 
 ## Why use MCP? 
 
-Because of its recency, MCP can be confusing to grasp or you can be afraid to embrace this new concept. After all, why bother? You can copy paste the whole slack thread in Claude and it will effectively summarize the posts for you, and then you will copy and paste these posts in your scheduler tool, or directly in the social media posting component. 
+If you're turning your best Slack threads into social posts, you're probably:
 
-### Factor of time
+- Searching valuable threads in your workspace.
+- Reading through long conversations to identify key insights.
+- Extracting specific messages worth sharing externally.
+- Rewriting content for different social platforms.
+- Manually scheduling posts across multiple channels.
 
-This is slow. In a world, where information moves fast, you will want new ideas out there really quick. Also, managing all posts yourself from different social media platforms, scheduling, formatting according to context, hashtags, characters limit is exhausting. 
+This manual process becomes overwhelming when your team generates multiple high-value discussions weekly, leaving great content buried in Slack instead of reaching your audience.
 
-### Factor of errors
+You could automate parts of this by building custom integrations. For instance, you might write Python scripts that call the Slack API to retrieve messages, send them to OpenAI for analysis and content creation, then use function calling to structure responses and fire requests to Postiz for scheduling. But you'd still need to manually run scripts whenever you find a useful thread.
 
-You can effectively create your own script with your own Anthropic or OpenAI integration, that will use function calling or tools to  format the posts as ideas, as they receive the data from slack from a script you will have written, and then another one to post it a scheduler or a tool. Then you will have to deal with formatting and having a data structure for each different post, which will make your code verbose, long and not easy to navigate.  
+Or, you can just trigger this whole thing using just a reaction emoji 🚀. Then, with an OpenAI agent, you will give him tools exposed via MCP servers for both Slack and Postiz.
 
-```javascript
-import OpenAI from 'openai';
+### The MCP Advantage
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+MCP standardizes how AI agents access different tools. Instead of writing custom integrations for Slack, Postiz, and future tools you want to add, you get one consistent interface that agents can use intelligently across any platform. Since MCP is an open protocol, it works with any AI model or agent framework.
 
-// Function schema for OpenAI
-const FUNCTION_SCHEMA = {
-  name: "format_slack_thread_to_posts",
-  description: "Convert Slack thread messages into formatted social media posts",
-  parameters: {
-    type: "object",
-    properties: {
-      posts: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            platform: {
-              type: "string",
-              enum: ["twitter", "linkedin"]
-            },
-            content: {
-              type: "object",
-              properties: {
-                twitterPost: {
-                  type: "object",
-                  properties: {
-                    text: { type: "string", maxLength: 280 },
-                    hashtags: { 
-                      type: "array", 
-                      items: { type: "string" },
-                      maxItems: 3 
-                    }
-                  }
-                },
-                linkedinPost: {
-                  type: "object",
-                  properties: {
-                    text: { type: "string", maxLength: 3000 },
-                    hashtags: { 
-                      type: "array", 
-                      items: { type: "string" },
-                      maxItems: 5 
-                    }
-                  }
-                }
-              }
-            }
-          },
-          required: ["platform", "content"]
-        }
-      }
-    },
-    required: ["posts"]
-  }
-};
+Gram eliminates the need to implement MCP protocol code by automatically converting your OpenAPI specification into a hosted MCP server. You focus on building your API while Gram handles the MCP server creation and hosting.
 
-async function processSlackThread(slackThreadData) {
-  const prompt = `Convert this Slack thread into Twitter and LinkedIn posts:
+Here's the automated flow:
 
-Thread messages:
-${slackThreadData.messages.map(msg => `${msg.user}: ${msg.text}`).join('\n')}
+![Automated Workflow](/Users/koladev/ritza/speakeasy-developer-docs/mcp/using-mcp/assets/mcp-slack-workflow.png)
 
-Create engaging posts for both platforms based on the discussion.`;
+## Prerequisites
 
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        { role: "user", content: prompt }
-      ],
-      functions: [FUNCTION_SCHEMA],
-      function_call: { name: "format_slack_thread_to_posts" },
-      temperature: 0.7
-    });
+To build this automated Slack-to-social media system, you'll need:
 
-    const functionCall = completion.choices[0]?.message?.function_call;
-    if (functionCall?.name === "format_slack_thread_to_posts") {
-      return JSON.parse(functionCall.arguments);
-    }
-    
-    throw new Error("No function call returned");
-  } catch (error) {
-    console.error("OpenAI processing failed:", error);
-    return { posts: [] };
-  }
-}
-```
+- Python 3.11+
 
-Add to that the fact that each provider has its own way of dealing with functions, so if you are looking to migrate to an AI service, you will need to rewrite a lot. 
+- **Gram access** – For hosting your Slack MCP server.
+- **Postiz account** – For social media scheduling (7-day free trial available).
+- **OpenAI API key** – For the AI agent that orchestrates the workflow.
+- **Ngrok** – To expose your local API during development (or use any hosting provider).
+- Slack app with a user token having these scopes:
+  - `channels:history` – Read channel messages.
+  - `channels:read` – Access channel information.
+  - `search:read` – Search across messages.
+  - `search:read.private`: Search in private channels.
+  - `search:read.public`: Search in public channels.
+  - `users:read` – Get user profile details.
+  - `groups:history` – Access private channel history.
+  - `groups:read` – View basic information about user's private channel.
+  - `reactions:read` – Detect emoji reactions.
 
-With MCP, you can have one server that your agent can call, and then make decisions. It's also accessible in many languages, but as we will see in the  [Hosting on Gram](#hosting-on-gram) section, you can create your MCP server without coding. Just the OpenAPI document from your API. 
+### Quick Start Option
 
-## Adding the Slack API
+You can find the complete Slack API server code at [github.com/ritza-co/speakeasy-examples/slack-mcp-server-api](https://github.com/ritza-co/speakeasy-examples/slack-mcp-server-api). Follow the README to get a working application and jump directly to the [Turning Your API into an MCP Server](#turn-your-api-into-an-mcp-server) section.
 
-The first step in the process is to add the Slack API. For that purpose, we will build an API with FastAPI who will expose the following endpoints: 
+### Implementation Overview
 
-The API will expose the following endpoints:
+We'll build this integration in four stages:
+
+- Build a Slack API wrapper that exposes message and thread data through HTTP endpoints
+- Deploy an MCP server on Gram using our API's OpenAPI specification
+- Configure Postiz MCP integration for social media scheduling
+- Create an AI agent that connects both MCP servers and handles the automated workflow
+
+## Building Your Slack Integration
+
+To automate the process of turning Slack threads into social media posts, we need to create an API that will retrieve Slack messages and threads for our AI agent. This API will serve as the backend for our MCP server, giving the agent standardized access to Slack data through HTTP endpoints.
+
+The API will expose five core endpoints that cover everything our agent needs to analyze Slack threads:
 
 - **GET /messages/search**: Search for messages across Slack channels with advanced filtering options.
 - **GET /messages/{channel_id}/{message_ts}/thread**: Retrieve a complete message thread including parent message and all replies.
@@ -159,22 +83,24 @@ The API will expose the following endpoints:
 - **GET /channels**: List all accessible Slack channels.
 - **GET /channels/{channel_id}/messages**: Retrieve messages from a specific channel.
 
-So, we will follow these steps:
+We'll build this API in four stages: 
 
-- Creating the project.
-- Adding the FastAPI app and pydantic models.
-- Adding endpoints.
-- Enriching endpoints data with the `x-gram` extension.
+- Setting up the Python project with dependencies.
+- Defining the FastAPI application and Pydantic models for data validation.
+- Implementing the endpoint logic with proper Slack SDK integration.
+- Enriching the OpenAPI specification with `x-gram` extensions that help Gram generate better MCP tool descriptions for our AI agent.
 
-### Step 1: Creating the project
+When complete, we'll have a REST API that our MCP server will expose as standardized tools, allowing the AI agent to retrieve Slack threads and analyze them for social media content creation.
 
-The first step is to create the project. For this project, we are using uv to manage dependencies, but you can use any Python dependencies manager you find useful. In your working directory, following these commands
+### Creating the project
+
+Start by creating a new Python project with uv, though you can use any dependency manager you prefer:
 
 ```
 uv init
 ```
 
-The command will create a Python project, with a `pyproject.toml` configuration file, detailing the name of the project, description, and dependencies. You can use the following configuration. 
+This creates a `pyproject.toml` file where we'll define our dependencies. We need the Slack SDK for API integration, FastAPI for our web server, and the OpenAI Agents SDK with Gram AI for our MCP integration:
 
 ```toml
 [project]
@@ -190,8 +116,10 @@ dependencies = [
     "fastapi[all]==0.115.5",
     "slack-sdk==3.29.0",
     "python-dotenv==1.0.1",
-    "pydantic==2.10.5",
+    "pydantic>=2.11.2",
     "uvicorn[standard]==0.32.1",
+    "openai-agents>=0.2.4",
+    "gram-ai>=0.1.0",
 ]
 
 [project.optional-dependencies]
@@ -221,36 +149,32 @@ dev-dependencies = [
 ] 
 ```
 
-Next step is to run the sync command, to install the dependencies and create the `uv.lock` file. 
+Install the dependencies:
 
 ```bash
 uv sync
 ```
 
-Then, create a Python package called `app` that will contain a Python file called `main.py`. The `main.py` file will contain the endpoints of the FastAPI API. 
+Create an `app` python package directory with `main.py` and `__init__.py`  files that will contain our FastAPI endpoints. With the project structure ready, we can implement the API endpoints.
 
-We have created the project. We can now move to adding the endpoints. 
+### Adding FastAPI App and Pydantic Models
 
-### Step 2: Adding FastAPI App and Pydantic Models
+Now we'll set up the FastAPI application with proper data models and authentication. We need three key components: Bearer token authentication for Slack API access, Pydantic models for data validation, and well-documented endpoints that Gram can convert into MCP tools.
 
-We will add now the endpoints that will be used by MCP server tools to make requests to the Slack API. For that, we have to ensure three things: 
-
-- Add an authorization layer, where the token we are expecting is a bot token or user token from Slack. 
-- Initialize the Slack SDK instance and make a request to the Slack API. 
-- Make sure the API are well described so we can import the openAPI definitions in Gram. To learn more about why it's important, you can read this [section](#adding-an-openapi-file-to-gram).
-
-First, let's add the needed imports and define the FastAPI application and the authentication strategy, which will be `HTTPBearer` to state that the client should provide a Bearer token.
+Start by creating the FastAPI app with Bearer token security:
 
 ```python
-from fastapi import FastAPI, HTTPException, Depends, Query, Path
+from fastapi import FastAPI, HTTPException, Depends, Query, Path, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.openapi.utils import get_openapi
-from typing import Optional, List, Dict, Any
+from fastapi.responses import PlainTextResponse, JSONResponse
+from typing import Optional, List, Dict, Any, Union
 from pydantic import BaseModel, Field
 from datetime import datetime
 from dotenv import load_dotenv
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+import asyncio
 
 load_dotenv()
 
@@ -276,7 +200,7 @@ app = FastAPI(
 security = HTTPBearer()
 ```
 
-Next, we need to define the Pydandic models, for a Slack mesage, Slack user, Slack channel, message search results and Thread response. These models are essential so FastAPI automatically validates request/response data against these models. 
+Define Pydantic models for data validation and automatic OpenAPI schema generation:
 
 ```python
 # Pydantic models
@@ -337,12 +261,32 @@ class ThreadResponse(BaseModel):
     )
     replies: List[SlackMessage] = Field(..., description="Thread replies")
     reply_count: int = Field(..., description="Total number of replies")
+    
+class SlackUrlVerificationEvent(BaseModel):
+    """Model for Slack URL verification event"""
+    
+    token: str = Field(..., description="Verification token")
+    challenge: str = Field(..., description="Challenge string to echo back")
+    type: str = Field(..., description="Event type - should be 'url_verification'")
+
+
+class SlackEventWrapper(BaseModel):
+    """Model for general Slack event payload"""
+    
+    token: Optional[str] = Field(None, description="Verification token")
+    challenge: Optional[str] = Field(None, description="Challenge for url_verification")
+    type: str = Field(..., description="Event type")
+    team_id: Optional[str] = Field(None, description="Team ID")
+    api_app_id: Optional[str] = Field(None, description="App ID")
+    event: Optional[Dict[str, Any]] = Field(None, description="Inner event data")
+    event_context: Optional[str] = Field(None, description="Event context")
+    event_id: Optional[str] = Field(None, description="Event ID")
+    event_time: Optional[int] = Field(None, description="Event timestamp")
 ```
 
-And lastly, we need to add the slack client. 
+Create the authenticated Slack client dependency:
 
 ```python
-# Dependency to get authenticated Slack client
 async def get_slack_client(
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> WebClient:
@@ -372,21 +316,15 @@ async def get_slack_client(
         )
 ```
 
-With the pydantic models, slack client and FastAPI app configurationa added, we can move to adding the endpoints.
+We now have a FastAPI application with proper authentication, data validation, and models that will generate clean OpenAPI documentation for Gram to convert into MCP tools.
 
-### Step 3: Adding the endpoints
+### Adding the endpoints
 
-We will add the following endpoints to the FastAPI application. 
-
-- `GET /messages/search`: Search for messages across Slack channels with advanced filtering options.
-- `GET /messages/{channel_id}/{message_ts}/thread`: Retrieve a complete message thread including parent message and all replies.
-- `GET /users/{user_id}`: Get detailed information about a Slack user.
-- `GET /channels`: List all accessible Slack channels.
-- `GET /channels/{channel_id}/messages`: Retrieve messages from a specific channel.
+Now we'll implement the endpoints our MCP server needs to provide comprehensive Slack access to the AI agent. Each endpoint handles a specific aspect of Slack data retrieval, from searching messages to analyzing complete threads.
 
 **GET /messages/search**
 
-This endpoint is responsible for searching for messages accross slack channels with some parameters. It will take a query params which is the text to match, and then other requests URL parameters such as channel and user, that represents IDs of the channel or the user. Then, we will also have parameters for dates, before, and after and the limit params to specify the limit of messages we want to retrieve. 
+This endpoint searches for messages across Slack channels with filtering by text, user, channel, date ranges, and result limits:
 
 ```python
 @app.get(
@@ -478,11 +416,11 @@ async def search_messages(
 
 ```
 
-The code above will take the query paramers, then construct the payload to send along the request call to the Slack API, using the SlackMessage api client. We then return a response. 
+The code above constructs a Slack search query by combining the text query with optional filters, sends the request through the Slack SDK client, and returns structured message data that our MCP server will expose as a tool.
 
 **GET /messages/{channel_id}/{message_ts}/thread**
 
-This endpoint will retrieve all replies from a thread message. This is an important part of the API that the MCP server will interaact with. The controller will accept a channel ID, and the message timestamp. 
+This endpoint retrieves complete conversation threads, which is essential for our AI agent to understand the full context of discussions:
 
 ```python
 @app.get(
@@ -551,11 +489,11 @@ async def get_thread(
         )
 ```
 
-Here, the message timestamp of the parent message is essential because in Slack, every message has a unique timestamp (like `1234567890.123456`) that serves as its primary identifier within a channel.
+This endpoint uses Slack's message timestamp (like `1234567890.123456`) as the unique identifier to fetch the complete thread conversation, separating the parent message from its replies for easier agent processing.
 
 **GET /users/{user_id}**
 
-This endpoint used to retrieve information about a Slack user. You might want to ask your AI agent to retrieve some messages, that this user or that user sent. The agent can then call the tool that will call this endpoint, to retrieve more information about the user, such as the ID for example, that can be used for filtering other requests. 
+This endpoint retrieves detailed user information that helps the AI agent understand message authorship and context when analyzing threads:
 
 ```python
 @app.get(
@@ -607,9 +545,11 @@ async def get_user(
 
 ```
 
+This endpoint fetches user profile information from Slack's API and formats it into our structured SlackUser model, giving the agent access to names, email addresses, and other profile details for better thread analysis.
+
 **GET /channels**
 
-This endpoint is used to list channels in a workspace. This will be useful to the agent to target specific channels if you mention the name of the channel for example. Can be used for reserches. 
+This endpoint lists all accessible channels in the workspace, allowing the agent to discover available channels and convert channel names to IDs for targeted searches and message retrieval.
 
 ```python
 @app.get(
@@ -682,9 +622,11 @@ async def list_channels(
         )
 ```
 
+This code makes separate API calls to retrieve public and private channels, then transforms the raw Slack data into our structured SlackChannel models with standardized fields.
+
 **GET /channels/{channel_id}/message**
 
-This endpoint will be used by the agent, to retrieve messages from a specific channel. It accepts the channel `id` and other query parameters such as `latest` and `oldest` to look for messages following timestamps. 
+This endpoint retrieves messages from a specific channel with optional date filtering and pagination, enabling the agent to analyze recent channel activity or messages from specific time periods.
 
 ```python
 @app.get(
@@ -759,13 +701,15 @@ async def get_channel_messages(
         )
 ```
 
+This code uses Slack's `conversations_history` API with optional timestamp filtering to retrieve messages from a specific channel, handling common errors like missing channels or insufficient permissions, then converts the raw message data into our SlackMessage models.
+
 We have added all endpoints needed for the Slack API. Now, because we want to export our API definition in the OpenAPI definition format for Gram to build and host our MCP server, we will add a function to customize the OpenAPI output. 
 
-### Step 4: Customizing the OpenAPI Output
+### Customizing the OpenAPI Output
 
-OpenAPI descriptions are not designed for LLMs. OpenAPI descriptions that are either too verbose (causing token bloat and context window issues) or too vague (causing tool selection confusion) both lead to LLM errors. 
+Now we need to enhance our API's OpenAPI documentation for optimal MCP server generation. Standard OpenAPI descriptions aren't designed for LLM tool selection, so we'll add Gram's `x-gram` extensions to provide better context and instructions for our AI agent.
 
-To avoid confusion, each operation should have a clear, precise description that explains exactly what it does and when to use it. Gram allows us to add an extension called `x-gram` to OpenAPI paths, to add more information such as an LLM oriented description, summary, other name for the operation. 
+OpenAPI descriptions that are too verbose cause token bloat, while vague descriptions lead to poor tool selection. Gram's `x-gram` extension lets us add LLM–optimized descriptions with context about when to use each tool and any prerequisites needed.
 
 ```python
 def custom_openapi():
@@ -873,23 +817,7 @@ def custom_openapi():
                 </prerequisites>""",
                 "responseFilterType": "jq",
             }
-        },
-        "health_check": {
-            "x-gram": {
-                "name": "health_check",
-                "summary": "Check API health status",
-                "description": """<context>
-                This endpoint provides a simple health check to verify that the Slack MCP server
-                is running and responsive. Returns current timestamp and status.
-                </context>
-
-                <prerequisites>
-                - No authentication required
-                - Always available for monitoring purposes
-                </prerequisites>""",
-                "responseFilterType": "jq",
-            }
-        },
+        }
     }
 
     # Apply x-gram extensions to paths
@@ -905,7 +833,7 @@ def custom_openapi():
     return app.openapi_schema
 ```
 
-In the code above, we have have a dictionary `x_gram_extensions` that contains the information to the paths, with the key being the operation ID. We when run a loop through the paths, to match with the operation, and then attach the `x-gram` component.
+This customization adds structured context and prerequisites to each endpoint, helping Gram generate MCP tools that the AI agent can use more effectively.
 
 After that, we need to override the custom openapi definition from FastAPI and add the logic to run the FastAPI app.
 
@@ -919,11 +847,11 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 ```
 
-Great! We have added the FastAPI Slack API and we can now run it. Last step, let's add some scripts that can run and generate openAPI files in Json or YAML format, we can use to import it Gram. 
+Great! We have added the FastAPI Slack API. Last step, let's add a script that will generate openAPI files in Json or YAML format, we can use to import it Gram. 
 
-### Step 5: Generating OpenAPI files
+### Generating OpenAPI files
 
-You can use the following script to generate OpenAPI files in JSON  and YAML. Create a file called `generate_openapi.py`.
+We need to export our API specification in formats that Gram can import to create our MCP server. This script generates both JSON and YAML versions of our OpenAPI specification. At the root of the project, create a file called `generate_openapi.py`.
 
 ```python
 """Save this FastAPI app's OpenAPI specification to JSON and YAML"""
@@ -973,15 +901,15 @@ if __name__ == "__main__":
 
 ```
 
-In this script, we are importing the FastAPI app, and calling the `app.openapi()` method, which will return the dict version of the OpenAPI definition. 
+In the script above, we are importing the FastAPI app, and calling the `app.openapi()` method, which will return the dict version of the OpenAPI definition. 
 
-You can then call the following command to generate the files. 
+Run the generation script:
 
-```
+```bash
 uv run python generate_openapi.py
 ```
 
-You should have a similar output. 
+This outputs:
 
 ```txt
 🚀 Generating OpenAPI specification files...
@@ -989,138 +917,318 @@ Generated openapi.json
 Generated openapi.yaml
 ```
 
-### Step 5: Running the API
+### Running the API
 
-Final step, run the API. You will have to expose your API to the internet. For the sake of simplicity, we are using ngrok in this tutorial. 
-
-First, run the FastAPI application. 
+Start the FastAPI server and expose it with ngrok for testing:
 
 ```bash
-uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn app.main:app --reload
 ```
 
-And then, use ngrok to expose the application. 
+In another terminal, expose the API:
 
 ```bash
 ngrok http 127.0.0.1:8000
 ```
 
-![Ngrk running in a terminal](./assets/ngrok-terminal-running.png.png)
+![Ngrk running in a terminal](./assets/ngrok-terminal-running.png)
 
-You will find the forwarding HTTPS URL. Copy the URL somewhere, we will need it when configuring the MCP server.
+Copy the HTTPS forwarding URL from ngrok – we'll use this when configuring our MCP server in Gram. With our API running and OpenAPI files generated, we're ready to create the MCP server.
 
-## Creating an MCP server In Gram
+## Turning Your API into an MCP Server
 
-Gram is a service that helps you create MCP servers with just uploading an OpenAPI file. It gives you the possbilities to expose also these MCP servers publicly or privately. Here are few concepts to understand before moving on: 
+Now we'll use Gram to convert our FastAPI specification into a hosted MCP server that AI agents can connect to. Gram eliminates the need to implement MCP protocol code manually by generating servers from OpenAPI documents.
 
-* Tool definitions: They contain both the metadata needed to describe a tool to  an LLM and the configuration Gram uses to construct the corresponding  HTTP request to your API or a third-party integration. In Gram, the tool definition originates from the OpenAPI document.
-* Tool variations: Gram allows you to edit your tools descriptions in the UI. You can also modify sumamries and descriptions using the `x-gram` extension, as we did when creating our API.
-* Toolsets: They represent curated collections of tool definitions. Many API can have many operations. Toolsets allows you to add and select only the ones you want to expose to the agent. You can also confugure there, environment variables that will be used if the server is private.
+Gram works with three key concepts: tool definitions that describe each API endpoint to LLMs, tool variations that let you customize descriptions, and toolsets that group related tools together. The `x-gram` extensions we added earlier will automatically enhance how Gram presents our tools to AI agents.
 
-To create an MCP server in Gram, we will follow these steps: 
+### Upload the OpenAPI document
 
-- Upload an OpenAPI document.
-- Configure Toolsets.
-- Create an MCP server.
-- Expose the server.
-
-### Step 1: Upload the OpenAPI document
-
-On the Gram dashboard, navigate to the Toolsets page.
+Navigate to the **Toolsets** page in your Gram dashboard.
 
 ![Navigate](./assets/gram-nav-to-toolsets.png)
 
-Then, click on the **+ ADD API** button to add an API source. On that page, you will be shown a model, where you can uplload your OpenAPI document and name the API source. 
+Then, click on the **+ ADD API** button to add an API source. Upload the `openapi.json` file we generated and give your API source a descriptive name like **Slack MCP API**.
 
-![Adding an API source](./assets/gram-adding-api-source.png.png)
+![Adding an API source](./assets/gram-adding-api-source.png)
 
-### Step 2: Create a toolset
+### Create a toolset
 
-To create a toolset, click on the **+ ADD TOOLSET** button, still on the `Toolsets` page of the dashboard. A modal will appear where you will have to enter a name for the toolset. After entering a name and validating, you will be redirected to a list of tools you can enable for your toolsets. You can find the tool definitions you created earlierm and click on `Enable All` to enable all tools definitions.
+Click the **+ ADD TOOLSET** button on the Toolsets page. A modal will appear asking for a toolset name – enter something like "Slack Tools" and click **Create**. You'll be redirected to a new page showing all available tools from your API. 
+
+You can see the tool definitions we created from the **Slack MCP API** API source: search messages, get threads, get users, list slack channels, get channel messages. Click **Enable All** to include all tools in your toolset.
 
 ![Adding Toolset](./assets/gram-adding-toolsets.png) 
 
-### Step 3: Create an MCP server
+### Create a new Environment
 
-Go back on the Toolsets page, and select your newly created toolset to access your toolset zoom in page. You will see a similar page. 
+Navigate to the Environments page and click **+ NEW ENVIRONMENT**. Enter "slack" as the environment name. Once created, you'll be redirected to the environment configuration page. Click **NEW VARIABLE** to add environment variables.
 
-![Toolset Zoom in](./assets/gram-toolset-zoom-in.png)
+![Adding environment variables](/Users/koladev/ritza/speakeasy-developer-docs/mcp/using-mcp/assets/adding-environment-variables.png)
 
-Now, click on the `MCP` tab to access your MCP server deployment configurations. 
+Add your Slack user token as `SLACK_API_HTTP_BEARER` . And add the ngrok URL as `SLACK_API_SERVER_URL`. These variables let Gram authenticate with Slack and route requests to your running API.
 
-You can make your server public or private. For simplicity, this tutorial works with a public server. We will configure the API URL and the token, on the client side.
+We have created an MCP server for Slack data access that exposes our endpoints as standardized tools. Next, we need to configure Postiz for social media scheduling, then build the AI agent that orchestrates the entire workflow.
 
-![Gram MCP Server configuration](./assets/gram-mcp-server-configuration.png)
+## Connecting to Postiz for Social Media Scheduling
 
-Copy the configuration under the `Pass-through Authentication` section. We will add this configuration in our `claude_desktop_config.json` file. 
+Now we need to set up Postiz, which handles the social media scheduling portion of our automated workflow. Postiz provides a direct MCP server integration, so unlike our Slack API, we don't need to build a wrapper – we can connect to their MCP server directly.
 
-```json
-{
-  "mcpServers": {
-    "SlackMcpServer": {
-      "command": "npx",
-      "args": [
-          "mcp-remote",
-          "https://app.getgram.ai/mcp/ritza-rzx-zx36b",
-          "--header",
-          "MCP-SLACK-API-HTTP-BEARER:${VALUE}",
-          "--header",
-          "MCP-SLACK-API-SERVER-URL:${VALUE}"
-        ]
-    }
-  }
-}
-```
+Postiz supports scheduling across multiple social media platforms. For this guide, we'll use X (formerly Twitter), but you can connect LinkedIn, Facebook, or other platforms depending on your needs.
 
-Replace `${VALUE}` with the the values of the Slack token and the API server URL, which will just be the ngrok URL. 
+### Configure Postiz MCP Server
 
-With the Slack MCP server added, we can now configure Postiz. 
+First, ensure you have at least one social media account connected in Postiz. Add your X account or whichever platform you want to schedule posts to.
 
-## Configuring Postiz
-
-Postiz is a platform that allows you scheudle posts across media channels or discussions channels. They provide an interesting MCP integration, we can use in this guide. 
-
-In this guide, we've added an X (formeerly Twitter) channel to Postiz. You can connect any social channel you want.
-
-On the Postiz dashboard, navigate to the setting page and select Public API. You will see an MCP section with the MCP URL configuration. 
+On the Postiz dashboard, navigate to the Settings page and select **Public API**. You'll see an MCP section displaying your unique MCP server URL. This URL provides direct access to Postiz's posting and scheduling functionality through the MCP protocol.
 
 ![Postiz MCP configuration](./assets/postiz-mcp-config.png)
 
-Copy the URL and open your Claude Desktop application. Navigate to `Settings -> Connectors` and click on **Add Custom Connector** button.
-
-![Adding Postiz Connector](./assets/postiz-adding-postiz-mcp-to-claude.png)
-
-Validate the add and open a new conversation. We will start testing our integration. 
-
-## Testing the integration 
-
-Claude Desktop can now access your Slack and schedule posts on Postiz. Let's test the integration by using the following prompt and seing how Claude works. 
+Copy the MCP URL and save it to your `.env` file in your FastAPI project as `POSTIZ_MCP_URL`. Your environment variables should now look like this:
 
 ```txt
-Hello friend. 
-
-Please, go to Slack and check the #threads channel. Identify the most recent high-performing thread. Analyze its content and extract key ideas, insights, or takeaways. Then, create multiple Twitter (X) posts based on that thread, optimized for engagement. Prepare the posts so they can be scheduled in Postiz.
+SLACK_USER_TOKEN=xoxp-your-slack-user-token-here
+GRAM_AI_API_KEY=your-gram-ai-api-key-here
+OPENAI_API_KEY=sk-proj-your-openai-api-key-here
+POSTIZ_MCP_URL=your-postiz-mcp-url
 ```
 
-![Claude Asking Slack](./assets/claude-asking-slack.png)
+With both MCP servers configured – Gram hosting our Slack tools and Postiz providing direct scheduling access – we can now build the AI agent that connects them.
 
-We can see Claude going trough Slack, analyzing channels, looking for threads and replies. After that, it retrieve the messages and start interacting with Postiz to schedule posts. 
+## Creating the AI Agent Workflow
 
-![Claude Asking Postiz](./assets/claude-asking-postiz.png)
+With our Slack MCP server hosted on Gram and Postiz MCP server configured, we need to build the AI agent that orchestrates the entire workflow. The agent will receive emoji reactions from Slack, analyze threads, and schedule social media posts automatically.
 
-And we can see the posts scheduled in Postiz. 
+We'll create the agent logic in a separate module, then add a webhook endpoint to our FastAPI app that Slack's Events API will call when emoji reactions are added to messages.
+
+### Creating the Agent Module
+
+In the `app` Python package, create a new file called `social_agent.py`. This file will contain the AI agent that connects our two MCP servers:
+
+```python
+import asyncio
+import os
+from agents import Agent, Runner, set_default_openai_key
+from gram_ai.openai_agents import GramOpenAIAgents
+from agents.mcp.server import MCPServerSse
+
+postiz_mcp_server = MCPServerSse(
+    name="postiz",
+    params={
+        "url": os.getenv("POSTIZ_MCP_URL")
+    }
+)
+
+async def create_social_media_posts(channel_id: str, message_ts: str):
+    gram = GramOpenAIAgents(api_key=os.getenv("GRAM_AI_API_KEY"))
+    set_default_openai_key(os.getenv("OPENAI_API_KEY"))
+    
+    agent = Agent(
+        name="Assistant",
+        tools=gram.tools(
+            project="default", 
+            toolset="slack-tools",
+            environment="slack",
+        ),
+        mcp_servers=[postiz_mcp_server]
+    )
+    
+    prompt = f"""Hello friend.
+    
+                A rocket emoji was added to a message in channel {channel_id} at timestamp {message_ts}.
+
+                Please analyze this thread and create Twitter posts based on the content. Then schedule 4 posts on Postiz.
+            """
+    
+    await postiz_mcp_server.connect()
+    result = await Runner.run(agent, prompt)
+    await postiz_mcp_server.cleanup()
+    
+    return result.final_output 
+```
+
+This code sets up an OpenAI agent with access to both MCP servers: Gram's tools for Slack access and Postiz's direct MCP server for scheduling. The agent receives the channel and message details, then handles the complete workflow autonomously.
+
+### Add Slack Events Webhook
+
+Now we'll integrate our agent with FastAPI by adding a webhook endpoint that Slack's Events API will call when emoji reactions are added.
+
+In the `main.py` file, add the event controller before the the `custom_openapi` function:
+
+```python
+@app.post("/events", include_in_schema=False)
+async def handle_slack_events(request: Request):
+    """
+    Handle Slack Events API requests.
+    
+    This endpoint processes various Slack events, starting with url_verification.
+    It's excluded from OpenAPI documentation as it's internal to Slack integration.
+    """
+    try:
+        # Parse the request body
+        body = await request.json()
+                
+        # Handle url_verification event
+        if body.get("type") == "url_verification":
+            # Validate the event structure
+            verification_event = SlackUrlVerificationEvent(**body)
+            
+            # Respond with the challenge value in plain text
+            return PlainTextResponse(
+                content=verification_event.challenge,
+                status_code=200,
+                headers={"Content-Type": "text/plain"}
+            )
+        
+        # Handle event callbacks
+        elif body.get("type") == "event_callback":
+            # Parse the full event wrapper
+            event_wrapper = SlackEventWrapper(**body)
+            event = event_wrapper.event or {}
+            
+            # Handle rocket emoji reactions for social media posts
+            if (event.get("type") == "reaction_added" and 
+                event.get("reaction") == "rocket" and
+                event.get("item", {}).get("type") == "message"):
+                
+                channel_id = event["item"]["channel"]
+                message_ts = event["item"]["ts"]
+                
+                print(f"Rocket reaction: {channel_id}/{message_ts}")
+                asyncio.create_task(
+                    process_social_media_workflow(channel_id, message_ts)
+                )
+            
+            return JSONResponse(
+                content={"status": "ok"},
+                status_code=200
+            )
+        
+        # Unknown event type
+        else:
+            return JSONResponse(
+                content={"error": "Unknown event type"},
+                status_code=400
+            )
+            
+    except Exception as e:
+        print(f"Error: {e}")
+        return JSONResponse(
+            content={"status": "error", "message": str(e)},
+            status_code=200
+        )
+
+
+async def process_social_media_workflow(channel_id: str, message_ts: str):
+    """Process rocket reaction for social media content generation"""
+    try:
+        from app.social_agent import create_social_media_posts
+        result = await create_social_media_posts(channel_id, message_ts)
+        print(result)
+    except Exception as e:
+        print(f"Error: {e}")
+```
+
+This endpoint handles two critical Slack events: URL verification (required when setting up the webhook) and emoji reactions. When someone adds a rocket emoji, it triggers our AI agent workflow in the background while immediately responding to Slack.
+
+Restart your FastAPI server to load the new endpoint:
+
+```bash
+uv run uvicorn app.main:app --reload
+```
+
+The webhook is now ready to receive Slack events and trigger our automated social media workflow.
+
+### Configure the Slack Event URL
+
+Before testing the integration, we need to configure Slack so it can reach our event endpoint and send emoji reaction notifications.
+
+#### Step 1: Configure Event Subscriptions
+
+1. Go to your Slack app settings at [api.slack.com/apps](https://api.slack.com/apps)
+2. Select your app
+3. Navigate to **Event Subscriptions** in the left sidebar
+4. Toggle **Enable Events** to ON
+
+#### Step 2: Add Request URL
+
+1. In the Request URL field, enter your webhook endpoint:
+
+   ```txt
+   https://your-ngrok-url/events
+   ```
+
+2. Slack will send a verification challenge and the FastAPI `/events` endpoint should automatically handle this. If the challenge is good, you will see a green `Verified` text.
+
+3. Scroll down to **Subscribe to bot events**.
+
+4. Click **Add Bot User Event**.
+
+5. Add the `reaction_added` event.
+
+![Slack Event Configuration](/Users/koladev/ritza/speakeasy-developer-docs/mcp/using-mcp/assets/slack-event-configuration.png)
+
+Save the changes, and we are now ready to test the integration. 
+
+#### Step 3: Verify Bot Permissions
+
+Ensure your bot has the required OAuth scopes under **OAuth & Permissions**:
+
+- `channels:history` – Read channel messages.
+- `channels:read` – Access channel information.
+- `search:read` – Search across messages.
+- `search:read.private`: Search in private channels.
+- `search:read.public`: Search in public channels.
+- `users:read` – Get user profile details.
+- `groups:history` – Access private channel history.
+- `groups:read` – View basic information about user's private channel.
+- `reactions:read` – Detect emoji reactions.
+
+If you added new scopes, reinstall the app to your workspace.
+
+With Slack configured to send reaction events to our webhook, we're ready to test the complete automated workflow.
+
+## Testing the Integration 
+
+Now let's test our complete automated workflow. Find a Slack thread with valuable content and add a 🚀 reaction to any message in that thread.
+
+When you add the rocket emoji, Slack will immediately send an event to your `/events` endpoint. You can monitor this activity in your ngrok terminal, where you'll see incoming requests from Slack's servers. 
+
+![Ngrok Terminal](/Users/koladev/ritza/speakeasy-developer-docs/mcp/using-mcp/assets/ngrok-terminal.png)
+
+The agent will then make requests to your Gram-hosted MCP server to retrieve the thread content, analyze it for social media potential, create platform-appropriate posts, and schedule them through the Postiz MCP server. Your FastAPI server will log the rocket reaction detection and trigger the AI agent workflow.
+
+```txt
+INFO:     34.xxx.xxx.xxx:0 - "POST /events HTTP/1.1" 200 OK
+INFO:     35.xxx.xxx.xxx:0 - "GET /messages/C097TXXXXX/1754342272.363509/thread HTTP/1.1" 200 OK
+I've analyzed the thread and scheduled 4 Twitter posts based on the content. You can view and manage them [here](https://platform.postiz.com/p/cmdsgxxxxxxxxq).
+
+Here's a summary of the scheduled posts:
+
+1. **Domain Insights**: Highlighting trending tech-related domains and the lucrative potential of .io domains.
+   
+2. **Domain Sales Tips**: Sharing a successful sale story and recommending platforms like Sedo and Flippa.
+
+3. **Pricing Guide**: Providing a quick guide on pricing different types of domains.
+
+4. **Selling Tips**: Emphasizing the importance of updating listings and approaching potential buyers professionally. 
+
+If you need further adjustments, feel free to ask!
+```
+
+Check your Postiz dashboard to see the scheduled posts. The agent will have created Twitter-optimized content based on the thread's key insights and scheduled them for publication.
 
 ![Postiz scheduled posts](./assets/postiz-scheduled-posts.png)
 
-And now, we have an integration where you can convert your best Slack threads into X posts, using MCP server we've built and host on Gram and the Postiz MCP server. 
+We now have a fully automated system that converts Slack discussions into social media content with just an emoji reaction. The integration uses two MCP servers: our custom Slack server hosted on Gram and Postiz's direct MCP integration, orchestrated by an OpenAI agent that handles the entire workflow intelligently.
 
 ## Final Thoughts
 
-In this guide, we have learned how to use MCP servers to transform your slack threads into social media posts. We have host an MCP server on  Gram that communicates with an API, and also configured an MCP server on Postiz on Claude Desktop. 
+We've built a complete automated system that transforms Slack discussions into social media content using MCP servers. By combining a custom Slack API with Gram's MCP hosting and Postiz's direct MCP integration, we created a workflow that requires zero manual intervention: just add a rocket emoji and watch your team's insights become social posts.
 
-You can push this project further by: 
+This project demonstrates MCP's core value: standardizing how AI agents interact with different tools. Instead of writing custom integrations for each service, we used MCP servers that any AI agent can understand and use pragmatically.
 
-- Adding more media channels in Postiz. 
-- Refining your prompts to include more needs or touches. 
+You can enhance this integration in several ways:
 
-If you want to know more about, Gram, check our documentation here.
+- **Add more social platforms** by connecting additional accounts in Postiz - LinkedIn for professional content, Facebook for broader reach
+
+- **Improve content quality** by refining the agent's prompt to include your brand voice, specific hashtag strategies, or content formatting preferences
