@@ -99,71 +99,49 @@ Building the API involves:
 
 ### Create the project
 
-Create a new Python project with uv (you can use any dependency manager you prefer):
+Create a new Python project directory and set up the environment:
 
+```bash
+mkdir slack-mcp-server
+cd slack-mcp-server
 ```
-uv init
+
+Create a virtual environment and activate it:
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-The command above creates a `pyproject.toml` file where you'll define the dependencies. We need the Slack SDK for API integration, FastAPI for the web server, and the OpenAI Agents SDK with Gram AI SDK for the MCP integration:
+Create a `requirements.txt` file with all the dependencies needed for the Slack API integration, FastAPI web server, and OpenAI Agents SDK with Gram AI SDK for MCP integration:
 
-```toml
-[project]
-name = "slack-mcp-server"
-version = "0.1.0"
-description = "A FastAPI server that integrates with Slack API for message search and thread operations, optimized for getgram MCP servers"
-authors = [
-    {name = "Your Name", email = "your.email@example.com"}
-]
-readme = "README.md"
-requires-python = ">=3.9"
-dependencies = [
-    "fastapi[all]==0.115.5",
-    "slack-sdk==3.29.0",
-    "python-dotenv==1.0.1",
-    "pydantic>=2.11.2",
-    "uvicorn[standard]==0.32.1",
-    "openai-agents>=0.2.4",
-    "gram-ai>=0.1.0",
-]
-
-[project.optional-dependencies]
-test = [
-    "pytest==8.3.4",
-    "pytest-asyncio==0.25.0",
-    "httpx==0.28.1",
-]
-dev = [
-    "pytest==8.3.4",
-    "pytest-asyncio==0.25.0",
-    "httpx==0.28.1",
-]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.build.targets.wheel]
-packages = ["app"]
-
-[tool.uv]
-dev-dependencies = [
-    "pytest==8.3.4",
-    "pytest-asyncio==0.25.0",
-    "httpx==0.28.1",
-] 
+```txt
+fastapi[all]==0.115.5
+slack-sdk==3.29.0
+python-dotenv==1.0.1
+pydantic>=2.11.2
+uvicorn[standard]==0.32.1
+openai-agents>=0.2.4
+gram-ai>=0.1.0
+pytest==8.3.4
+pytest-asyncio==0.25.0
+httpx==0.28.1
 ```
 
 Install all dependencies:
 
 ```bash
-uv sync
+pip install -r requirements.txt
 ```
 
 Create a Python package named `app` with the following structure:
 
-- `app/__init__.py`
-- `app/main.py`
+```bash
+touch .env
+mkdir app
+touch app/__init__.py
+touch app/main.py
+```
 
 ### Add the FastAPI app and Pydantic models
 
@@ -324,7 +302,7 @@ async def get_slack_client(
         )
 ```
 
-The FastAPI application now has proper authentication, data validation, and models. You can now generate a clean OpenAPI document for the app that Gram can convert into MCP tools.
+The FastAPI application now has proper authentication, data validation, and models. This enables generating a clean OpenAPI document for the app that Gram can convert into MCP tools.
 
 ### Add the endpoints
 
@@ -902,7 +880,7 @@ This script imports the FastAPI app, and calls the `app.openapi()` method, and r
 Run the generation script:
 
 ```bash
-uv run python generate_openapi.py
+python generate_openapi.py
 ```
 
 This is the output from the command:
@@ -918,7 +896,7 @@ Generated openapi.yaml
 Start the FastAPI server and expose it with ngrok for testing:
 
 ```bash
-uv run uvicorn app.main:app --reload
+uvicorn app.main:app --reload
 ```
 
 In another terminal, expose the API:
@@ -935,8 +913,6 @@ Copy the HTTPS forwarding URL from ngrok – this URL is used when configuring t
     alt: "Ngrok running in a terminal",
   }}
 />
-
-Copy the HTTPS forwarding URL from ngrok – you'll use the URL when configuring the MCP server in Gram.
 
 ## Turn the API into an MCP Server
 
@@ -1180,7 +1156,7 @@ The endpoint above handles two critical Slack events: URL verification (required
 Restart the FastAPI server to load the new endpoint:
 
 ```bash
-uv run uvicorn app.main:app --reload
+uvicorn app.main:app --reload
 ```
 
 The webhook is now ready to receive Slack events and trigger the automated social media workflow.
