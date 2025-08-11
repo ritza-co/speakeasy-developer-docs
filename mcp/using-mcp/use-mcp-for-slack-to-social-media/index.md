@@ -54,13 +54,7 @@ To build this automated Slack-to-social media system, these are required:
 * [Postiz](https://platform.postiz.com/auth) account – To schedule social media posts (7-day free trial available).
 * [OpenAI API](https://openai.com/api/) key – To power the AI agent that orchestrates the workflow.
 * [Ngrok](https://ngrok.com/) – To expose local API during development (or use any hosting provider).
-* [Slack app](https://api.slack.com/apps/) and bot user OAuth token with these scopes:
-  * `channels:history` – To read channel messages.
-  * `channels:read` – To access channel information.
-  * `groups:history` – To access private channel history.
-  * `groups:read` – To view basic information about a user's private channel.
-  * `reactions:read` – To detect emoji reactions.
-  * `users:read` – To get user profile details.
+* [Slack account](https://slack.com/) with the appropriate permissions for adding apps to a workspace.
 
 ### Quick start option
 
@@ -74,6 +68,39 @@ Implementing this automation includes four steps:
 - Deploy an MCP server on Gram using the API OpenAPI document.
 - Configure Postiz MCP integration for social media scheduling.
 - Create an AI agent that connects to both Slack and Postiz MCP servers and handles the automated workflow.
+
+### Create Slack app and bot token
+
+Create a new Slack app to access workspace data:
+
+Navigate to [api.slack.com/apps](https://api.slack.com/apps) and click **Create New App**. Select **From scratch**, enter app name and workspace.
+
+<Screenshot
+  image={{
+    src: "./assets/create-slack-app.png",
+    alt: "Create new Slack app",
+  }}
+/>
+
+Navigate to **OAuth & Permissions** in the sidebar. Scroll to **Bot Token Scopes** and add these required scopes:
+
+<Screenshot
+  image={{
+    src: "./assets/slack-bot-scopes.png",
+    alt: "Add bot token scopes",
+  }}
+/>
+
+Click **Install to Workspace** at the top of the page. Authorize the app and copy the **Bot User OAuth Token** that starts with `xoxb-`.
+
+<Screenshot
+  image={{
+    src: "./assets/slack-bot-token.png",
+    alt: "Copy bot user OAuth token",
+  }}
+/>
+
+Save the token to environment variables as `SLACK_USER_TOKEN`.
 
 ## Build the Slack integration
 
