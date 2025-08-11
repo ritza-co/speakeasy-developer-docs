@@ -54,16 +54,13 @@ To build this automated Slack-to-social media system, these are required:
 * [Postiz](https://platform.postiz.com/auth) account – To schedule social media posts (7-day free trial available).
 * [OpenAI API](https://openai.com/api/) key – To power the AI agent that orchestrates the workflow.
 * [Ngrok](https://ngrok.com/) – To expose local API during development (or use any hosting provider).
-* [Slack](https://slack.com/) app and user token with these scopes:
+* [Slack app](https://api.slack.com/apps/) and bot user OAuth token with these scopes:
   * `channels:history` – To read channel messages.
   * `channels:read` – To access channel information.
-  * `search:read` – To search across messages.
-  * `search:read.private` – To search in private channels.
-  * `search:read.public` – To search in public channels.
-  * `users:read` – To get user profile details.
   * `groups:history` – To access private channel history.
   * `groups:read` – To view basic information about a user's private channel.
   * `reactions:read` – To detect emoji reactions.
+  * `users:read` – To get user profile details.
 
 ### Quick start option
 
@@ -896,7 +893,7 @@ Generated openapi.yaml
 Start the FastAPI server and expose it with ngrok for testing:
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app
 ```
 
 In another terminal, expose the API:
@@ -935,7 +932,7 @@ Navigate to the **Toolsets** page in the Gram dashboard.
   }}
 />
 
-Click the **Get Started** button to add an API source. Upload the generated `openapi.json` file and give the API source a this name **Slack API**. It is important that you use this name exactly to follow along with this guide.
+Click the **Get Started** button to add an API source. Upload the generated `openapi.json` file and give the API source this name **Slack API**. It is important that you use this name exactly to follow along with this guide.
 
 <Screenshot
   image={{
@@ -946,9 +943,11 @@ Click the **Get Started** button to add an API source. Upload the generated `ope
 
 ### Create a toolset
 
-Click the **+ ADD TOOLSET** button on the Toolsets page. A modal will appear asking for a toolset name – enter "Slack Tools" and click **Create**. You'll be redirected to a new page showing all available tools from your APIs. 
+On the next page a modal will appear asking to create a toolset – enter "Slack Tools" as the name and click **Continue**. 
 
-You can see the tool definitions you created from the **Slack API** API source: search messages, get threads, get users, list slack channels, get channel messages. Click **Enable All** to include all tools in the toolset.
+On the next page accept the default MCP server slug and click **Continue**.
+
+To see the tool definitions, navigate to **Toolsets** and click on the **Slack Tools**. There the tools listed in the **Slack API** API source will be present: search messages, get threads, get users, list slack channels, get channel messages.
 
 <Screenshot
   image={{
@@ -1156,7 +1155,7 @@ The endpoint above handles two critical Slack events: URL verification (required
 Restart the FastAPI server to load the new endpoint:
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app
 ```
 
 The webhook is now ready to receive Slack events and trigger the automated social media workflow.
@@ -1204,13 +1203,10 @@ Ensure the bot has the required OAuth user scopes under **OAuth & Permissions**:
 
 - `channels:history` – Read channel messages.
 - `channels:read` – Access channel information.
-- `search:read` – Search across messages.
-- `search:read.private`: Search in private channels.
-- `search:read.public`: Search in public channels.
-- `users:read` – Get user profile details.
 - `groups:history` – Access private channel history.
 - `groups:read` – View basic information about a user's private channel.
 - `reactions:read` – Detect emoji reactions.
+- `users:read` – Get user profile details.
 
 If new scopes were added, reinstall the app to the workspace.
 
@@ -1218,7 +1214,7 @@ With Slack configured to send reaction events, testing the complete automated wo
 
 ## Test the integration 
 
-Now let's test the complete automated workflow. Find a Slack thread with valuable content and add a 🚀 reaction to the parent message of that thread.
+Now let's test the complete automated workflow. Find a Slack thread with valuable content, add the bot to the channel by typing `/invite @your-bot-name`, then add a 🚀 reaction to the parent message of that thread.
 
 When adding the rocket emoji, Slack immediately sends an event to the `/events` endpoint. Monitor the activity in the ngrok terminal to see incoming requests from Slack's servers. 
 
