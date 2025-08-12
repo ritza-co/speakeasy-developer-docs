@@ -7,11 +7,11 @@ import { Screenshot } from "@/mdx/components";
 
 # Use MCP to turn your best Slack threads into social posts
 
-Teams generate valuable insights in Slack discussions daily. Technical breakthroughs, market observations, and customer feedback make for excellent social media content. But extracting these insights from lengthy threads and manually creating posts is time-consuming.
+Teams create valuable insights in Slack discussions daily. Technical breakthroughs, market observations, and customer feedback make for excellent social media content. But extracting these insights from lengthy threads and manually creating posts is time-consuming.
 
-What if adding a 🚀 emoji to any valuable message could automatically generate and schedule social media posts? What would normally require custom webhook handling and API orchestration becomes a simple AI agent and MCP server setup.
+What if adding a 🚀 emoji to any valuable message could automatically create and schedule social media posts? What would normally require custom webhook handling and API orchestration becomes a simple AI agent and MCP server setup.
 
-This article shows how to build a Slack MCP server using [Gram](https://getgram.ai), connect it with [Postiz](https://docs.postiz.com/public-api) for social media scheduling, and generate an AI agent that transforms team discussions into engaging social content with just an emoji reaction.
+This article shows how to build a Slack MCP server using [Gram](https://getgram.ai), connect it with [Postiz](https://docs.postiz.com/public-api) for social media scheduling, and create an AI agent that transforms team discussions into engaging social content with just an emoji reaction.
 
 ## Why use MCP? 
 
@@ -54,16 +54,7 @@ To build this automated Slack-to-social media system, these are required:
 * [Postiz](https://platform.postiz.com/auth) account – To schedule social media posts (7-day free trial available).
 * [OpenAI API](https://openai.com/api/) key – To power the AI agent that orchestrates the workflow.
 * [Ngrok](https://ngrok.com/) – To expose local API during development (or use any hosting provider).
-* [Slack](https://slack.com/) app and user token with these scopes:
-  * `channels:history` – To read channel messages.
-  * `channels:read` – To access channel information.
-  * `search:read` – To search across messages.
-  * `search:read.private` – To search in private channels.
-  * `search:read.public` – To search in public channels.
-  * `users:read` – To get user profile details.
-  * `groups:history` – To access private channel history.
-  * `groups:read` – To view basic information about a user's private channel.
-  * `reactions:read` – To detect emoji reactions.
+* [Slack account](https://slack.com/) with the appropriate permissions for adding apps to a workspace.
 
 ### Quick start option
 
@@ -77,6 +68,39 @@ Implementing this automation includes four steps:
 - Deploy an MCP server on Gram using the API OpenAPI document.
 - Configure Postiz MCP integration for social media scheduling.
 - Create an AI agent that connects to both Slack and Postiz MCP servers and handles the automated workflow.
+
+### Create Slack app and bot token
+
+Create a new Slack app to access workspace data:
+
+Navigate to [api.slack.com/apps](https://api.slack.com/apps) and click **Create New App**. Select **From scratch**, enter app name and workspace.
+
+<Screenshot
+  image={{
+    src: "./assets/create-slack-app.png",
+    alt: "Create new Slack app",
+  }}
+/>
+
+Navigate to **OAuth & Permissions** in the sidebar. Scroll to **Bot Token Scopes** and add these required scopes:
+
+<Screenshot
+  image={{
+    src: "./assets/slack-bot-scopes.png",
+    alt: "Add bot token scopes",
+  }}
+/>
+
+Click **Install to Workspace** at the top of the page. Authorize the app and copy the **Bot User OAuth Token** that starts with `xoxb-`.
+
+<Screenshot
+  image={{
+    src: "./assets/slack-bot-token.png",
+    alt: "Copy bot user OAuth token",
+  }}
+/>
+
+Save the token to environment variables as `SLACK_USER_TOKEN`.
 
 ## Build the Slack integration
 
@@ -302,7 +326,7 @@ async def get_slack_client(
         )
 ```
 
-The FastAPI application now has proper authentication, data validation, and models. This enables generating a clean OpenAPI document for the app that Gram can convert into MCP tools.
+The FastAPI application now has proper authentication, data validation, and models. This will generate a clean OpenAPI document for the app that Gram can convert into MCP tools.
 
 ### Add the endpoints
 
@@ -896,7 +920,7 @@ Generated openapi.yaml
 Start the FastAPI server and expose it with ngrok for testing:
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app
 ```
 
 In another terminal, expose the API:
@@ -935,7 +959,7 @@ Navigate to the **Toolsets** page in the Gram dashboard.
   }}
 />
 
-Click the **Get Started** button to add an API source. Upload the generated `openapi.json` file and give the API source a this name **Slack API**. It is important that you use this name exactly to follow along with this guide.
+Click the **Get Started** button to add an API source. Upload the generated `openapi.json` file and give the API source this name **Slack API**. It is important that you use this name exactly to follow along with this guide.
 
 <Screenshot
   image={{
@@ -946,9 +970,11 @@ Click the **Get Started** button to add an API source. Upload the generated `ope
 
 ### Create a toolset
 
-Click the **+ ADD TOOLSET** button on the Toolsets page. A modal will appear asking for a toolset name – enter "Slack Tools" and click **Create**. You'll be redirected to a new page showing all available tools from your APIs. 
+On the next page a modal will appear asking to create a toolset – enter "Slack Tools" as the name and click **Continue**. 
 
-You can see the tool definitions you created from the **Slack API** API source: search messages, get threads, get users, list slack channels, get channel messages. Click **Enable All** to include all tools in the toolset.
+On the next page accept the default MCP server slug and click **Continue**.
+
+To see the tool definitions, navigate to **Toolsets** and click on the **Slack Tools**. There the tools listed in the **Slack API** API source will be present: search messages, get threads, get users, list slack channels, get channel messages.
 
 <Screenshot
   image={{
@@ -1156,7 +1182,7 @@ The endpoint above handles two critical Slack events: URL verification (required
 Restart the FastAPI server to load the new endpoint:
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app
 ```
 
 The webhook is now ready to receive Slack events and trigger the automated social media workflow.
@@ -1204,13 +1230,10 @@ Ensure the bot has the required OAuth user scopes under **OAuth & Permissions**:
 
 - `channels:history` – Read channel messages.
 - `channels:read` – Access channel information.
-- `search:read` – Search across messages.
-- `search:read.private`: Search in private channels.
-- `search:read.public`: Search in public channels.
-- `users:read` – Get user profile details.
 - `groups:history` – Access private channel history.
 - `groups:read` – View basic information about a user's private channel.
 - `reactions:read` – Detect emoji reactions.
+- `users:read` – Get user profile details.
 
 If new scopes were added, reinstall the app to the workspace.
 
@@ -1218,7 +1241,7 @@ With Slack configured to send reaction events, testing the complete automated wo
 
 ## Test the integration 
 
-Now let's test the complete automated workflow. Find a Slack thread with valuable content and add a 🚀 reaction to the parent message of that thread.
+Now let's test the complete automated workflow. Find a Slack thread with valuable content, add the bot to the channel by typing `/invite @your-bot-name`, then add a 🚀 reaction to the parent message of that thread.
 
 When adding the rocket emoji, Slack immediately sends an event to the `/events` endpoint. Monitor the activity in the ngrok terminal to see incoming requests from Slack's servers. 
 
@@ -1258,11 +1281,11 @@ Check your Postiz dashboard to see the scheduled posts. The agent will have crea
   }}
 />
 
-This generates a fully automated system that converts Slack discussions into social media content with just an emoji reaction. The integration uses two MCP servers: a custom Slack server hosted on Gram and Postiz's direct MCP integration, orchestrated by an OpenAI agent that handles the entire workflow intelligently.
+This creates a fully automated system that converts Slack discussions into social media content with just an emoji reaction. The integration uses two MCP servers: a custom Slack server hosted on Gram and Postiz's direct MCP integration, orchestrated by an OpenAI agent that handles the entire workflow intelligently.
 
 ## Final thoughts
 
-This builds a complete automated system that transforms Slack discussions into social media content using MCP servers. By combining a custom Slack API with Gram's MCP hosting and Postiz's direct MCP integration, this generates a workflow that requires zero manual intervention: just add a rocket emoji and watch team insights become social posts.
+This builds a complete automated system that transforms Slack discussions into social media content using MCP servers. By combining a custom Slack API with Gram's MCP hosting and Postiz's direct MCP integration, this creates a workflow that requires zero manual intervention: just add a rocket emoji and watch team insights become social posts.
 
 The project demonstrates MCP's core value: standardizing how AI agents interact with different tools. Instead of writing custom integrations for each service, we used MCP servers that any AI agent can understand and use pragmatically.
 
