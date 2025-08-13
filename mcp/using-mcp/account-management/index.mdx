@@ -909,40 +909,14 @@ Copy the configuration under the `Pass-through Authentication` section. We will 
           "Authorization:${GRAM_KEY}"
         ],
       "env": {
-        "GRAM_KEY": "Bearer <your-key-here>"
+        "GRAM_KEY": "Bearer YOUR_GRAM_API_KEY"
       }
     }
   }
 }
 ```
 
-Replace `${VALUE}` with the the values of the Slack token and the API server URL, which will just be the ngrok URL. 
-
-Open the `claude_desktop_config.json` file and add the configuration for the Slack MCP server.
-
-```json
-{
-  "mcpServers": {
-    "SlackMCP": {
-      "command": "npx",
-      "args": [
-          "mcp-remote",
-          "https://app.getgram.ai/mcp/xxxxxxx",
-          "--header",
-          "MCP-SLACK-API-HTTP-BEARER:${VALUE}",
-          "--header",
-          "MCP-SLACK-API-SERVER-URL:${VALUE}",
-          "--header",
-          "Authorization:${GRAM_KEY}"
-        ],
-      "env": {
-        "GRAM_KEY": "Bearer <your-key-here>"
-      }
-    }
-  }
-}
-
-```
+Replace `${VALUE}` with the the values of the Slack token and the API server URL, which will just be the ngrok URL. Replace `YOUR_GRAM_API_KEY` with your actual Gram API key.
 
 You can run a test in Claude desktop to make sure the integration is working by asking Claude to list the current channels in your Slack workspace.
 
