@@ -1092,6 +1092,8 @@ async def create_social_media_posts(channel_id: str, message_ts: str):
 
 The code above sets up the AI agent with access to both MCP servers: Gram's tools for Slack access and Postiz's direct MCP server for scheduling. The agent receives the channel and message details, then handles the complete workflow autonomously.
 
+When declaring the agent, make sure to set the `project` value to the name of the project where the toolset is hosted, otherwise the agent will not be able to find the tools.
+
 ### Add the Slack events webhook
 
 Integrating the agent with FastAPI requires adding a webhook endpoint that Slack's Events API will call when emoji reactions are added.
