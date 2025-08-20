@@ -7,7 +7,7 @@ import { Screenshot } from "@/mdx/components";
 
 # Use MCP for Account Management with Slack and HubSpot
 
-[17% of businesses](https://www.zippia.com/advice/crm-statistics/#:~:text=17%25%20of%20businesses%20say%20that%20manual%20data%20entry%20is%20their%20biggest%20challenge%20in%20using%20their%20current%20CRM.) say manual data entry is their biggest CRM challenge.Sales teams post call summaries in Slack, then manually copy that information into HubSpot, doubling their data entry work. Managers spot urgent opportunities in channels notifications but can't quickly prioritize them without logging into the CRM to update deal status. In the meantime, your competitor is closing deals because you are not prioritizing quickly in your workflow, and your sales team has to look for what is prioritized. Lead volume increases but conversion rates stay flat because urgent opportunities get buried in manual workflows.
+[17% of businesses](https://www.zippia.com/advice/crm-statistics/#:~:text=17%25%20of%20businesses%20say%20that%20manual%20data%20entry%20is%20their%20biggest%20challenge%20in%20using%20their%20current%20CRM.) say manual data entry is their biggest CRM challenge. Sales teams post call summaries in Slack, then manually copy that information into HubSpot, doubling their data entry work. Managers spot urgent opportunities in channels notifications but can't quickly prioritize them without logging into the CRM to update deal status. In the meantime, your competitor is closing deals because you are not prioritizing quickly in your workflow, and your sales team has to look for what is prioritized. Lead volume increases but conversion rates stay flat because urgent opportunities get buried in manual workflows.
 
 What if emoji reactions could highlight priority messages? Your manager reacts to a Slack message with ‼️ and the sales rep asks Claude to show all high-priority messages and update the corresponding HubSpot deals.
 
@@ -17,11 +17,11 @@ In this article, you'll build an integration where Claude reads emoji-marked Sla
 
 If you're managing sales follow-ups manually, you're probably:
 
-- Listening to call summaries in Slack notifications
-- Identifying which deals need immediate attention
-- Logging into HubSpot to find deal records
-- Adding notes and updating deals status manually
-- Coordinating priority changes with your team
+- Listening to call summaries in Slack notifications.
+- Identifying which deals need immediate attention.
+- Logging into HubSpot to find deal records.
+- Adding notes and updating deals status manually.
+- Coordinating priority changes with your team.
 
 If your sales team handles dozens of calls daily, this process becomes overwhelming. Important deals get delayed while account managers spend time on CRM updates instead of selling.
 
@@ -39,30 +39,21 @@ Claude makes MCP integration simple. Add MCP server configurations to your `clau
 
 To build this automated account management workflow, you'll need:
 
-- **Python 3.11 or higher** – For running the Slack API server
-- **Claude Desktop** – For the MCP-powered workflow interface
-- **Ngrok** – To expose your local API during development (or use any hosting provider)
-
-- HubSpot private app with these scopes:
-  - `crm.lists.read` and `crm.lists.write` – To manage contact lists
-  - `crm.objects.companies.read` – To access company records
-  - `crm.objects.contacts.read` and `crm.objects.contacts.write` – To manage contact information
-  - `crm.objects.deals.read` and `crm.objects.deals.write` – To read and update deal records
-  - `crm.objects.appointments.read` and `crm.objects.appointments.write` – To manage meeting data
-  - `crm.objects.leads.read` and `crm.objects.leads.write` – To handle lead management
-  - `crm.objects.custom.read` and `crm.objects.custom.write` – To access custom objects
-
-- **Gram account** – To host your Slack MCP server
-- Slack app with user token containing these scopes:
+- **[Python 3.11 or higher](https://www.python.org/downloads/)** – For running the Slack API server
+- **[Claude Desktop](https://claude.ai/download)** – For the MCP-powered workflow interface
+- **[Ngrok](https://ngrok.com/)** – To expose your local API during development (or use any hosting provider)
+- [HubSpot](https://hubspot.com/) private app.
+- **[Gram account](https://app.getgram.ai/)** – To host your Slack MCP server
+- [Slack app](https://api.slack.com/apps) with user token containing these scopes:
   - `channels:history` – Read channel messages
   - `channels:read` – Access channel information
+  - `groups:history` – Access private channel history
+  - `groups:read` – View basic information about private channels
+  - `reactions:read` – Detect emoji reactions
   - `search:read` – Search across messages
   - `search:read.private` – Search in private channels
   - `search:read.public` – Search in public channels
   - `users:read` – Get user profile details
-  - `groups:history` – Access private channel history
-  - `groups:read` – View basic information about private channels
-  - `reactions:read` – Detect emoji reactions
 
 ## Build the Slack integration 
 
@@ -77,51 +68,35 @@ The API exposes these endpoints for account management workflow:
 
 Here's how you'll build the API:
 
-- Set up the Python project with dependencies
-- Define the FastAPI application and Pydantic models for message data validation
-- Implement the endpoint logic with Slack SDK integration for call notifications
+- Set up the Python project with dependencies.
+- Define the FastAPI application and Pydantic models for message data validation.
+- Implement the endpoint logic with Slack SDK integration for call notifications.
 - Enrich the OpenAPI document with `x-gram` extensions that help Gram generate better MCP tool descriptions for Claude.
 
 ### Create the project
 
-Create a new Python project with uv (you can use any dependency manager you prefer):
+Create a new Python project directory and set up a `requirements.txt` file with the dependencies needed for the Slack SDK and FastAPI:
 
+```txt
+fastapi[all]==0.115.5
+slack-sdk==3.29.0
+python-dotenv==1.0.1
+pydantic>=2.11.2
+uvicorn[standard]==0.32.1
+PyYAML
 ```
-uv init
-```
 
-The command above creates a `pyproject.toml` file where you'll define the dependencies. We need the Slack SDK for API integration and FastAPI for the web server.
+Create a virtual environment and activate it:
 
-```toml
-[project]
-name = "slack-account-management"
-version = "0.1.0"
-description = "A FastAPI server for Slack account management workflows with MCP integration"
-authors = [
-    {name = "Your Name", email = "your.email@example.com"}
-]
-readme = "README.md"
-requires-python = ">=3.9"
-dependencies = [
-    "fastapi[all]==0.115.5",
-    "slack-sdk==3.29.0",
-    "python-dotenv==1.0.1",
-    "pydantic>=2.11.2",
-    "uvicorn[standard]==0.32.1",
-]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.build.targets.wheel]
-packages = ["app"]
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 Install the dependencies:
 
 ```bash
-uv sync
+pip install -r requirements.txt
 ```
 
 Create an `app` directory with `main.py` and `__init__.py` files for your FastAPI endpoints. With the project structure ready, you can implement the Slack API integration.
@@ -768,12 +743,12 @@ if __name__ == "__main__":
 
 ```
 
-This script imports the FastAPI app, and calls the `app.openapi()` method, and returns the dict version of the OpenAPI document. 
+This script imports the FastAPI app, and calls the `app.openapi()` method, and returns the `dict` version of the OpenAPI document. 
 
 Run the generation script:
 
 ```bash
-uv run python generate_openapi.py
+python generate_openapi.py
 ```
 
 This is the output from the command:
@@ -789,7 +764,7 @@ Generated openapi.yaml
 Start the FastAPI server and expose it with ngrok for testing:
 
 ```bash
-uv run uvicorn app.main:app --reload
+uvicorn app.main:app --reload
 ```
 
 In another terminal, expose the API:
@@ -809,7 +784,7 @@ Copy the HTTPS forwarding URL from ngrok. You'll use the URL when configuring th
 
 ## Turn the API into an MCP Server
 
-Gram works with three key concepts: 
+[Gram](https://app.getgram.ai/) works with three key concepts: 
 
 - **Tool definitions** that describe each API endpoint to LLMs.
 - **Tool variations** that let you customize descriptions.
@@ -839,7 +814,7 @@ Click the **+ ADD API** button to add an API source. Upload the `openapi.json` f
 
 ### Create a toolset
 
-Click the **+ ADD TOOLSET** button on the Toolsets page. A modal will appear asking for a toolset name. Enter something like "Slack Tools" and click **Create**. You'll be redirected to a new page showing all available tools from your APIs. 
+Click the **+ CREATE A TOOLSET** button on the Toolsets page. A modal will appear asking for a toolset name. Enter something like "Slack Tools" and click **Create**. You'll be redirected to a new page showing all available tools from your APIs. 
 
 You can see the tool definitions you created from the **Slack MCP API** API source: search messages, get threads, get users, list slack channels, get channel messages. Click **Enable All** to include all tools in your toolset.
 
@@ -861,14 +836,14 @@ Navigate to the Environments page and click **+ NEW ENVIRONMENT**. Enter "slack"
   }}
 />
 
-Add your Slack user token as `SLACK_API_HTTP_BEARER` . And add the ngrok URL as `SLACK_API_SERVER_URL`. These new variables will allow Gram to authenticate with Slack and route requests to your running API.
+Add your Slack user token as `SLACK_API_HTTP_BEARER`. And add the ngrok URL as `SLACK_API_SERVER_URL`. These new variables will allow Gram to authenticate with Slack and route requests to your running API.
 
 ### Create a Gram API key
 
 You'll need a Gram API key to connect Claude to the MCP server. In your Gram dashboard, go to Settings and click **Create API Key**.
 
 <Screenshot
-  image={{.  
+  image={{
     src: "./assets/creating-gram-api-key.png",
     alt: "Creating a Gram API key",
   }}
@@ -916,13 +891,44 @@ Copy the configuration under the `Pass-through Authentication` section. We will 
 }
 ```
 
+## Locating the configuration file
+
+To find and edit the `claude_desktop_config.json` file, go to **Settings** in Claude Desktop, then navigate to **Developer** > **Edit Config**.
+
+<Screenshot
+  image={{
+    src: "./assets/claude-desktop-config-settings.png",
+    alt: "Claude Desktop configuration settings",
+  }}
+/>
+
 Replace `${VALUE}` with the the values of the Slack token and the API server URL, which will just be the ngrok URL. Replace `YOUR_GRAM_API_KEY` with your actual Gram API key.
 
 You can run a test in Claude desktop to make sure the integration is working by asking Claude to list the current channels in your Slack workspace.
 
+## Create Slack app and user token
+
+Before setting up the MCP server, create a Slack app to access workspace data for account management:
+
+Navigate to [api.slack.com/apps](https://api.slack.com/apps) and click **Create New App**. Select **From scratch**, enter an app name like "Account Management Assistant" and select your workspace.
+
+Navigate to **OAuth & Permissions** in the sidebar. Scroll to **User Token Scopes** and add these required scopes for account management functionality:
+
+- `channels:history` – Read channel messages
+- `channels:read` – Access channel information  
+- `groups:history` – Access private channel history
+- `groups:read` – View basic information about private channels
+- `reactions:read` – Detect emoji reactions
+- `search:read` – Search across messages
+- `search:read.private` – Search in private channels
+- `search:read.public` – Search in public channels
+- `users:read` – Get user profile details
+
+Click **Install to Workspace** at the top of the page. Authorize the app and copy the **User OAuth Token** that starts with `xoxp-`. This is the token you'll use as `${VALUE}` for the `MCP-SLACK-API-HTTP-BEARER` header in the Claude Desktop configuration above.
+
 ## Configure HubSpot
 
-HubSpot has launched an MCP service to allow AI assistants like Claude to connect and interact with HubSpot data in real-time. Users can install the MCP server in Claude Desktop and give instructions.
+[HubSpot](https://hubspot.com) has launched an MCP service to allow AI assistants like Claude to connect and interact with HubSpot data in real-time. Users can install the MCP server in Claude Desktop and give instructions.
 
 ### Create the HubSpot private application 
 
@@ -1016,7 +1022,7 @@ Close and reopen Claude Desktop. You're ready to test the integration.
 Now let's test the complete workflow. The test scenario follows this flow. Feel free to adapt it to your current setup:
 
 - A notification message is posted in a Slack channel called leads. 
-- Someone adds the ‼️reaction to the message indicating high priority. 
+- Someone adds the ‼️ reaction to the message indicating high priority. 
 - Using Claude Desktop, we ask for a summary of messages in the leads channel and the one with priority. 
 - We then ask Claude to analyze the high-priority messages and add notes to the corresponding HubSpot deals indicating whether each lead looks promising or needs attention.
 
@@ -1038,7 +1044,7 @@ Claude found priority leads for us. Let's Claude to add a note to those leads an
   }}
 />
 
-In HubSpot, navigate to Contacts -> Deals and click on the related to see the results.
+In HubSpot, navigate to CRM -> Deals and click on the related to see the results.
 
 <Screenshot
   image={{
