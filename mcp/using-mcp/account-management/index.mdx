@@ -1,37 +1,46 @@
 ---
-title: "Use MCP for Account Management with Slack and HubSpot"
+title: "Use MCP for account management with Slack and HubSpot"
 description: "Learn how to use MCP to automate account management tasks with Slack, HubSpot and Claude Desktop."
 ---
 
 import { Screenshot } from "@/mdx/components";
 
-# Use MCP for Account Management with Slack and HubSpot
+# Use MCP for account management with Slack and HubSpot
 
-[17% of businesses](https://www.zippia.com/advice/crm-statistics/#:~:text=17%25%20of%20businesses%20say%20that%20manual%20data%20entry%20is%20their%20biggest%20challenge%20in%20using%20their%20current%20CRM.) say manual data entry is their biggest CRM challenge. Sales teams post call summaries in Slack, then manually copy that information into HubSpot, doubling their data entry work. Managers spot urgent opportunities in channels notifications but can't quickly prioritize them without logging into the CRM to update deal status. In the meantime, your competitor is closing deals because you are not prioritizing quickly in your workflow, and your sales team has to look for what is prioritized. Lead volume increases but conversion rates stay flat because urgent opportunities get buried in manual workflows.
+[17% of businesses](https://cdn2.hubspot.net/hubfs/53/HubSpot-State-of-Inbound-Report-2016.pdf) say manual data entry is their biggest CRM challenge. 
 
-What if emoji reactions could highlight priority messages? Your manager reacts to a Slack message with ‼️ and the sales rep asks Claude to show all high-priority messages and update the corresponding HubSpot deals.
+<Screenshot
+  image={{
+    src: "./assets/crm-challenges.png",
+    alt: "Bar chart of CRM challenges, led by manual data entry (17%). Source: [HubSpot](https://cdn2.hubspot.net/hubfs/53/HubSpot-State-of-Inbound-Report-2016.pdf)",
+  }}
+/>
 
-In this article, you'll build an integration where Claude reads emoji-marked Slack messages and updates HubSpot records on command. Your account managers will be able to prioritize deals through emoji reactions on Slack messages.
+CRM systems can be unwieldy: Sales teams post call summaries in Slack, then manually copy that information into HubSpot, doubling their data entry work. Managers spot urgent opportunities in channel notifications but can't quickly prioritize them without logging into the CRM to update deal status. In the meantime, your competitor is closing deals because you are not prioritizing quickly in your workflow, and your sales team has to look for what is prioritized. Lead volume increases but conversion rates stay flat because urgent opportunities get buried in manual workflows.
+
+What if emoji reactions could streamline this workflow? Instead of manual CRM updates, your team could simply react with ‼️ to high-priority messages.
+
+In this article, we'll show you how to build this integration. Claude will read the emoji-marked Slack messages and update HubSpot records automatically.
 
 ## Why use MCP? 
 
 If you're managing sales follow-ups manually, you're probably:
 
-- Listening to call summaries in Slack notifications.
-- Identifying which deals need immediate attention.
-- Logging into HubSpot to find deal records.
-- Adding notes and updating deals status manually.
-- Coordinating priority changes with your team.
+- Listening to call summaries in Slack notifications
+- Identifying which deals need immediate attention
+- Logging into HubSpot to find deal records
+- Adding notes and updating deal status manually
+- Coordinating priority changes with your team
 
 If your sales team handles dozens of calls daily, this process becomes overwhelming. Important deals get delayed while account managers spend time on CRM updates instead of selling.
 
-You could build custom integrations to automate this workflow. You might write scripts to monitor Slack notifications, parse deal information, and update HubSpot records. But you'd need webhook handling, API authentication for multiple services, and logic to classify urgent versus routine follow-ups.
+You could build custom integrations to automate this workflow by writing scripts to monitor Slack notifications, parse deal information, and update HubSpot records. But you'd need webhook handling, API authentication for multiple services, and logic to classify urgent versus routine follow-ups.
 
-Instead, you can ask Claude to find all urgent messages and update your CRM records. You ask Claude "show me all high-priority messages marked with ‼️ reaction in Slack," review the urgent calls, then ask Claude to "add notes to the HubSpot deal for those urgent calls." Claude uses MCP servers to read Slack reactions, find messages, locate HubSpot deals, and update records.
+Instead, you can ask Claude to find all urgent messages and update your CRM records. Simply ask Claude, "Show me all high-priority messages marked with ‼️ reaction in Slack," review the urgent calls, then ask it to "add notes to the HubSpot deal for those urgent calls." Claude uses MCP servers to read Slack reactions, find the messages, locate the corresponding HubSpot deals, and update records.
 
-### The MCP Advantage
+### The MCP advantage
 
-MCP standardizes how LLMs access different tools. Instead of writing custom integrations for Slack, HubSpot, and future tools you want to add, you get one consistent interface that LLMs can use intelligently across any platform. Since MCP is an open protocol, it works with any LLM model or agent framework.
+MCP standardizes how LLMs access different tools. Instead of writing custom integrations for Slack, HubSpot, and future tools you want to add to your workflow, an MCP server provides a consistent interface that LLMs can use intelligently across any platform. Since MCP is an open protocol, it works with any LLM model or agent framework.
 
 Claude makes MCP integration simple. Add MCP server configurations to your `claude_desktop_config.json` file, reload the app, and Claude gains access to your tools.
 
@@ -39,32 +48,32 @@ Claude makes MCP integration simple. Add MCP server configurations to your `clau
 
 To build this automated account management workflow, you'll need:
 
-- **[Python 3.11 or higher](https://www.python.org/downloads/)** – For running the Slack API server
-- **[Claude Desktop](https://claude.ai/download)** – For the MCP-powered workflow interface
-- **[Ngrok](https://ngrok.com/)** – To expose your local API during development (or use any hosting provider)
+- **[Python 3.11 or higher](https://www.python.org/downloads/)** – For running the Slack API server.
+- **[Claude Desktop](https://claude.ai/download)** – For the MCP-powered workflow interface.
+- **[Ngrok](https://ngrok.com/)** – To expose your local API during development (or use any hosting provider).
 - [HubSpot](https://hubspot.com/) private app.
-- **[Gram account](https://app.getgram.ai/)** – To host your Slack MCP server
+- **[Gram account](https://app.getgram.ai/)** – To host your Slack MCP server.
 - [Slack app](https://api.slack.com/apps) with user token containing these scopes:
-  - `channels:history` – Read channel messages
-  - `channels:read` – Access channel information
-  - `groups:history` – Access private channel history
-  - `groups:read` – View basic information about private channels
-  - `reactions:read` – Detect emoji reactions
-  - `search:read` – Search across messages
-  - `search:read.private` – Search in private channels
-  - `search:read.public` – Search in public channels
-  - `users:read` – Get user profile details
+  - `channels:history` – Read channel messages.
+  - `channels:read` – Access channel information.
+  - `groups:history` – Access private channel history.
+  - `groups:read` – View basic information about private channels.
+  - `reactions:read` – Detect emoji reactions.
+  - `search:read` – Search across messages.
+  - `search:read.private` – Search in private channels.
+  - `search:read.public` – Search in public channels.
+  - `users:read` – Get user profile details.
 
 ## Build the Slack integration 
 
 You'll create an API that retrieves Slack messages and reactions for account management. This API serves as the backend for the MCP server, giving Claude access to sales call notifications and priority reactions.
 
-The API exposes these endpoints for account management workflow:
+The API exposes these `GET` endpoints for the account management workflow:
 
-- GET` /messages/search` – Search for sales call notifications and follow-up messages across channels
-- GET` /channels` – List accessible channels where sales notifications are posted
-- GET` /users/{user_id}` – Get information about sales team members and managers
-- GET `/channels/{channel_id}/messages` – Retrieve messages from specific sales channels
+- `/messages/search`: Search for sales call notifications and follow-up messages across channels.
+- `/channels`: List accessible channels where sales notifications are posted.
+- `/users/{user_id}`: Get information about sales team members and managers.
+- `/channels/{channel_id}/messages`: Retrieve messages from specific sales channels.
 
 Here's how you'll build the API:
 
@@ -73,7 +82,7 @@ Here's how you'll build the API:
 - Implement the endpoint logic with Slack SDK integration for call notifications.
 - Enrich the OpenAPI document with `x-gram` extensions that help Gram generate better MCP tool descriptions for Claude.
 
-### Create the project
+### Create a Python project
 
 Create a new Python project directory and set up a `requirements.txt` file with the dependencies needed for the Slack SDK and FastAPI:
 
@@ -99,13 +108,13 @@ Install the dependencies:
 pip install -r requirements.txt
 ```
 
-Create an `app` directory with `main.py` and `__init__.py` files for your FastAPI endpoints. With the project structure ready, you can implement the Slack API integration.
+Create an `app` directory with `main.py` and `__init__.py` files for the FastAPI endpoints. With the project structure ready, you can implement the Slack API integration.
 
 ### Add the FastAPI app and Pydantic models
 
 Now you'll set up the FastAPI application with authentication and data validation. You will need the Bearer token authentication to access Slack securely, Pydantic models to structure your API responses, and detailed endpoint documentation for Gram's MCP conversion.
 
-In the `main.py` file, start by creating the FastAPI app with Bearer token security:
+In the `main.py` file, create the FastAPI app with Bearer token security:
 
 ```python
 from fastapi import FastAPI, HTTPException, Depends, Query, Path, Request
@@ -245,7 +254,7 @@ The FastAPI application now has proper authentication, data validation, and mode
 
 Each endpoint handles a specific aspect of Slack data retrieval, from searching messages to retrieving complete threads.
 
-Add the `/messages/search` GET endpoint to enable searching Slack messages across channels and filtering by text, user, channel, date range, or result limits:
+Add the `/messages/search` endpoint to enable searching Slack messages across channels and filtering by text, user, channel, date range, or result limits:
 
 ```python
 @app.get(
@@ -337,9 +346,9 @@ async def search_messages(
 
 ```
 
-The code above constructs a Slack search query by combining the text query with optional filters, sends the request through the Slack SDK client, and returns structured message data in `MessageSearchResponse` that the MCP server will expose as a tool.
+The code above constructs a Slack search query by combining the text query with optional filters and sends the request through the Slack SDK client. The structured message data is returned in `MessageSearchResponse`, and the MCP server exposes it as a tool.
 
-Add the `/users/{user_id` GET endpoint to enable retrieving detailed user information that helps Claude understand message authorship and context when analyzing threads.
+Add the `/users/{user_id` endpoint to retrieve detailed user information that helps Claude understand message authorship and context when analyzing threads.
 
 ```python
 @app.get(
@@ -391,9 +400,9 @@ async def get_user(
 
 ```
 
-The endpoint above fetches user profile information from Slack's API and formats it into the structured `SlackUser` model, giving Claude access to names, email addresses, and other profile details for better thread analysis.
+This endpoint fetches user profile information from Slack's API and formats it into the structured `SlackUser` model, giving Claude access to names, email addresses, and other profile details for better thread analysis.
 
-Add the `/channels` GET endpoint to enable listing all accessible channels in the workspace, allowing Claude to discover available channels and convert channel names to IDs for targeted searches and message retrieval.
+Add the `/channels` endpoint to list all accessible channels in the workspace, allowing Claude to discover available channels and convert channel names to IDs for targeted searches and message retrieval.
 
 ```python
 @app.get(
@@ -466,9 +475,9 @@ async def list_channels(
         )
 ```
 
-The endpoint above makes separate API calls to retrieve public and private channels, then transforms the raw Slack data into the structured `SlackChannel` models with standardized fields.
+This endpoint makes separate API calls to retrieve public and private channels, then transforms the raw Slack data into the structured `SlackChannel` models with standardized fields.
 
-Add the ` /channels/{channel_id}/message` GET endpoint to enable retrieving messages from a specific channel with optional date filtering and pagination, enabling Claude to analyze recent channel activity or messages from specific time periods.
+Add the `/channels/{channel_id}/message` endpoint to retrieve messages from a specific channel with optional date filtering and pagination, enabling Claude to analyze recent channel activity or messages from specific time ranges.
 
 ```python
 @app.get(
@@ -553,7 +562,7 @@ Let's enhance the OpenAPI document for MCP server generation.
 
 Standard OpenAPI descriptions are designed for humans, not LLMs. Verbose descriptions cause token bloat and vague descriptions lead to poor tool selection. 
 
-Gram's `x-gram` extensions provide better context and instructions for Claude, letting you add LLM-optimized descriptions with context about when to use each tool and any prerequisites needed.
+Gram's `x-gram` extensions provide better context and instructions for Claude, letting you add LLM-optimized descriptions with context about when to use each tool and what prerequisites it has.
 
 ```python
 def custom_openapi():
@@ -679,7 +688,7 @@ def custom_openapi():
 
 This customization adds structured context and prerequisites to each endpoint, helping Gram generate MCP tools that the AI agent can use more effectively.
 
-Next, override the custom openapi definition from FastAPI and add the logic to run the FastAPI app.
+Next, override the custom OpenAPI definition from FastAPI and add the logic to run the FastAPI app.
 
 ```python
 # Override the default OpenAPI function
@@ -695,7 +704,7 @@ if __name__ == "__main__":
 
 The following script generates JSON and YAML versions of the OpenAPI document. 
 
-At the root of the project, create a file called `generate_openapi.py` and add the following content.
+At the root of the project, create a file called `generate_openapi.py` and add the following content:
 
 ```python
 import json
@@ -743,7 +752,7 @@ if __name__ == "__main__":
 
 ```
 
-This script imports the FastAPI app, and calls the `app.openapi()` method, and returns the `dict` version of the OpenAPI document. 
+This script imports the FastAPI app, calls the `app.openapi()` method, and returns the OpenAPI document as a dictionary object.
 
 Run the generation script:
 
@@ -780,9 +789,9 @@ ngrok http 127.0.0.1:8000
   }}
 />
 
-Copy the HTTPS forwarding URL from ngrok. You'll use the URL when configuring the MCP server in Gram.
+Copy the HTTPS forwarding URL from ngrok. You'll use this URL when you configure the MCP server in Gram.
 
-## Turn the API into an MCP Server
+## Turn the API into an MCP server
 
 [Gram](https://app.getgram.ai/) works with three key concepts: 
 
@@ -814,9 +823,9 @@ Click the **+ ADD API** button to add an API source. Upload the `openapi.json` f
 
 ### Create a toolset
 
-Click the **+ CREATE A TOOLSET** button on the Toolsets page. A modal will appear asking for a toolset name. Enter something like "Slack Tools" and click **Create**. You'll be redirected to a new page showing all available tools from your APIs. 
+On the **Toolsets** page, click the **+ ADD TOOLSET** button. In the modal, give the toolset a name (for example, "Slack Tools") and click **Create**. You'll be redirected to a new page showing all the tools available from your APIs. 
 
-You can see the tool definitions you created from the **Slack MCP API** API source: search messages, get threads, get users, list slack channels, get channel messages. Click **Enable All** to include all tools in your toolset.
+You'll see the tool definitions you created from the **Slack MCP API** API source: search messages, get threads, get users, list slack channels, and get channel messages. Click **Enable All** to include all tools in your toolset.
 
 <Screenshot
   image={{
@@ -827,7 +836,7 @@ You can see the tool definitions you created from the **Slack MCP API** API sour
 
 ### Create a new environment
 
-Navigate to the Environments page and click **+ NEW ENVIRONMENT**. Enter "slack" as the environment name. Once created, you'll be redirected to the environment configuration page. Click **NEW VARIABLE** to add environment variables.
+Navigate to the **Environments** page and click **+ NEW ENVIRONMENT**. Enter "slack" as the environment name and click **Submit**. On the environment configuration page, click **NEW VARIABLE** to add environment variables.
 
 <Screenshot
   image={{
@@ -836,11 +845,11 @@ Navigate to the Environments page and click **+ NEW ENVIRONMENT**. Enter "slack"
   }}
 />
 
-Add your Slack user token as `SLACK_API_HTTP_BEARER`. And add the ngrok URL as `SLACK_API_SERVER_URL`. These new variables will allow Gram to authenticate with Slack and route requests to your running API.
+Add your Slack user token as `SLACK_API_HTTP_BEARER`. Add the ngrok URL as `SLACK_API_SERVER_URL`. These new variables will allow Gram to authenticate with Slack and route requests to your running API.
 
 ### Create a Gram API key
 
-You'll need a Gram API key to connect Claude to the MCP server. In your Gram dashboard, go to Settings and click **Create API Key**.
+You'll need a Gram API key to connect Claude to the MCP server. In your Gram dashboard, go to **Settings** and click **Create API Key**.
 
 <Screenshot
   image={{
@@ -849,15 +858,15 @@ You'll need a Gram API key to connect Claude to the MCP server. In your Gram das
   }}
 />
 
-Copy the API key somewhere safe as we will need it in the next section for Claude Desktop configuration.
+Copy the API key somewhere safe. You'll need it to configure Claude Desktop in the next section.
 
-## Install the Slack MCP server in Claude Desktop
+## Install the Slack MCP server in Claude Desktop 
 
-With the Slack MCP server ready and deployed, let's add the server in Claude Desktop. 
+You need to add the API URL, Slack token, and Gram key to the Claude Desktop configuration file.
 
-Click on the `MCP` tab and select the Slack MCP server to get access to deployment configurations. 
+Click the **MCP** tab and select the Slack MCP server to access the deployment configurations. 
 
-You can make your server public or private. For security, this tutorial works with a private server. We will configure the API URL and the token, on the client side, and also add the Gram Key.
+You can make the server public or private. For security, this tutorial works with a private server. 
 
 <Screenshot
   image={{
@@ -866,7 +875,7 @@ You can make your server public or private. For security, this tutorial works wi
   }}
 />
 
-Copy the configuration under the `Pass-through Authentication` section. We will add this configuration in our `claude_desktop_config.json` file. 
+Copy the configuration under the **Pass-through Authentication** section and add it to `claude_desktop_config.json`. 
 
 ```json
 {
@@ -902,9 +911,11 @@ To find and edit the `claude_desktop_config.json` file, go to **Settings** in Cl
   }}
 />
 
-Replace `${VALUE}` with the the values of the Slack token and the API server URL, which will just be the ngrok URL. Replace `YOUR_GRAM_API_KEY` with your actual Gram API key.
+- In `MCP-SLACK-API-HTTP-BEARER:${VALUE}`, replace `${VALUE}` with your Slack token.
+- In `MCP-SLACK-API-SERVER-URL:${VALUE}`, replace `${VALUE}` with the API server URL, which is the ngrok URL. 
+- Replace `YOUR_GRAM_API_KEY` with your actual Gram API key.
 
-You can run a test in Claude desktop to make sure the integration is working by asking Claude to list the current channels in your Slack workspace.
+To test that the connection is working, ask Claude to list the current channels in your Slack workspace.
 
 ## Create Slack app and user token
 
@@ -926,15 +937,15 @@ Navigate to **OAuth & Permissions** in the sidebar. Scroll to **User Token Scope
 
 Click **Install to Workspace** at the top of the page. Authorize the app and copy the **User OAuth Token** that starts with `xoxp-`. This is the token you'll use as `${VALUE}` for the `MCP-SLACK-API-HTTP-BEARER` header in the Claude Desktop configuration above.
 
-## Configure HubSpot
+## Install the HubSpot MCP Server in Claude Desktop 
 
-[HubSpot](https://hubspot.com) has launched an MCP service to allow AI assistants like Claude to connect and interact with HubSpot data in real-time. Users can install the MCP server in Claude Desktop and give instructions.
+The HubSpot MCP Server allows AI assistants like Claude to connect and interact with HubSpot data in real-time. 
 
-### Create the HubSpot private application 
+You need to create a HubSpot private application, assign scopes for the actions Claude will execute, and get an API key before you add the HubSpot MCP Server to Claude Desktop.
 
-Before adding the HubSpot MCP server in Claude Desktop, you will create a HubSpot private application, assign scopes for the actions you want to allow Claude to execute, and retrieve the API key.
+### Create a HubSpot private application 
 
-On the dashboard homepage, click on the settings icon in the top navigation bar. 
+On the HubSpot dashboard, click the settings icon in the top navigation bar. 
 
 <Screenshot
   image={{
@@ -943,7 +954,7 @@ On the dashboard homepage, click on the settings icon in the top navigation bar.
   }}
 />
 
-This redirects you to your HubSpot account settings. Navigate to Integrations -> Private Apps and click the **Create a private app** button.
+In your HubSpot account settings, go to **Integrations -> Private Apps** and click **Create a private app**.
 
 <Screenshot
   image={{
@@ -961,7 +972,7 @@ Enter a name for the application.
   }}
 />
 
-Navigate to the scopes tab and add the following scopes:
+Navigate to the **Scopes** tab and add the following scopes:
 
 - `crm.lists.read` and `crm.lists.write` 
 - `crm.objects.companies.read` 
@@ -978,11 +989,29 @@ Navigate to the scopes tab and add the following scopes:
   }}
 />
 
-Click the **Create app** button in the top right corner and validate the creation. HubSpot will show you a modal with your API key. Copy this API key and store it safely. You'll use the key when adding the MCP server in Claude Desktop.
+Click **Create app** in the top-right corner and validate the creation. 
 
-### Add HubSpot MCP server
+In the modal that opens, copy the API key and store it safely. You'll use this key when you add the MCP server to Claude Desktop.
 
-In your `claude_desktop_config.json` file, add the MCP configuration for HubSpot. Here is what your configuration should look like currently.
+### Add the HubSpot MCP Server to Claude Desktop
+
+Add the HubSpot MCP Server configuration to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "HubspotMCP": {
+      "command": "npx",
+      "args": ["-y", "@hubspot/mcp-server"],
+      "env": {
+        "PRIVATE_APP_ACCESS_TOKEN": "YOUR_HUBSPOT_KEY"
+      }
+    },
+```
+
+Replace `YOUR_HUBSPOT_KEY` with the API key you copied from HubSpot.
+
+Your configuration file should now look something like this:
 
 ```json
 {
@@ -1019,14 +1048,14 @@ Close and reopen Claude Desktop. You're ready to test the integration.
 
 ## Test the integration 
 
-Now let's test the complete workflow. The test scenario follows this flow. Feel free to adapt it to your current setup:
+Now let's test the complete workflow with this scenario (feel free to adapt it to your setup):
 
-- A notification message is posted in a Slack channel called leads. 
-- Someone adds the ‼️ reaction to the message indicating high priority. 
-- Using Claude Desktop, we ask for a summary of messages in the leads channel and the one with priority. 
-- We then ask Claude to analyze the high-priority messages and add notes to the corresponding HubSpot deals indicating whether each lead looks promising or needs attention.
+- A message is posted in a Slack channel called "leads". 
+- Someone adds the ‼️ reaction to mark it as high priority. 
+- Using Claude Desktop, we ask for a summary of messages in the "leads" channel and to identify high-priority messages. 
+- We then ask Claude to analyze those messages and add notes to the corresponding HubSpot deals with notes about lead quality.
 
-Let's ask Claude to send a summary of leads call notifications and the high priority ones.
+Ask Claude to send a summary of leads call messages and which are high priority.
 
 <Screenshot
   image={{
@@ -1035,7 +1064,7 @@ Let's ask Claude to send a summary of leads call notifications and the high prio
   }}
 />
 
-Claude found priority leads for us. Let's Claude to add a note to those leads and mark them as high priority.
+Claude finds priority leads. Ask Claude to add a note to those leads in HubSpot.
 
 <Screenshot
   image={{
@@ -1044,7 +1073,7 @@ Claude found priority leads for us. Let's Claude to add a note to those leads an
   }}
 />
 
-In HubSpot, navigate to CRM -> Deals and click on the related to see the results.
+In HubSpot, navigate to **CRM -> Deals** and click on the related lead to see the results.
 
 <Screenshot
   image={{
@@ -1057,11 +1086,11 @@ Now you have an integration that turns reactions in Slack into automatic HubSpot
 
 ## Final thoughts
 
-We've built an account management system that turns manual CRM work into simple conversations with Claude. Sales managers can now use reactions in Slack to highlight important messages for Claude and Claude will read the messages and use HubSpot for updates without switching between tools or logging into different systems.
+This account management system turns manual CRM work into simple conversations with Claude. Sales managers can use reactions in Slack to highlight important messages, and Claude will read those messages and update HubSpot without switching between tools or logging into different systems.
 
-This shows how MCP makes business tools work together. Instead of building custom integrations or doing manual data entry, Claude can interact with both Slack and HubSpot.
+This emoji-to-CRM workflow demonstrates how MCP transforms how business tools work together. No building custom integrations, no manual data entry, just Claude interacting with your platforms.
 
-You can make this workflow even better:
+If you'd like to enhance this workflow, try:
 
-- Add more CRM features like creating tasks, scheduling meetings, or generating reports through Claude.
-- Make prioritization smarter by rewriting the prompts so Claude can spot different types of urgent deals based on message content.
+- Adding CRM features like creating tasks, scheduling meetings, or generating reports through Claude.
+- Making prioritization smarter by rewriting prompts so that Claude can spot different types of urgent deals based on message content.
