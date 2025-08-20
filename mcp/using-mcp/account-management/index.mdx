@@ -48,28 +48,21 @@ Claude makes MCP integration simple. Add MCP server configurations to your `clau
 
 To build this automated account management workflow, you'll need:
 
-- **Python 3.11 or higher** to run the Slack API server.
-- **Claude Desktop** for the MCP-powered workflow interface.
-- **ngrok** to expose your local API during development (or use any hosting provider).
-- A HubSpot private app with these scopes:
-  - `crm.lists.read` and `crm.lists.write` to manage contact lists.
-  - `crm.objects.companies.read` to access company records.
-  - `crm.objects.contacts.read` and `crm.objects.contacts.write` to manage contact information.
-  - `crm.objects.deals.read` and `crm.objects.deals.write` to read and update deal records.
-  - `crm.objects.appointments.read` and `crm.objects.appointments.write` to manage meeting data.
-  - `crm.objects.leads.read` and `crm.objects.leads.write` to handle lead management.
-  - `crm.objects.custom.read` and `crm.objects.custom.write` to access custom objects.
-- A **Gram account** to host your Slack MCP server on Gram.
-- A Slack app and user token with these scopes:
-  - `channels:history` to read channel messages.
-  - `channels:read` to access channel information.
-  - `search:read` to search across messages.
-  - `search:read.private` to search in private channels.
-  - `search:read.public` to search in public channels.
-  - `users:read` to get user profile details.
-  - `groups:history` to access private channel history.
-  - `groups:read` to view basic information about private channels.
-  - `reactions:read` to detect emoji reactions.
+- **[Python 3.11 or higher](https://www.python.org/downloads/)** – For running the Slack API server.
+- **[Claude Desktop](https://claude.ai/download)** – For the MCP-powered workflow interface.
+- **[Ngrok](https://ngrok.com/)** – To expose your local API during development (or use any hosting provider).
+- [HubSpot](https://hubspot.com/) private app.
+- **[Gram account](https://app.getgram.ai/)** – To host your Slack MCP server.
+- [Slack app](https://api.slack.com/apps) with user token containing these scopes:
+  - `channels:history` – Read channel messages.
+  - `channels:read` – Access channel information.
+  - `groups:history` – Access private channel history.
+  - `groups:read` – View basic information about private channels.
+  - `reactions:read` – Detect emoji reactions.
+  - `search:read` – Search across messages.
+  - `search:read.private` – Search in private channels.
+  - `search:read.public` – Search in public channels.
+  - `users:read` – Get user profile details.
 
 ## Build the Slack integration 
 
@@ -91,44 +84,28 @@ Here's how you'll build the API:
 
 ### Create a Python project
 
-Create a new Python project with uv (you can use any dependency manager you prefer):
+Create a new Python project directory and set up a `requirements.txt` file with the dependencies needed for the Slack SDK and FastAPI:
 
+```txt
+fastapi[all]==0.115.5
+slack-sdk==3.29.0
+python-dotenv==1.0.1
+pydantic>=2.11.2
+uvicorn[standard]==0.32.1
+PyYAML
 ```
-uv init
-```
 
-The command above creates a `pyproject.toml` file where you'll define the dependencies. We need the Slack SDK for API integration and FastAPI for the web server.
+Create a virtual environment and activate it:
 
-```toml
-[project]
-name = "slack-account-management"
-version = "0.1.0"
-description = "A FastAPI server for Slack account management workflows with MCP integration"
-authors = [
-    {name = "Your Name", email = "your.email@example.com"}
-]
-readme = "README.md"
-requires-python = ">=3.9"
-dependencies = [
-    "fastapi[all]==0.115.5",
-    "slack-sdk==3.29.0",
-    "python-dotenv==1.0.1",
-    "pydantic>=2.11.2",
-    "uvicorn[standard]==0.32.1",
-]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.build.targets.wheel]
-packages = ["app"]
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 Install the dependencies:
 
 ```bash
-uv sync
+pip install -r requirements.txt
 ```
 
 Create an `app` directory with `main.py` and `__init__.py` files for the FastAPI endpoints. With the project structure ready, you can implement the Slack API integration.
@@ -780,7 +757,7 @@ This script imports the FastAPI app, calls the `app.openapi()` method, and retur
 Run the generation script:
 
 ```bash
-uv run python generate_openapi.py
+python generate_openapi.py
 ```
 
 This is the output from the command:
@@ -796,7 +773,7 @@ Generated openapi.yaml
 Start the FastAPI server and expose it with ngrok for testing:
 
 ```bash
-uv run uvicorn app.main:app --reload
+uvicorn app.main:app --reload
 ```
 
 In another terminal, expose the API:
@@ -816,7 +793,7 @@ Copy the HTTPS forwarding URL from ngrok. You'll use this URL when you configure
 
 ## Turn the API into an MCP server
 
-Gram works with three key concepts: 
+[Gram](https://app.getgram.ai/) works with three key concepts: 
 
 - **Tool definitions** that describe each API endpoint to LLMs.
 - **Tool variations** that let you customize descriptions.
@@ -875,7 +852,7 @@ Add your Slack user token as `SLACK_API_HTTP_BEARER`. Add the ngrok URL as `SLAC
 You'll need a Gram API key to connect Claude to the MCP server. In your Gram dashboard, go to **Settings** and click **Create API Key**.
 
 <Screenshot
-  image={{.  
+  image={{
     src: "./assets/creating-gram-api-key.png",
     alt: "Creating a Gram API key",
   }}
@@ -923,11 +900,42 @@ Copy the configuration under the **Pass-through Authentication** section and add
 }
 ```
 
+## Locating the configuration file
+
+To find and edit the `claude_desktop_config.json` file, go to **Settings** in Claude Desktop, then navigate to **Developer** > **Edit Config**.
+
+<Screenshot
+  image={{
+    src: "./assets/claude-desktop-config-settings.png",
+    alt: "Claude Desktop configuration settings",
+  }}
+/>
+
 - In `MCP-SLACK-API-HTTP-BEARER:${VALUE}`, replace `${VALUE}` with your Slack token.
 - In `MCP-SLACK-API-SERVER-URL:${VALUE}`, replace `${VALUE}` with the API server URL, which is the ngrok URL. 
 - Replace `YOUR_GRAM_API_KEY` with your actual Gram API key.
 
 To test that the connection is working, ask Claude to list the current channels in your Slack workspace.
+
+## Create Slack app and user token
+
+Before setting up the MCP server, create a Slack app to access workspace data for account management:
+
+Navigate to [api.slack.com/apps](https://api.slack.com/apps) and click **Create New App**. Select **From scratch**, enter an app name like "Account Management Assistant" and select your workspace.
+
+Navigate to **OAuth & Permissions** in the sidebar. Scroll to **User Token Scopes** and add these required scopes for account management functionality:
+
+- `channels:history` – Read channel messages
+- `channels:read` – Access channel information  
+- `groups:history` – Access private channel history
+- `groups:read` – View basic information about private channels
+- `reactions:read` – Detect emoji reactions
+- `search:read` – Search across messages
+- `search:read.private` – Search in private channels
+- `search:read.public` – Search in public channels
+- `users:read` – Get user profile details
+
+Click **Install to Workspace** at the top of the page. Authorize the app and copy the **User OAuth Token** that starts with `xoxp-`. This is the token you'll use as `${VALUE}` for the `MCP-SLACK-API-HTTP-BEARER` header in the Claude Desktop configuration above.
 
 ## Install the HubSpot MCP Server in Claude Desktop 
 
@@ -1065,7 +1073,7 @@ Claude finds priority leads. Ask Claude to add a note to those leads in HubSpot.
   }}
 />
 
-In HubSpot, navigate to **Contacts -> Deals** and click on the related lead to see the results.
+In HubSpot, navigate to **CRM -> Deals** and click on the related lead to see the results.
 
 <Screenshot
   image={{
