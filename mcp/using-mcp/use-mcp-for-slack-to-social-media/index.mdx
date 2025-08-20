@@ -637,7 +637,7 @@ async def list_channels(
 
 The endpoint above makes separate API calls to retrieve public and private channels, then transforms the raw Slack data into the structured `SlackChannel` models with standardized fields.
 
-Add the `/channels/{channel_id}/message` endpoint for retrieving messages from a specific channel with optional date filtering and pagination. This endpoint enables AI agents to analyze recent channel activity or messages from specific time periods.
+Add the `/channels/{channel_id}/messages` endpoint for retrieving messages from a specific channel with optional date filtering and pagination. This endpoint enables AI agents to analyze recent channel activity or messages from specific time periods.
 
 ```python
 @app.get(
