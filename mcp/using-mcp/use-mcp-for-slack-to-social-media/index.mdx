@@ -25,7 +25,7 @@ Teams already turning Slack threads into social posts typically:
 
 When teams have multiple high-value discussions weekly, this manual process becomes overwhelming, and great content is probably buried in Slack.
 
-You can automate parts of the process with custom integrations. For instance, you could write Python scripts that call the Slack API to retrieve messages, then send them to OpenAI for analysis and content creation, and use function calling to structure responses and fire requests to [Postiz](https://docs.postiz.com/public-api) for scheduling. But manually running scripts whenever you found a useful thread would still be time-consuming.
+You can automate parts of the process with custom integrations. For instance, you could write Python scripts that call the Slack API to retrieve messages, then send them to OpenAI for analysis and content creation, and use function calling to structure responses and fire requests to [Postiz](https://docs.postiz.com/public-api) for scheduling. But manually running scripts whenever you find a useful thread would still be time-consuming.
 
 Turning threads into social media posts with just a reaction is much quicker. Here's how it works:
 
@@ -60,11 +60,11 @@ To build this automated Slack-to-social media system, you need:
 - [ngrok](https://ngrok.com/) (or another hosting provider) to expose a local API during development
 - A [Slack](https://slack.com/) account with the appropriate permissions for adding apps to a workspace
 
-### Quickstart option
+## Quickstart option
 
 To skip straight to [turning the API into an MCP server](#turn-the-api-into-an-mcp-server), download the complete Slack API server code from the [example repository](https://github.com/ritza-co/speakeasy-examples/slack-mcp-server-api), and follow the instructions in the README to get a working application running.
 
-### Implementation overview
+## Implementation overview
 
 We'll implement this automation in four steps:
 
