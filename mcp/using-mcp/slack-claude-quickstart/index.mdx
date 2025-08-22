@@ -4,15 +4,15 @@ description: Learn how to integrate the Slack MCP server in Claude Desktop.
 
 ---
 
-MCP (Model Context Protocol) lets Claude Desktop connect to external services like Slack to read and analyze your messages directly in the chat interface. ![Diagram showing data flow for Slack MCP server](/Users/koladev/ritza/speakeasy-developer-docs/mcp/using-mcp/slack-claude-quickstart/assets/data-flow.png)
+MCP (Model Context Protocol) lets Claude Desktop connect to external services like Slack to read and analyze your messages directly in the chat interface. ![Diagram showing data flow for Slack MCP server](./assets/data-flow.png)
 
 The MCP server fetches data from Slack's API using your browser tokens, then provides that data to Claude Desktop when you ask questions about your Slack messages.
 
 Slack doesn't officially support MCP servers. Anthropic published a reference Slack MCP server when MCP launched, but deprecated it due to [security vulnerabilities](https://embracethered.com/blog/posts/2025/security-advisory-anthropic-slack-mcp-server-data-leakage/).
 
-This guide uses the [slack-mcp-server](https://github.com/korotovsky/slack-mcp-server) open source project instead. This guide shows you how to set up a third-party Slack MCP server that acts as a bridge between your Slack workspace and Claude Desktop.
+This guide uses the [slack-mcp-server](https://github.com/korotovsky/slack-mcp-server) open source project that will act as a bridge between your Slack workspace and Claude Desktop.
 
-![Demo of the Slack integration](/Users/koladev/ritza/speakeasy-developer-docs/mcp/using-mcp/slack-claude-quickstart/assets/demo.gif)
+![Demo of the Slack integration](./assets/demo.gif)
 
 ## Prerequisites
 
@@ -74,7 +74,7 @@ The slack-mcp-server reads messages, searches messages, and finds users. It does
 
 You'll modify the source code to add reaction support.
 
-Follow these instructions these instructions to add the reaction capability. 
+Follow these instructions to add the reaction capability. 
 
 1. Clone the project on your machine.
 
@@ -82,7 +82,7 @@ Follow these instructions these instructions to add the reaction capability.
    git clone https://github.com/korotovsky/slack-mcp-server.git
    ```
 
-2. Open the project and find the `conversation.go` file, which path is `slack-mcp-server/pkg/handler/conversations.go`.
+2. Open the project and find the `conversation.go` file, located at `slack-mcp-server/pkg/handler/conversations.go`.
 
 3. Replace the `Message` struct with the following to add the `Reactions` field.
 
