@@ -1,24 +1,33 @@
-```
+---
 title: Using Slack MCP server and HubSpot MCP server
 description: Learn how to integrate the Slack MCP server with the HubSpot MCP server
-```
+---
 
-Multiple MCP servers unlock powerful automation workflows in Claude Desktop. 
+Multiple MCP servers unlock powerful automation workflows in Claude Desktop.
 
 This guide shows you how to automatically update HubSpot contacts based on Slack message reactions, turning emoji responses into CRM actions.
 
-![Demo](./assets/slack-hubspot-integration-demo.gif)
+<video
+  controls={false}
+  loop={true}
+  autoPlay={true}
+  muted={true}
+  width="100%"
+  className="mt-10"
+>
+  <source src="./assets/slack-hubspot-integration-demo.mp4" type="video/mp4" />
+</video>
 
 ## Prerequisites
 
 - You'll need both MCP servers installed:
-  - Complete the [Slack MCP server setup guide](link-to-slack-guide).
-  - Complete the [HubSpot MCP server setup guide.](link-to-hubspot-guide)
-  - Claude Desktop.
+  - Complete the [Slack MCP server guide](/mcp/using-mcp/slack-claude-quickstart).
+  - Complete the [HubSpot MCP server guide](/mcp/using-mcp/hubspot-claude-quickstart).
+- [Claude Desktop](https://claude.ai/download).
 
 ## Your configuration
 
-Your claude_desktop_config.json file should look like this:
+Your `claude_desktop_config.json` file should look like this:
 
 ```json
 {
@@ -57,7 +66,7 @@ Ask Claude:
 In the #leads Slack channel, find the messages marked with :bangbang: emoji reactions as they are critical ones. Add a note only for the contacts in those messages using the HubSpot MCP server to schedule a call as soon as possible.
 ```
 
-![Testing the integration](./assets/claude-processing-slack-messages.png)
+![Claude Desktop processing Slack messages with emoji reactions](./assets/claude-processing-slack-messages.png)
 
 Claude will:
 
@@ -66,11 +75,11 @@ Claude will:
 3. Look up matching contacts in HubSpot
 4. Add priority notes to each contact record
 
-![Claude Desktop final results](./assets/claude-workflow-execution-result.png)
+![Claude Desktop showing workflow execution results](./assets/claude-workflow-execution-result.png)
 
 The contacts in HubSpot will now have "schedule call ASAP" notes added to their records.
 
-![HubSpot Contacts](./assets/hubspot-contact-record-updated.png)
+![HubSpot contact record with updated notes](./assets/hubspot-contact-record-updated.png)
 
 ## Best practices for multiple MCP servers
 
@@ -80,4 +89,4 @@ The contacts in HubSpot will now have "schedule call ASAP" notes added to their 
 
 ## Conclusion
 
-Combined MCP servers turn Claude Desktop into a powerful automation hub. The key is writing clear prompts that specify which services to use and in what order
+Combined MCP servers turn Claude Desktop into a powerful automation hub. The key is writing clear prompts that specify which services to use and in what order.
