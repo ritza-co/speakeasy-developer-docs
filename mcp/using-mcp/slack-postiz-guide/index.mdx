@@ -7,7 +7,10 @@ If you're like most communicative teams, your Slack channels are full of great i
 
 In this guide, you will learn how to use the Slack and Postiz MCP servers with Claude Desktop to automatically transform those valuable conversations into social media content.
 
-![Demo](./assets/demo.gif)
+<video width="100%" controls>
+  <source src="./assets/demo.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Prerequisites
 
@@ -15,8 +18,8 @@ Before we get started, make sure you have:
 
 - [Claude Desktop](https://claude.ai/download) installed.
 - Both MCP servers set up:
-  - [Slack MCP server setup](/mcp/using-mcp/slack-mcp-guide).
-  - [Postiz MCP server setup](/mcp/using-mcp/postiz-mcp-guide).
+  - [Slack MCP server setup](/mcp/using-mcp/slack-claude-quickstart).
+  - [Postiz MCP server setup](/mcp/using-mcp/social-media-postiz).
 
 ## Installing the MCP servers
 
@@ -24,18 +27,19 @@ After following both setup guides, your `claude_desktop_config.json` should incl
 
 ```json
 {
-    "mcpServers": {
-      "SlackMCPServer": {
-        "command": "PATH_TO/slack-mcp-server",
-        "args": [],
-        "env": {
-          "SLACK_MCP_XOXC_TOKEN": "YOUR_XOXC_TOKEN",
-          "SLACK_MCP_XOXD_TOKEN": "YOUR_XOXD_TOKEN",
-          "SLACK_MCP_SSE_API_KEY": "my-sse-secret-key-123"
-        }
+  "mcpServers": {
+    "SlackMCPServer": {
+      "command": "PATH_TO_MCP_SERVER/slack-mcp-server",
+      "args": ["-transport", "stdio"],
+      "env": {
+        "SLACK_MCP_XOXC_TOKEN": "YOUR_XOXC_TOKEN",
+        "SLACK_MCP_XOXD_TOKEN": "YOUR_XOXD_TOKEN",
+        "SLACK_MCP_USERS_CACHE": "PATH_TO_MCP_SERVER/.users_cache.json",
+        "SLACK_MCP_CHANNELS_CACHE": "PATH_TO_MCP_SERVER/.channels_cache.json"
       }
     }
   }
+}
 ```
 
 You should also see your Postiz connector listed in Claude Desktop **Settings → Connectors**.
