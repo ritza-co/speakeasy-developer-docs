@@ -1,6 +1,6 @@
 ---
-title: Using Slack MCP server and HubSpot MCP server
-description: Learn how to integrate the Slack MCP server with the HubSpot MCP server
+title: Using Slack and HubSpot MCP servers
+description: Set up automated workflows between Slack and HubSpot using MCP servers in Claude Desktop. Turn emoji reactions into CRM updates with this step-by-step guide.
 ---
 
 Multiple MCP servers unlock powerful automation workflows in Claude Desktop.
@@ -20,14 +20,14 @@ This guide shows you how to automatically update HubSpot contacts based on Slack
 
 ## Prerequisites
 
-- You'll need both MCP servers installed:
-  - Complete the [Slack MCP server guide](/mcp/using-mcp/slack-claude-quickstart).
-  - Complete the [HubSpot MCP server guide](/mcp/using-mcp/hubspot-claude-quickstart).
-- [Claude Desktop](https://claude.ai/download).
+- Slack and HubSpot MCP servers installed. Follow the guides:
+  - [Using Slack with MCP quickstart guide](/mcp/using-mcp/slack-claude-quickstart)
+  - [Using HubSpot with MCP quickstart guide](/mcp/using-mcp/hubspot-claude-quickstart)
+- [Claude Desktop](https://claude.ai/download)
 
-## Your configuration
+## Adding the servers to Claude Desktop
 
-Your `claude_desktop_config.json` file should look like this:
+Add the servers to the `claude_desktop_config.json` file:
 
 ```json
 {
@@ -54,39 +54,41 @@ Your `claude_desktop_config.json` file should look like this:
 
 ```
 
-Replace the token placeholders with your actual values and restart Claude Desktop.
+Replace the token placeholders with your actual values.
 
-## Testing the integration
+Restart Claude Desktop.
 
-Here's a practical scenario: Your team shares lead updates in a Slack channel and marks urgent ones with ‼️ reactions. You want Claude to automatically add "Schedule call ASAP" notes to those contacts in HubSpot.
+## Testing the connection
+
+Here's a practical scenario: Your team shares lead updates in a Slack channel and marks urgent ones with the ‼️ emoji. You want Claude to automatically add a "Schedule call ASAP" note to those contacts in HubSpot.
 
 Ask Claude:
 
 ```txt
-In the #leads Slack channel, find the messages marked with :bangbang: emoji reactions as they are critical ones. Add a note only for the contacts in those messages using the HubSpot MCP server to schedule a call as soon as possible.
+In the #leads Slack channel, find the messages marked with :bangbang: emoji reactions as they are critical. Add a note only for the contacts in those messages using the HubSpot MCP server to schedule a call as soon as possible.
 ```
 
 ![Claude Desktop processing Slack messages with emoji reactions](./assets/claude-processing-slack-messages.png)
 
 Claude will:
 
-1. Search the #leads channel for messages with ‼️ reactions
-2. Parse contact information from those messages
-3. Look up matching contacts in HubSpot
-4. Add priority notes to each contact record
+1. Search the #leads channel for messages with ‼️ reactions.
+2. Parse contact information from those messages.
+3. Look up matching contacts in HubSpot.
+4. Add a priority note to each contact record.
 
 ![Claude Desktop showing workflow execution results](./assets/claude-workflow-execution-result.png)
 
-The contacts in HubSpot will now have "schedule call ASAP" notes added to their records.
+The contacts in HubSpot will now have a "schedule call ASAP" note added to their records.
 
 ![HubSpot contact record with updated notes](./assets/hubspot-contact-record-updated.png)
 
 ## Best practices for multiple MCP servers
 
-- Be specific about which server to use: "Use HubSpot to get contact details for John Smith" is better than saying "Get the contact info for John Smith"
-- Design prompts like workflows: If the steps make sense to you, they'll make sense to Claude. Break complex tasks into clear, sequential actions.
-- Test individual servers first: Verify each MCP server works independently before combining them in complex workflows.
+- **Be specific about which server to use:** "Use HubSpot to get contact details for John Smith" is better than saying "Get the contact info for John Smith."
+- **Design prompts like workflows:** If the steps make sense to you, they'll make sense to Claude. Break complex tasks into clear, sequential actions.
+- **Test individual servers first:** Verify each MCP server works independently before combining them in complex workflows.
 
 ## Conclusion
 
-Combined MCP servers turn Claude Desktop into a powerful automation hub. The key is writing clear prompts that specify which services to use and in what order.
+Combined MCP servers turn Claude Desktop into a powerful automation hub. The key is writing clear prompts that specify which services to use in what order.
