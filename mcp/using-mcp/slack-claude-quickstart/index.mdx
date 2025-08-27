@@ -1,18 +1,16 @@
 ---
-title: Using Slack with MCP quick start guide
-description: Learn how to integrate the Slack MCP server in Claude Desktop.
+title: Using Slack with MCP quickstart guide
+description: Learn how to connect the open-source Slack MCP Server to Claude Desktop.
 
 ---
 
-This guide demonstrates how to integrate your Slack workspace with Claude Desktop so you can analyze your team conversations directly in Claude without switching between applications.
+This guide demonstrates how to connect your Slack workspace to Claude Desktop using the Model Context Protocol (MCP). Once connected, you can read and summarize conversations, search message history, and analyze team communications without leaving the Claude interface.
 
-Using MCP (Model Context Protocol), you can connect Claude Desktop to your Slack workspace to read and summarize conversations, search message history, and analyze team communications without leaving the Claude interface.
+As Slack doesn't provide an official MCP server, and Anthropic's reference implementation was deprecated due to [security vulnerabilities](https://embracethered.com/blog/posts/2025/security-advisory-anthropic-slack-mcp-server-data-leakage/), this guide uses the popular open-source [`slack-mcp-server`](https://github.com/korotovsky/slack-mcp-server) that safely bridges your Slack workspace and Claude Desktop.
 
-While Slack doesn't provide an official MCP server, Anthropic's reference implementation was deprecated due to [security vulnerabilities](https://embracethered.com/blog/posts/2025/security-advisory-anthropic-slack-mcp-server-data-leakage/). Instead, this guide uses the popular open source [`slack-mcp-server`](https://github.com/korotovsky/slack-mcp-server) that safely bridges your Slack workspace and Claude Desktop.
+![Diagram showing the data flow for Slack MCP Server](./assets/data-flow.png)
 
-![Diagram showing data flow for Slack MCP server](./assets/data-flow.png)
-
-Here's what the integration looks like in action:
+Here's what the connection looks like in action:
 
 <video
   controls={false}
@@ -27,64 +25,49 @@ Here's what the integration looks like in action:
 
 ## Prerequisites
 
-You'll need:
+- [Go](https://golang.org/dl/) 1.24.4 or higher
+- [Claude Desktop](https://claude.ai/download)
+- A [Slack](https://slack.com/) workspace
 
-- [Go](https://golang.org/dl/) 1.24.4 or higher.
-- [Claude Desktop](https://claude.ai/download).
-- A [Slack](https://slack.com/) workspace opened in your browser.
-- A text editor.
-- Basic familiarity with browser dev tools.
+## Getting Slack API tokens
 
-## Setup
+You need Slack API tokens for the MCP server to access Slack data. The server supports two token types:
 
-You need Slack API tokens for the MCP server to access your data. The server supports two token types:
-
-- `xoxc/xoxd` tokens are extracted from your browser session. These give the MCP server the same access you have in the Slack web app, without creating applications or managing permissions
-- `xoxp` tokens require creating a Slack app, configuring scopes, and installing the app in each channel you want to access
+- `xoxc/xoxd` tokens: Extracted from your browser session, these tokens give the MCP server the same access you have in the Slack web app without creating applications or managing permissions.
+- `xoxp` tokens: These tokens require creating a Slack app, configuring scopes, and installing the app in each channel you want to access.
 
 This guide uses `xoxc/xoxd` tokens because they're faster to set up and work across all your channels immediately.
 
-### Retrieving the tokens
+To get the `xoxc` token:
 
-Follow these instructions to retrieve the `xoxc` token.
-
-Retrieve the `xoxc` token:
-
-1. Open your browser's Developer Console while your Slack workspace is open.
-
-2. Open Developer Tools by pressing `Ctrl+Shift+I` (`Cmd+Option+I` on Mac) or `F12`.
-
-3. Switch to the Console tab.
-
-4. Type "allow pasting" into the console and press ENTER.
-
-5. Paste this snippet into the console and press ENTER:
+1. Open the Slack workspace in your browser.
+2. Open the developer console by pressing `Ctrl+Shift+I` (`Cmd+Option+I` on macOS) or `F12`.
+3. Switch to the **Console** tab.
+4. Type "allow pasting" into the console and press `Enter`.
+5. Paste the following snippet into the console and press `Enter`:
 
    ```text
    JSON.parse(localStorage.localConfig_v2).teams[document.location.pathname.match(/^\/client\/([A-Z0-9]+)/)[1]].token
    ```
 
-The token will be returned in the console. It starts with `xoxc-`. Save it for the next step.
+The token will be returned in the console. It starts with `xoxc-`. Copy and save it for the next step.
 
-![Retrieving xoxc token from browser console](./assets/slack-xoxc-token-console.png)
+![Browser developer console showing Slack xoxc token location](./assets/slack-xoxc-token-console.png)
 
-Retrieve the `xoxd` token:
+To get the `xoxd` token:
 
-1. Switch to the **Application** tab (**Storage** tab in Firefox and Safari).
-2. Click **Cookies** in the **Storage** section in the sidebar, then find the cookie named `d` in the table.
-3. Copy the cookie's value to the clipboard.
+1. Switch to the **Application** tab (**Storage** in Firefox and Safari).
+2. In the sidebar, under **Storage**, click **Cookies**.
+3. Find the cookie named `d` in the table.
+4. Copy the cookie's value to the clipboard.
 
-![Retrieving xoxd token from browser cookies](./assets/slack-xoxd-token-cookie.png)
+![Developer tools cookies panel showing how to locate and copy the Slack xoxd authentication token](./assets/slack-xoxd-token-cookie.png)
 
-The token value starts with `xoxd-`, save it somewhere for now.
+The token value starts with `xoxd-`. Save it somewhere for now.
 
-### Cloning and modifying the project
+## Cloning and modifying the project
 
-The server reads messages, searches messages, and finds users. It doesn't support reading reactions, which limits useful workflows like having managers prioritize messages with specific reactions or triggering deployments through emoji responses.
-
-You'll modify the source code to add reaction support.
-
-Follow these instructions to add the reaction capability.
+The server reads messages, searches messages, and finds users, but doesn't support reading reactions. As this limits useful workflows (like prioritizing messages with specific reactions or triggering deployments through emoji responses), let's modify the source code to add reaction support.
 
 1. Create a directory and clone the project:
 
@@ -95,9 +78,9 @@ Follow these instructions to add the reaction capability.
    cd slack-mcp-server
    ```
 
-2. Open the project and find the `conversation.go` file, located at `slack-mcp-server/pkg/handler/conversations.go`.
+2. Open the project and find the `conversation.go` file at `slack-mcp-server/pkg/handler/conversations.go`.
 
-3. Replace the `Message` struct with the following to add the `Reactions` field.
+3. Replace the `Message` struct with the code below to add the `Reactions` field.
 
    ```go
    type Message struct {
@@ -114,7 +97,7 @@ Follow these instructions to add the reaction capability.
    }
    ```
 
-4. Now let's add reaction processing to the `convertMessagesFromHistory` function. We need to modify how messages are processed to include reaction data. Around line 391, find this code:
+4. We'll add reaction processing to the `convertMessagesFromHistory` function. Find the code below (around line 391):
 
    ```go
       		msgText := msg.Text + text.AttachmentsTo2CSV(msg.Text, msg.Attachments)
@@ -131,16 +114,16 @@ Follow these instructions to add the reaction capability.
       		})
    ```
 
-    Replace this with code that captures and formats the reaction data:
+    Replace it with this: 
 
-   ```go
-      		msgText := msg.Text + text.AttachmentsTo2CSV(msg.Text, msg.Attachments)
-
-      		// Convert reactions to flat pipe-separated format: emoji:count|emoji:count
-      		var reactionParts []string
-      		for _, r := range msg.Reactions {
-      			reactionParts = append(reactionParts, fmt.Sprintf("%s:%d", r.Name, r.Count))
-      		}
+    ```go
+       		msgText := msg.Text + text.AttachmentsTo2CSV(msg.Text, msg.Attachments)
+ 
+       		// Convert reactions to flat pipe-separated format: emoji:count|emoji:count
+       		var reactionParts []string
+       		for _, r := range msg.Reactions {
+       			reactionParts = append(reactionParts, fmt.Sprintf("%s:%d", r.Name, r.Count))
+       		}
       		reactionsString := strings.Join(reactionParts, "|")
 
       		messages = append(messages, Message{
@@ -154,9 +137,9 @@ Follow these instructions to add the reaction capability.
       			Time:      timestamp,
       			Reactions: reactionsString,
       		})
-   ```
+    ```
 
-5. We also need to update the `convertMessagesFromSearch` function to include the reactions field for consistency. Around line 449, find this code:
+5. We'll update the `convertMessagesFromSearch` function to include the reactions field for consistency. Around line 449, find this code:
 
    ```go
       		messages = append(messages, Message{
@@ -171,7 +154,7 @@ Follow these instructions to add the reaction capability.
       		})
    ```
 
-   Let's replace this with code that captures and formats the reaction data:
+   Replace it with this:
 
    ```go
       		messages = append(messages, Message{
@@ -193,51 +176,51 @@ Follow these instructions to add the reaction capability.
    go build -o slack-mcp-server ./cmd/slack-mcp-server
    ```
 
-The build will be located in the root of the cloned project `slack-mcp-server/slack-mcp-server`.
+The build will be located in the root of the cloned project at `slack-mcp-server/slack-mcp-server`.
 
-## Install the MCP server in Claude
+## Installing the MCP server in Claude
 
-Next, update your Claude Desktop configuration to include the MCP server. To find and edit the `claude_desktop_config.json` file, go to **Settings** in Claude Desktop, then navigate to **Developer** > **Edit Config**.
+Now update your Claude Desktop configuration to include the MCP server. 
+
+In **Settings**, go to **Developer** > **Edit Config**. 
 
 ![Claude Desktop configuration settings](./assets/claude-desktop-config-settings.png)
 
-Replace the values in the configuration with your actual tokens and paths:
+In the `claude_desktop_config.json` file that opens, add the Slack MCP Server configuration:
 
 ```json
 {
   "mcpServers": {
     "SlackMCPServer": {
-      "command": "PATH_TO_/slack-mcp-server/slack-mcp-server",
+      "command": "PATH_TO_MCP_SERVER/slack-mcp-server",
       "args": ["-transport", "stdio"],
       "env": {
         "SLACK_MCP_XOXC_TOKEN": "YOUR_XOXC_TOKEN",
         "SLACK_MCP_XOXD_TOKEN": "YOUR_XOXD_TOKEN",
-        "SLACK_MCP_USERS_CACHE": "PATH_TO_/slack-mcp-server/.users_cache.json",
-        "SLACK_MCP_CHANNELS_CACHE": "PATH_TO_/slack-mcp-server/.channels_cache.json"
+        "SLACK_MCP_USERS_CACHE": "PATH_TO_MCP_SERVER/.users_cache.json",
+        "SLACK_MCP_CHANNELS_CACHE": "PATH_TO_MCP_SERVER/.channels_cache.json"
       }
     }
   }
 }
 ```
 
-Replace `SLACK_MCP_XOXC_TOKEN` and `SLACK_MCP_XOXD_TOKEN` with your actual Slack tokens from the earlier steps. Replace `PATH_TO_` with the absolute path to your project directory.
+Replace `PATH_TO_MCP_SERVER` with the absolute path to your cloned `slack-mcp-server` directory. Replace `YOUR_XOXC_TOKEN` and `YOUR_XOXD_TOKEN` with the Slack tokens you saved previously.
 
 Restart Claude Desktop to load the server.
 
-You can run a test in Claude Desktop to make sure the integration is working by asking Claude to list the current channels in your Slack workspace.
+To test that the connection is working, ask Claude to list the current channels in your Slack workspace.
 
-## Test the integration
+## Testing reaction functionality
 
-Open Claude Desktop and start a new chat. Click the **Search and tools** button to see the MCP server listed. Enable all tools if needed.
+In Claude Desktop, start a new chat. Click the **Search and tools** button to see the MCP server listed. Enable all tools if needed.
 
-![Claude Desktop MCP server settings](./assets/claude-mcp-server-settings.png)
+![Screenshot showing how to locate the Slack MCP Server in Claude Desktop "Search and tools"](./assets/claude-mcp-server-settings.png)
 
-Test the integration by adding reactions to messages in your Slack workspace, then ask Claude to show you messages with reaction emojis.
+Add reaction emojis to messages in your Slack workspace, then ask Claude to show you messages with reactions to test the server's reaction-reading functionality.
 
 ![Slack messages with reactions displayed in Claude](./assets/slack-messages-with-reactions.png)
 
-Your integration is now working.
-
 ## Conclusion
 
-You've installed the Slack MCP server in Claude Desktop and modified it to read message reactions. While the server can be installed directly using a [DXT file](https://github.com/korotovsky/slack-mcp-server/blob/master/docs/03-configuration-and-usage.md#Using-DXT), building from source lets you customize functionality for your workflows.
+Claude Desktop can now access your Slack workspace and read message reactions through the customized MCP server. While the server can be installed directly using a [DXT file](https://github.com/korotovsky/slack-mcp-server/blob/master/docs/03-configuration-and-usage.md#Using-DXT), building from source lets you customize functionality for your workflows.
