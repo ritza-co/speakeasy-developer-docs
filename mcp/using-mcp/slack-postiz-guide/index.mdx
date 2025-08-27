@@ -1,11 +1,11 @@
 ---
-title: Use MCP to turn your best Slack threads into social media posts
-description: Learn how to use Postiz and Slack MCP servers to create social media posts from Slack threads.
+title: Using MCP to turn your best Slack threads into social media posts
+description: Learn how to use the Postiz and Slack MCP servers to create social media posts from Slack threads.
 ---
 
 If you're like most communicative teams, your Slack channels are full of great insights, customer feedback, and interesting discussions that never make it beyond your workspace. 
 
-In this guide, you will learn how to use the Slack and Postiz MCP servers with Claude Desktop to automatically transform those valuable conversations into social media content.
+This guide demonstrates how to use the Slack and Postiz MCP servers with Claude Desktop to automatically transform those valuable conversations into social media content.
 
 <video width="100%" controls>
   <source src="./assets/demo.mp4" type="video/mp4">
@@ -14,12 +14,12 @@ In this guide, you will learn how to use the Slack and Postiz MCP servers with C
 
 ## Prerequisites
 
-Before we get started, make sure you have:
+Before you get started, make sure you have:
 
-- [Claude Desktop](https://claude.ai/download) installed.
+- [Claude Desktop](https://claude.ai/download) installed
 - Both MCP servers set up:
-  - [Slack MCP server setup](/mcp/using-mcp/slack-claude-quickstart).
-  - [Postiz MCP server setup](/mcp/using-mcp/social-media-postiz).
+  - [Slack MCP setup guide](/mcp/using-mcp/slack-claude-quickstart)
+  - [Postiz MCP setup guide](/mcp/using-mcp/social-media-postiz)
 
 ## Installing the MCP servers
 
@@ -42,15 +42,15 @@ After following both setup guides, your `claude_desktop_config.json` should incl
 }
 ```
 
-You should also see your Postiz connector listed in Claude Desktop **Settings → Connectors**.
+You should also see your Postiz connector listed in Claude Desktop, under **Settings → Connectors**.
 
 ![Postiz connector](./assets/postiz-connector.png)
 
-With these configuration available in your Claude Desktop application, we can test the integration. 
+With Slack and Postiz configured in Claude, you can test the integration. 
 
 ## Testing the integration
 
-Here's a practical scenario: let's say your team uses 🚀 reactions to mark threads that contain insights worth sharing externally. You can ask Claude to find these conversations and turn them into social media posts:
+Here's a practical scenario: Let's say your team uses 🚀 emoji reactions to mark Slack threads that contain insights worth sharing externally. You can ask Claude to find these conversations and turn them into social media posts:
 
 Here is the prompt: 
 
@@ -58,16 +58,16 @@ Here is the prompt:
 Find threads in the #threads channel that have 🚀 emoji reactions. Read those thread messages, analyze the key points, and create engaging X posts using the Postiz MCP server.
 ```
 
-When you run this prompt, Claude will search your Slack workspace, analyze the marked conversations, and create optimized posts for your social platforms.
+When you run this prompt, Claude searches your Slack workspace, analyzes the marked conversations, and creates optimized posts for your social platforms.
 
 ![Claude analysis](./assets/claude-analysis.png)
 
-The posts get scheduled through Postiz, and you can review them at [platform.postiz.com](https://platform.postiz.com/).
+Claude schedules the posts on Postiz, and you can review them at [platform.postiz.com](https://platform.postiz.com/).
 
 ![Claude using Postiz](./assets/postiz-scheduled-posts.png)
 
 ## Conclusion
 
-In this guide, you learned how to transform your best Slack threads into social media posts by finding threads marked with 🚀 reactions. 
+Clause can now automatically turn your best Slack threads into social media posts by finding threads marked with 🚀 reactions. 
 
-You can customize this workflow based on your team's needs, focusing on messages from specific channels or particular users to create content that resonates with your audience.
+Customize this workflow to suit your team's needs and skills. For example, telling Claude to focus on messages from specific channels or users may help it create content that resonates with your audience.
