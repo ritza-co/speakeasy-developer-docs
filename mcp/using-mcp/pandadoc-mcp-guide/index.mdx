@@ -72,6 +72,22 @@ Add the PandaDoc configuration to the `claude_desktop_config.json` file:
 
 Replace `YOUR_SANDBOX_KEY` with the sandbox key you copied from PandaDoc and restart Claude Desktop.
 
+## Configure Claude for optimal PandaDoc integration
+
+To ensure Claude works effectively with PandaDoc templates, add this context to your Claude configuration. In Claude Desktop, go to **Settings** > **Profile** then add these to your response preferences:
+
+```txt
+When working with PandaDoc MCP server:
+- Always create text fields with specific merge_field names when populating templates
+- Use the pattern: "Add a text field with merge_field name '[field_name]'"
+- Include verification: "Check that the document is filled, otherwise make sure"
+- Specify content length for better generation (e.g., "50-word report")
+```
+
+![Response Preferences in Claude Desktop UI](./assets/response-preferences.png)
+
+This helps Claude understand how to properly populate PandaDoc templates with dynamic content.
+
 ## Test the connection 
 
 Test the integration by asking Claude to create a progress report using your template. This involves two steps: first, Claude needs to find your template in PandaDoc, then it can generate and share the document.
@@ -87,12 +103,16 @@ Confirm the Progress Report template exists using the PandaDoc MCP server.
 Now ask Claude to generate a short scrum report, create the document and share it with an email in your organization:
 
 ```txt
-Create a short scrum report regarding tasks advancement. Then create a document in PandaDoc with the Progress Report template and fill it with the scrum report. Then, publish and share the document with an_email_address_com.
+Before starting this task, first review my PandaDoc preferences and confirm you understand them. Then create a short scrum report and create a document in PandaDoc with the Progress Report template following my documented approach. Finally, publish and share the document with an_email_address_com.
 ```
 
 ![Generating and publishing the document](./assets/generate-document.png)
 
 Claude will generate the report content, populate your template, create the document in PandaDoc, and share it with the specified email address.
+
+![Resulting Doc sent to Email](./assets/result-email.png)
+
+![Resulting Doc in PandaDoc](./assets/result-doc.png)
 
 ## Conclusion
 
