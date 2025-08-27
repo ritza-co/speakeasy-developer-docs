@@ -5,25 +5,23 @@ description: Learn how to use the Resend MCP server to programatically send emai
 
 Email automation typically requires switching between your CRM, email platform, and other tools. The Resend MCP server lets you send emails, manage audiences, and create automated workflows directly from Claude Desktop using natural language commands.
 
-In this guide, you will learn how to connect the Resend MCP server with Claude Desktop. 
+In this guide, you will learn how to connect the Resend MCP server with Claude Desktop.
 
-<video src="./assets/resend-mcp-demo.mp4"></video>
+<div style="text-align: center;">
+  <video src="./assets/resend-mcp-demo.mp4" autoplay muted playsinline></video>
+</div>
 
 ## Prerequisites
 
-For this guide, you will need: 
+For this guide, you will need:
 
-- [Resend Account](https://resend.com/). 
-- [Claude Desktop](https://claude.ai/download). 
+- [Resend Account](https://resend.com/).
+- [Claude Desktop](https://claude.ai/download).
 - [Node.js](https://nodejs.org/en/download/) installed on your system.
 
 ## Retrieve the Resend API key
 
-You need a Resend API key for the MCP server to authenticate with your account. In your Resend dashboard, go to API Keys.
-
-![Navigating to API Keys page](./assets/resend-api-keys-page.png)
-
-Click on the **Create API key button**.
+You need a Resend API key for the MCP server to authenticate with your account. In your Resend dashboard, go to API Keys. Click on the **Create API key button**.
 
 ![Creating an API key](./assets/create-api-key-button.png)
 
@@ -85,10 +83,10 @@ Please, use the Resend MCP server to list the current audiences in my Resend app
 
 ![Listing Audiences](./assets/list-audiences.png)
 
-You can then ask Claude to send an email to a specific audience or email address. For example, you might send from onboarding@resend.dev. Here is the prompt: 
+You can then ask Claude to send an email to a specific audience or email address. For example, you might send from onboarding@resend.dev. Here is the prompt:
 
 ```txt
-Please, send a short welcoming email to the user kolawole@ritza.co from onboarding@resend.dev.
+Please, send a short welcoming email to the user example@email.com from onboarding@resend.dev.
 ```
 
 ![Sending emails](./assets/send-email-example.png)
