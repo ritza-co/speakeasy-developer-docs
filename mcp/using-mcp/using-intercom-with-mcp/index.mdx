@@ -3,7 +3,7 @@ title: "Using Intercom with MCP"
 description: "Connect Intercom to Claude Desktop to analyze customer conversations and monitor customer health"
 ---
 
-import { Callout, Screenshot } from "@/mdx/components";
+import { Screenshot } from "@/mdx/components";
 import GramCallout from "../.partials/gram-callout.mdx";
 
 <GramCallout />
@@ -34,7 +34,7 @@ Customer success teams save 8-10 hours per week while improving retention rates.
 Before we begin, make sure you have:
 
 - [Claude Desktop](https://claude.ai/download) installed
-- An Intercom workspace with admin access or permission to create integrations
+- An [Intercom workspace](https://www.intercom.com/) with admin access or permission to create integrations
 - A few sample conversations in Intercom (we'll show you how to set this up)
 
 ## Set Up Demo Data in Intercom
@@ -43,7 +43,7 @@ For this guide, we need realistic customer data to analyze. We'll use the Interc
 
 ### Install the Intercom Messenger Component
 
-Since we can't directly create conversations in Intercom, we'll use a Messenger widget component to create sample conversations. 
+Since we can't directly create conversations in Intercom, we'll use a Messenger widget component to create sample conversations.
 
 <Screenshot src="assets/intercom-messenger-install.png" alt="Intercom Messenger installation page showing code snippet options" />
 
@@ -67,9 +67,10 @@ Once you've created these messages, your Intercom inbox should look like this:
 
 <Screenshot src="assets/intercom-final-inbox.png" alt="Intercom inbox showing multiple conversations with varying customer health signals" />
 
-Now here's the challenge: looking at this conversation list, can you quickly tell which customers are healthy and which ones are at risk of churning? 
+Now here's the challenge: looking at this conversation list, can you quickly tell which customers are healthy and which ones are at risk of churning?
 
 You'd need to:
+
 - Click into each conversation individually
 - Read through the entire message history
 - Try to remember the context from previous conversations
@@ -88,12 +89,12 @@ We'll use the Intercom MCP server to connect your Intercom data to Claude Deskto
 First, create an Intercom app to access your data:
 
 1. In Intercom, go to **Settings** > **Integrations** > **Developer Hub**
-2. Click **New App** and create an internal integration
+2. Click **New app** and create an internal integration
 3. Name it "Customer Health Monitor"
 4. Under **Authentication**, you'll need to configure permissions for the MCP server to access your data
 5. Enable the following permissions:
    - Read conversations
-   - Read contacts  
+   - Read contacts
    - Read companies
    - Read events
    - Write events (for updating customer data)
@@ -105,7 +106,7 @@ Next, we need to configure the Intercom MCP server in Claude Desktop.
 
 Open your Claude Desktop configuration file and add the Intercom MCP server:
 
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
@@ -155,7 +156,7 @@ Claude will use the Intercom MCP server to get the list of conversations, identi
 Once you've gotten the hang of it, you can automate it by:
 
 1. **Creating a weekly reminder** to run the health check
-2. **Setting up templates** for common outreach scenarios  
+2. **Setting up templates** for common outreach scenarios
 3. **Building a simple dashboard** to track health score trends over time
 
 Ask Claude:
