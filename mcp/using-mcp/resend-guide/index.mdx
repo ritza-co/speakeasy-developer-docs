@@ -1,11 +1,11 @@
 ---
-title: Sending emails with the Resend MCP server
-description: Learn how to use the Resend MCP server to programatically send emails to audiences.
+title: Sending emails with the Resend MCP Server
+description: Connect Resend to Claude Desktop to programmatically send emails to audiences using natural language commands.
 ---
 
-Email automation typically requires switching between your CRM, email platform, and other tools. The Resend MCP server lets you send emails, manage audiences, and create automated workflows directly from Claude Desktop using natural language commands.
+Rather than switching between your CRM, email platform, and other tools, you can use the Resend MCP Server to send emails, manage audiences, and create automated workflows directly from Claude Desktop using natural language commands.
 
-In this guide, you will learn how to connect the Resend MCP server with Claude Desktop.
+This guide shows you how to connect the Resend MCP Server to Claude Desktop.
 
 <div style="text-align: center;">
   <video src="./assets/resend-mcp-demo.mp4" autoplay muted playsinline></video>
@@ -13,27 +13,29 @@ In this guide, you will learn how to connect the Resend MCP server with Claude D
 
 ## Prerequisites
 
-For this guide, you will need:
+- A [Resend account](https://resend.com/)
+- [Claude Desktop](https://claude.ai/download)
+- [Node.js](https://nodejs.org/en/download/) installed on your system
 
-- [Resend Account](https://resend.com/).
-- [Claude Desktop](https://claude.ai/download).
-- [Node.js](https://nodejs.org/en/download/) installed on your system.
+## Retrieving the Resend API key
 
-## Retrieve the Resend API key
+The Resend MCP Server needs your Resend API key to authenticate with your account.
 
-You need a Resend API key for the MCP server to authenticate with your account. In your Resend dashboard, go to API Keys. Click on the **Create API key button**.
+In the Resend dashboard, click **API Keys** in the side bar. Then click **Create API Key**.
 
-![Creating an API key](./assets/create-api-key-button.png)
+![Screenshot of the Resend UI showing the navigation path: API Keys → Create API Key](./assets/create-api-key-button.png)
 
-Enter a name for your API key. Leave the Permission and Domain fields at their default values. These control sending limits and domain restrictions and the defaults allow unlimited sending from any domain, which works for development. In production, you'd restrict these for security.
+In the **Add API Key** dialog, enter a name for the API key, and leave the **Permission** and **Domain** fields at their defaults. The **Permission** and **Domain** settings control sending limits and domain restrictions, and the defaults allow unlimited sending from any domain, which works for development. In production, you should restrict these for security.
 
-![Entering API keys information](./assets/api-key-form.png)
+Click **Add**.
 
-Copy the API key and save it somewhere safe. You'll need it for the MCP server configuration.
+![Screenshot of the "Add API Key" dialog in the Resend UI](./assets/api-key-form.png)
 
-![Copying the key](./assets/copy-api-key.png)
+Resend will display the API key. Copy and save it to use in the MCP server configuration in Claude Desktop.
 
-## Connect the Resend MCP server to Claude Desktop
+![Screenshot of the "View API Key" modal in the Resend UI](./assets/copy-api-key.png)
+
+## Cloning the Resend MCP project
 
 Clone the Resend MCP project:
 
@@ -49,13 +51,17 @@ npm install
 npm run build
 ```
 
-This generates an `index.js` file in a `build` directory. Building compiles the TypeScript source code into JavaScript that Claude Desktop can execute. The build step also bundles dependencies so the MCP server runs standalone.
+The `build` command generates an `index.js` file in the `build` directory. The build compiles TypeScript source code into JavaScript that Claude Desktop can execute, and bundles dependencies so the MCP server runs standalone.
 
 Copy the absolute path to the `index.js` file. You'll need it for the Claude Desktop configuration.
 
-### Install the MCP server
+## Connecting the Resend MCP Server
 
-Add the Resend configuration to your `claude_desktop_config.json` file:
+Now add the Resend MCP Server to the Claude Desktop configuration.
+
+In Claude Desktop, go to **Settings** → **Developer** → **Edit Config**.
+
+Add the Resend configuration to the `claude_desktop_config.json` file that opens:
 
 ```json
 {
@@ -71,26 +77,32 @@ Add the Resend configuration to your `claude_desktop_config.json` file:
 }
 ```
 
-Replace the path with your actual project location and `YOUR_RESEND_API_KEY` with your Resend API key and restart Claude Desktop.
+- Replace `ABSOLUTE_PATH_TO_MCP_SEND_EMAIL_PROJECT/build/index.js` with the path to your project location.
+- Replace `YOUR_RESEND_API_KEY` with your Resend API key.
 
-## Test the connection
+Restart Claude Desktop.
 
-Once you have Resend connected, test the integration by asking Claude to list your current audiences:
+## Testing the connection
 
-```txt
-Please, use the Resend MCP server to list the current audiences in my Resend application.
-```
-
-![Listing Audiences](./assets/list-audiences.png)
-
-You can then ask Claude to send an email to a specific audience or email address. For example, you might send from onboarding@resend.dev. Here is the prompt:
+Test the connection by asking Claude to list the current audiences in the Resend application:
 
 ```txt
-Please, send a short welcoming email to the user example@email.com from onboarding@resend.dev.
+Please use the Resend MCP Server to list the current audiences in my Resend application.
 ```
 
-![Sending emails](./assets/send-email-example.png)
+![Screenshot of the Claude Desktop UI showing the list of audiences in the Resend application](./assets/list-audiences.png)
+
+## Sending an email
+
+Now you can ask Claude to send an email to a specific audience or email address, for example:
+
+```txt
+Please send a short welcoming email to the user example@email.com from onboarding@resend.dev.
+```
+
+![Screenshot of the Claude Desktop UI showing an email was successfully sent](./assets/send-email-example.png)
 
 ## Conclusion
 
-In this guide, you learned how to connect the Resend MCP server with Claude Desktop. You can build on this by combining it with other MCP servers, like using the Slack MCP server to turn your best Slack threads into newsletter content that gets automatically sent through Resend.
+Now that you can send emails from Claude Desktop using the Resend MCP Server, try combining this functionality with other MCP servers. For example, you could turn [Slack threads](/mcp/using-mcp/slack-claude-quickstart) into newsletter content to email automatically using Resend.
+
