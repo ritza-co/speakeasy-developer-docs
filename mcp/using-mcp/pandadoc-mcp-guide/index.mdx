@@ -1,55 +1,58 @@
 ---
-title: Create and share documents with the PandaDoc MCP server
+title: Create and share documents with the PandaDoc MCP Server
 description: Connect PandaDoc to Claude Desktop to generate professional documents from templates using natural language commands.
 ---
 
-PandaDoc is a document automation platform that generates professional documents from templates. Their MCP server lets you create and populate documents directly through Claude Desktop, so you can generate contracts, proposals, and reports by describing what you need in natural language.
+PandaDoc is a document automation platform that helps users create professional documents from templates. 
 
-![](./assets/final-result.png)
+Using the PandaDoc MCP Server, you can create and populate professional documents through Claude Desktop, generating contracts, proposals, and reports by describing what you need in natural language.
 
+![Screenshot of Claude Desktop showing the generated content for the document](./assets/final-result.png)
 
-In this guide, you'll learn how to connect the PandaDoc MCP server with Claude Desktop.
+This guide will show you how to connect the PandaDoc MCP Server to Claude Desktop.
 
 ## Prerequisites 
 
-For this guide, you will need: 
-
-- [PandaDoc account](https://www.pandadoc.com/). 
-- [Claude Desktop](https://claude.ai/download). 
+- A [PandaDoc account](https://www.pandadoc.com/)
+- [Claude Desktop](https://claude.ai/download) 
 
 ## Create a PandaDoc template
 
-You need a template for Claude to work with when generating documents. PandaDoc uses templates as the foundation for all documents, so we'll create a simple one that Claude can populate with your specific content. In your PandaDoc dashboard, click **Templates** in the sidebar, then click **+ Template** (or **Other Template Type** if you using a new account).
+PandaDoc creates documents from templates, so you'll need a template that Claude can populate with your content.
 
-![Add a new template](./assets/add-template.png)
+In the PandaDoc dashboard, click **Templates** in the sidebar, then **+ Template** (or **Other Template Type**, if you're using a new account).
 
-Select **Blank Template** to create a clean template that Claude can populate with your content.
+![Screenshot of the PandaDoc dashboard highlighting the new template button](./assets/add-template.png)
 
-![Add blank template](./assets/blank-template.png)
+Select **Blank Template**.
 
-Name your template "Progress Report Template" by double-clicking the template name in the top left corner. This makes it easy to reference when asking Claude to generate documents.
+![Screenshot of the PandaDoc dashboard highlighting the blank template option](./assets/blank-template.png)
 
-![Rename the template](./assets/rename-template.png)
+Double-click the template name in the top-left corner and rename the template "Progress Report Template". This will make it easy to reference the template when you ask Claude to create the document using PandaDoc.
 
-Click **Create document** to create the template. Now that you have a template, get your PandaDoc API key.
+![Screenshot of the PandaDoc dashboard highlighting the template name and "Create document" button](./assets/rename-template.png)
 
-### Retrieve the API Key
+Click **Create document**. 
 
-In the PandaDoc dashboard, navigate to **Settings → API and Integrations**. Scroll down and click **API** in the **API and Webhooks** section.
+## Retrieve the PandaDoc API key
 
-![API key](./assets/api-settings.png)
+In the PandaDoc dashboard, navigate to **Settings → API and Integrations**. Scroll down and click **API** under **API and Webhooks**.
 
-This redirects you to the API configuration page where you can view your sandbox and production keys. Click **Generate** to create a sandbox API key, then copy the key and save it. You'll need it for the Claude Desktop configuration.
+![Screenshot of the PandaDoc "API and Integrations" configuration highlighting the "API" option](./assets/api-settings.png)
 
-![Copy the Sandbox API key](./assets/sandbox-api-key.png)
+On the API configuration page that opens, you can view the Sandbox and Production keys. Click **Generate** to create a Sandbox key, then copy the key and save it. You'll need it for the Claude Desktop configuration.
 
-### Connect the PandaDoc MCP server
+![Screenshot of PandaDoc settings showing where to copy the generated Sandbox key](./assets/sandbox-api-key.png)
 
-Next, update your Claude Desktop configuration to include the MCP server. To find and edit the `claude_desktop_config.json` file, go to **Settings** in Claude Desktop, then navigate to **Developer** > **Edit Config**.
+## Connect the PandaDoc MCP Server
 
-![Claude Desktop configuration settings](./assets/claude-desktop-config-settings.png)
+Now add the PandaDoc MCP Server to the Claude Desktop configuration.
 
-Add the PandaDoc configuration to the `claude_desktop_config.json` file:
+In Claude Desktop, go to **Settings** → **Developer** → **Edit Config**.
+
+![Screenshot of Claude Desktop highlighting the navigation path: Settings → Developer → Edit Config](./assets/claude-desktop-config-settings.png)
+
+Add the PandaDoc configuration to the `claude_desktop_config.json` file that opens:
 
 ```json
 {
@@ -70,50 +73,56 @@ Add the PandaDoc configuration to the `claude_desktop_config.json` file:
 }
 ```
 
-Replace `YOUR_SANDBOX_KEY` with the sandbox key you copied from PandaDoc and restart Claude Desktop.
+Replace `YOUR_SANDBOX_KEY` with the sandbox key you copied from PandaDoc.
+
+Restart Claude Desktop.
 
 ## Configure Claude for optimal PandaDoc integration
 
-To ensure Claude works effectively with PandaDoc templates, add this context to your Claude configuration. In Claude Desktop, go to **Settings** > **Profile** then add these to your response preferences:
+Update your response preferences in Claude Desktop to ensure Claude works effectively with PandaDoc templates. 
+
+Go to **Settings** → **Profile** and add the following instructions to your response preferences:
 
 ```txt
-When working with PandaDoc MCP server:
+When working with the PandaDoc MCP Server:
 - Always create text fields with specific merge_field names when populating templates
 - Use the pattern: "Add a text field with merge_field name '[field_name]'"
 - Include verification: "Check that the document is filled, otherwise make sure"
 - Specify content length for better generation (e.g., "50-word report")
 ```
 
-![Response Preferences in Claude Desktop UI](./assets/response-preferences.png)
+![Screenshot of Claude Desktop settings showing the response preferences field](./assets/response-preferences.png)
 
-This helps Claude understand how to properly populate PandaDoc templates with dynamic content.
+
 
 ## Test the connection 
 
-Test the integration by asking Claude to create a progress report using your template. This involves two steps: first, Claude needs to find your template in PandaDoc, then it can generate and share the document.
-
-Ask Claude to find your template:
+Test the connection by asking Claude to find your PandaDoc template:
 
 ```txt
 Confirm the Progress Report template exists using the PandaDoc MCP server.
 ```
 
-![Find the template](./assets/find-template.png)
+![Screenshot of Claude Desktop UI showing a response confirming the PandaDoc template has been found](./assets/find-template.png)
 
-Now ask Claude to generate a short scrum report, create the document and share it with an email in your organization:
+## Generate and share a document
+
+Now ask Claude to generate a short scrum report, and create and share the document using PandaDoc:
 
 ```txt
 Before starting this task, first review my PandaDoc preferences and confirm you understand them. Then create a short scrum report and create a document in PandaDoc with the Progress Report template following my documented approach. Finally, publish and share the document with an_email_address_com.
 ```
 
-![Generating and publishing the document](./assets/generate-document.png)
+![Screenshot of Claude Desktop UI showing the report has been successfully generated and emailed](./assets/generate-document.png)
 
-Claude will generate the report content, populate your template, create the document in PandaDoc, and share it with the specified email address.
+Claude will generate sample report content, populate your template, create the document in PandaDoc, and share it with the specified email address.
 
-![Resulting Doc sent to Email](./assets/result-email.png)
+![Screenshot of the email sent from PandaDoc with a link to the generated document](./assets/result-email.png)
 
-![Resulting Doc in PandaDoc](./assets/result-doc.png)
+In a real-world scenario, you could provide the report content as part of the prompt, include a context document containing the data, or have Claude pull the information from another MCP server.
+
+![Screenshot of the generated document in PandaDoc](./assets/result-doc.png)
 
 ## Conclusion
 
-In this guide, you learned how to connect the PandaDoc MCP server to Claude Desktop for automated document generation. You can build on this by combining it with other MCP servers, like using [Slack conversations](/mcp/using-mcp/slack-claude-quickstart) to automatically generate project reports or client updates through PandaDoc.
+Now that you can generate documents in Claude Desktop using the PandaDoc MCP Server, try combining this functionality with other MCP servers. For example, you could use [Slack conversations](/mcp/using-mcp/slack-claude-quickstart) to automatically generate project reports or client updates with PandaDoc.
