@@ -21,7 +21,7 @@ We're technically building one MCP server. HubSpot provides an official MCP serv
 
 The goal here is to allow customer service agents to use Claude to distribute licenses for successful leads.
 
-![](./assets/mcp-for-customer-service-design.gif)
+![](./assets/customer-service-workflow-design.gif)
 
 You can replace the License API with your inventory system, user provisioning service, or any internal tool that has an API and OpenAPI specification.
 
@@ -47,7 +47,7 @@ MCP standardizes how LLMs access different tools. Instead of writing custom inte
 
 Gram organizes tool definitions into toolsets, enabling specific workflows. When you upload an OpenAPI document, Gram converts every operation into a tool definition that follows MCP specifications.
 
-![image-20250914152608659](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/image-20250914152608659.png)
+![Gram toolsets overview](./assets/gram-toolsets-overview.png)
 
 Giving an LLM access to too many tool definitions exhausts the context window and causes agents to choose wrong tools. Toolsets enable you to curate only the tool definitions needed for specific tasks. You can scope separate toolsets for different teams (sales, marketing, support) ensuring agents access only relevant tool definitions.
 
@@ -97,19 +97,19 @@ Both options require managing infrastructure: monitoring, scaling, and tracking 
 
 Let's create the MCP server on Gram by adding an API source first. On the Gram dashboard, navigate to the Toolset Page. 
 
-![Navigate to Toolsets](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-12 at 06.31.49.png)
+![Navigate to Toolsets](./assets/gram-navigate-to-toolsets.png)
 
 Then, on the **Toolsets** page, click on the **+ ADD API** button. 
 
-![Add a new API](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-12 at 06.33.06.png)
+![Add a new API](./assets/gram-add-new-api.png)
 
 A modal appears where you'll upload an OpenAPI document and name the API. The License API project contains OpenAPI files in both JSON and YAML formats. Upload the YAML file and name it "License API". Gram will convert each API operation into a tool definition.
 
-![Generate the tools](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-12 at 06.36.35.png)
+![Generate the tools](./assets/gram-generate-tools-from-openapi.png)
 
 Click on **Continue ->** to close the modal. You will see the new License API listed under the API sources.
 
-![Listed License API under API sources](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-12 at 06.37.47.png)
+![Listed License API under API sources](./assets/gram-license-api-listed.png)
 
 ### Create a toolset
 
@@ -117,15 +117,15 @@ Next, create a toolset. A toolset is a collection of tool definitions that your 
 
 Click on the **+ ADD TOOLSET** button on the Toolsets page. 
 
-![Click on add toolset button](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-12 at 06.42.52.png)
+![Click on add toolset button](./assets/gram-add-toolset-button.png)
 
 A modal will be displayed, where you will enter the name of the Toolset. You can enter License.
 
-![Enter toolset name](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-12 at 06.44.07.png)
+![Enter toolset name](./assets/gram-enter-toolset-name.png)
 
 Click **Create** to open the tool selection page. Find the API source named `License_api` and click **Enable all** to add all tool definitions from the License API.
 
-![Enable all tools](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-12 at 06.47.05.png)
+![Enable all tools](./assets/gram-enable-all-tools.png)
 
 Navigate back to the Toolsets page and select the License toolset. A warning appears at the top with a **Set up now** link that opens the environment variables configuration page. If you can't see the warning, navigate to the **Auth** tab.
 
@@ -139,17 +139,17 @@ ngrok http 127.0.0.1:8000
 
 You will see a forwarding URL displayed by Ngrok. 
 
-![Forwarding URL](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-12 at 07.01.26.png)
+![Forwarding URL](./assets/ngrok-forwarding-url.png)
 
 Copy the URL and fill the `LICENSE_API_SERVER_URL` variable with the URL and save the changes.
 
-![Filling server URL](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-14 at 19.41.20.png)
+![Filling server URL](./assets/gram-set-server-url.png)
 
 ### Create a Gram key
 
 Before adding the configuration to `claude_desktop_config.json` , let's create a Gram key.  In your Gram dashboard, go to **Settings** and click **Create API Key**.
 
-![Creating a Gram key](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-14 at 19.42.57.png)
+![Creating a Gram key](./assets/gram-create-api-key.png)
 
 Copy the API key somewhere safe. You'll need it to configure Claude Desktop in the next section.
 
@@ -157,7 +157,7 @@ Copy the API key somewhere safe. You'll need it to configure Claude Desktop in t
 
 Navigate to the MCP tab on the License Toolset page. Click on the **ENABLE** button to enable MCP hosting. 
 
-![Enabling MCP settings](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-12 at 07.04.43.png)
+![Enabling MCP settings](./assets/gram-enable-mcp-hosting.png)
 
 Once enabled, scroll down the page. You'll see two configurations for installing the MCP server:
 
@@ -166,11 +166,11 @@ Once enabled, scroll down the page. You'll see two configurations for installing
 
 You will use managed authentication for this guide.
 
-![Use Managed auuthentication](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-12 at 07.07.41.png)
+![Use Managed authentication](./assets/gram-managed-authentication-config.png)
 
 Open the Claude Desktop application, navigate to **Settings -> Developers** and click on the Edit Config button.
 
-![Edit config](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-12 at 07.22.52.png)
+![Edit config](./assets/claude-desktop-edit-config.png)
 
 Open the `claude_desktop_config.json` file, copy the configuration for Managed authentication from Gram, and replace `<your-key-here>` with the value of the Gram key you have created. 
 
@@ -197,7 +197,7 @@ Open the `claude_desktop_config.json` file, copy the configuration for Managed a
 
 Restart Claude Desktop, open a new chat, and ask Claude to create a license for a test user to verify the integration works.
 
-![Create a license in Claude Desktop](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-12 at 07.37.06.png)
+![Create a license in Claude Desktop](./assets/claude-desktop-license-creation.png)
 
 ## The Complete Customer Service Workflow
 
@@ -219,11 +219,11 @@ The specific response will vary based on your actual data, but you'll observe Cl
 
 - Pull lead information from HubSpot, check related discussions in Slack, and analyze the data to determine which leads are qualified.
 
-  ![Pulling information from Slack and HubSpot](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-14 at 14.28.33.png)
+  ![Pulling information from Slack and HubSpot](./assets/claude-workflow-hubspot-slack-data.png)
 
 - Create licenses for qualified leads using the TaskMaster License MCP server you've created.
 
-  ![Claude creating licenses](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-14 at 14.30.02.png)
+  ![Claude creating licenses](./assets/claude-workflow-license-creation.png)
 
 You can improve the prompt by including more details on:
 
@@ -239,17 +239,17 @@ In the Gram concepts section, we discussed tool curation and tool variations. Le
 
 Navigate to the License toolset page and click the **+ ADD/REMOVE TOOLS** button.
 
-![Clicking on update tools button](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-14 at 19.57.24.png)
+![Clicking on update tools button](./assets/gram-add-remove-tools-button.png)
 
 The health check tool can be removed since it's not used in customer service workflows. Disable it by toggling it off.
 
-![Removing the health check tool](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-14 at 19.58.41.png)Return to the License toolset page. The health check tool no longer appears in your toolset. This demonstrates tool curation in practice. With larger APIs containing dozens of endpoints, you can remove irrelevant tools to improve LLM performance and reduce context window usage.
+![Removing the health check tool](./assets/gram-remove-health-check-tool.png)Return to the License toolset page. The health check tool no longer appears in your toolset. This demonstrates tool curation in practice. With larger APIs containing dozens of endpoints, you can remove irrelevant tools to improve LLM performance and reduce context window usage.
 
 ### Tool variations
 
 You can edit tool names and descriptions to improve LLM understanding. Hover over the `create_taskmaster_license` tool name to see an **Edit** button.
 
-![Modifying tool name](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-14 at 20.04.51.png)Click the button to open the editing modal. You can improve the tool name, but the description is more important for LLM guidance. Hover over the description of the create taskmaster license tool.
+![Modifying tool name](./assets/gram-edit-tool-name.png)Click the button to open the editing modal. You can improve the tool name, but the description is more important for LLM guidance. Hover over the description of the create taskmaster license tool.
 
 Tool descriptions tell the LLM what the tool does and guide it through workflows. Here's the current description for Create a TaskMaster license:
 
