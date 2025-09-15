@@ -7,9 +7,9 @@ description: Learn how to create an MCP server with Gram for internal AI workflo
 
 Customer service workflows break down when teams coordinate across multiple systems. Agents might qualify leads in HubSpot, discuss approvals in Slack, then switch to an internal license system to provision access. Each context switch slows response times and introduces errors.
 
-Building an internal dashboard means weeks of development, UX research, and ongoing maintenance. You'd build API integrations, design interfaces, handle authentication, deploy infrastructure, and train your team on another tool. You're adding technical debt instead of reducing complexity.
+Building an internal dashboard means weeks of development, UX research, and ongoing maintenance. You'd build API integrations, design interfaces, handle authentication, deploy infrastructure, and train the customer service team on another tool. You're adding technical debt instead of reducing complexity.
 
-There's a simpler approach: build an MCP server in a few hours, connect it to your existing API, and let your customer service team work through Claude conversations instead. If you already have an API with an OpenAPI document, Gram can have your MCP server ready in minutes.
+There's a simpler approach: build an MCP server in a few hours, connect it to your existing API, and let your customer service team work through LLMs conversations instead. If you already have an API with an OpenAPI document, Gram can have your MCP server ready in minutes.
 
 This guide demonstrates complete customer service automation using three MCP servers: HubSpot for lead data, Slack for team communication, and Gram hosting an internal License MCP server.
 
@@ -17,7 +17,7 @@ This guide demonstrates complete customer service automation using three MCP ser
 
 We're building a customer service workflow that connects HubSpot, Slack, and an internal License API through MCP servers. Customer service agents will identify qualified leads in HubSpot, check team discussions in Slack, then create licenses in the internal system, all through Claude conversations.
 
-We're technically building one MCP server. HubSpot provides an official MCP server. For Slack, we'll use the existing [slack-mcp-server](https://github.com/korotovsky/slack-mcp-server) package. For the internal License API, we'll create and host an MCP server on Gram.
+We're technically building one MCP server. HubSpot provides an official [MCP server](https://developers.hubspot.com/mcp). For Slack, we'll use the existing [slack-mcp-server](https://github.com/korotovsky/slack-mcp-server) package. For the internal License API, we'll create and host an MCP server on Gram.
 
 The goal here is to allow customer service agents to use Claude to distribute licenses for successful leads.
 
@@ -43,9 +43,9 @@ Before building with Gram, you need to understand these core components.
 
 ### Toolsets
 
-MCP standardizes how LLMs access different tools. Instead of writing custom integrations for each service, there's one consistent interface that agents can use across any platform. Tools are functions that LLMs can call to execute actions like reading files, making API requests, or querying databases.
+MCP standardizes how LLMs access different tools. Instead of writing custom integrations for each service, there's one consistent interface that agents can use. Tools are functions that LLMs can call to execute actions like reading files, making API requests, or querying databases.
 
-Gram organizes tool definitions into toolsets, enabling specific workflows. When you upload an OpenAPI document, Gram converts every operation into a tool definition that follows MCP specifications.
+Gram organizes tool definitions into [toolsets](https://docs.getgram.ai/concepts/toolsets), enabling specific workflows. When you upload an OpenAPI document, Gram converts every operation into a tool definition that follows MCP specifications.
 
 ![Gram toolsets overview](./assets/gram-toolsets-overview.png)
 
@@ -55,7 +55,7 @@ Giving an LLM access to too many tool definitions exhausts the context window an
 
 OpenAPI endpoints often lack clear summaries and descriptions. When tool definitions inherit vague descriptions, LLMs struggle to understand when and how to invoke tools properly.
 
-Gram provides **Tool Variations** to improve tool descriptions. You can edit tool names and descriptions to improve LLM understanding. This is prompt engineering for your API tool definitions.
+Gram provides [Tool Variations](https://docs.getgram.ai/concepts/tool-variations) to improve tool descriptions. You can edit tool names and descriptions to improve LLM understanding. This is prompt engineering for your API tool definitions.
 
 ## Create the License MCP server
 
@@ -188,7 +188,7 @@ Open the `claude_desktop_config.json` file, copy the configuration for Managed a
         "Authorization:${GRAM_KEY}"
       ],
       "env": {
-        "GRAM_KEY": "Bearer YOUR_GRAM_KEY"
+        "GRAM_KEY": "Bearer `<your-key-here>`"
       }
     }
   }
@@ -201,7 +201,47 @@ Restart Claude Desktop, open a new chat, and ask Claude to create a license for 
 
 ## The Complete Customer Service Workflow
 
-Open Claude Desktop and test the complete workflow with this prompt:
+Now, your `claude_desktop_config.json` should look like this:
+
+```json
+{
+  "mcpServers": {
+    "GramLicense": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://app.getgram.ai/mcp/xxxslu",
+        "--header",
+        "Gram-Environment:default",
+        "--header",
+        "Authorization:${GRAM_KEY}"
+      ],
+      "env": {
+        "GRAM_KEY": "Bearer gram_live_xxxxx85eb4dfd1"
+      }
+    },
+    "HubspotMCP": {
+      "args": ["-y", "@hubspot/mcp-server"],
+      "command": "npx",
+      "env": {
+        "PRIVATE_APP_ACCESS_TOKEN": "pat-xxxxx"
+      }
+    },
+    "SlackMCPServer": {
+      "args": [],
+      "command": "/PATH_TO_MCP_SLACK_PROJECT/slack-mcp-server/slack-mcp-server",
+      "env": {
+        "SLACK_MCP_SSE_API_KEY": "my-sse-secret-key-123",
+        "SLACK_MCP_XOXC_TOKEN": "xoxc-xxx50",
+        "SLACK_MCP_XOXD_TOKEN": "xoxd-xxxxx"
+      }
+    }
+  }
+}
+
+```
+
+To test the complete workflow, open Claude Desktop and test the complete workflow with this prompt:
 
 ```txt
 Hi Claude. Access the leads channel in Slack using the Slack MCP server and the leads data in HubSpot using the HubSpot MCP server.
