@@ -180,7 +180,7 @@ To install the Speakeasy CLI, follow the steps in the [Speakeasy Getting Started
 In the terminal, run:
 
 ```bash
-brew install speakeasy-api/homebrew-tap/speakeasy
+brew install speakeasy-api/tap/speakeasy
 ```
 
 Next, authenticate with Speakeasy by running the following:
@@ -381,10 +381,7 @@ Finally, we'll generate an SDK using the Speakeasy CLI.
 
 ```bash
 # Generate Petstore SDK using Speakeasy go generator
-speakeasy generate sdk \
-    --schema petstore.yaml \
-    --lang go \
-    --out ./petstore-sdk-go-speakeasy/
+speakeasy quickstart
 ```
 
 This command prints a log of warnings and information, then completes successfully.

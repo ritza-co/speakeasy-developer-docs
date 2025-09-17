@@ -51,7 +51,7 @@ For this comparison, we need both the Speakeasy and OpenAPI Generator CLIs insta
 Install the Speakeasy CLI by running the following command in the terminal:
 
 ```bash
-brew install speakeasy-api/homebrew-tap/speakeasy
+brew install speakeasy-api/tap/speakeasy
 ```
 
 You can check the version to ensure installation was successful:
@@ -296,10 +296,7 @@ Create a Java SDK from the `petstore.yaml` specification file using Speakeasy by
 
 ```bash
 # Generate Petstore SDK using Speakeasy java generator
-speakeasy generate sdk \
-    --schema petstore.yaml \
-    --lang java \
-    --out ./sdks/petstore-sdk-java-speakeasy/
+speakeasy quickstart
 ```
 
 The generator will return some logging results while the SDK is being created and a success indicator on completion.
