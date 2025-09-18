@@ -38,7 +38,7 @@ If your users are non-technical and you can't maintain a hosted server, use MCPB
 
 If you have hosting resources, deploy your MCP server remotely. This costs more but provides the best user experience with minimal configuration for users and easy integration for developers building automated systems.
 
-![Flowchart for selecting an option](/Users/koladev/ritza/speakeasy-developer-docs/mcp/productizing-mcp/how-to-distribute-your-mcp-server/assets/image-20250918034511676.png)
+![Flowchart for selecting an option](./assets/mcp-distribution-flowchart.png)
 
 ## Distribute your MCP server as an open source project
 
@@ -92,7 +92,7 @@ Hi Claude. Use the MCP echo server to echo this. "This is a working MCP server a
 
 You will have a similar result.
 
-![Testing local build](/Users/koladev/ritza/speakeasy-developer-docs/mcp/productizing-mcp/how-to-distribute-your-mcp-server/assets/CleanShot 2025-09-18 at 06.25.59@2x.png)
+![Testing local build](./assets/local-build-test-result.png)
 
 ## Distribute your MCP server as an NPM project
 
@@ -175,7 +175,7 @@ Once it's published, you can show your users how to install the MCP server in Cl
 
 Add the configuration above to your `claude-desktop-config.json` file. Reload Claude Desktop and you should see the MCP server in the chat.
 
-![Selecting NPM built package](/Users/koladev/ritza/speakeasy-developer-docs/mcp/productizing-mcp/how-to-distribute-your-mcp-server/assets/CleanShot 2025-09-18 at 06.02.21@2x.png)
+![Selecting NPM built package](./assets/npm-package-selection.png)
 
 Enter the following prompt to test the functionality.
 
@@ -185,7 +185,7 @@ Hi Claude. Use the MCP echo server to echo this. "This is a working MCP server a
 
 You should have a similar result.
 
-![Test results](/Users/koladev/ritza/speakeasy-developer-docs/mcp/productizing-mcp/how-to-distribute-your-mcp-server/assets/CleanShot 2025-09-18 at 06.03.57@2x.png)
+![Test results](./assets/npm-package-test-result.png)
 
 To make release and distribution easier, you should consider CI/CD tools to automate the process. You can find a GitHub Action for that here.
 
@@ -225,7 +225,7 @@ npx @anthropic-ai/mcpb init
 
 You'll need to enter values such as author name, package name, and description, plus set user configurable options that will be used for the Username environment variable.
 
-![Configuring the Manifest file](/Users/koladev/ritza/speakeasy-developer-docs/mcp/productizing-mcp/how-to-distribute-your-mcp-server/assets/CleanShot 2025-09-18 at 05.10.58@2x.png)
+![Configuring the Manifest file](./assets/mcpb-manifest-configuration.png)
 
 As of September 17th, there is a bug where Claude does not recognize the `manifest_version` key in the `manifest.json` file. Open the generated `manifest.json` file and replace `manifest_version` with `dxt_version`.
 
@@ -263,19 +263,19 @@ After running the command, you should see a file called `mcp-echo-server.mcpb` i
 
 Navigate to the settings of your Claude Desktop application, click on the Extensions screen, and click on the **Advanced settings** button.
 
-![Advanced settings button](/Users/koladev/ritza/speakeasy-developer-docs/mcp/productizing-mcp/how-to-distribute-your-mcp-server/assets/CleanShot 2025-09-18 at 05.23.13@2x.png)
+![Advanced settings button](./assets/claude-advanced-settings.png)
 
 Once on the **Advanced settings** page, scroll to the end of the page and click on the **Install Extension...** button to browse and select the `.mcpb` file we created earlier. Once the file is selected, Claude will display a modal with the extension description. You can click on the **Install** button to confirm the installation.
 
-![Adding the MCP server in Claude](/Users/koladev/ritza/speakeasy-developer-docs/mcp/productizing-mcp/how-to-distribute-your-mcp-server/assets/CleanShot 2025-09-18 at 05.38.01@2x.png)
+![Adding the MCP server in Claude](./assets/mcpb-installation-modal.png)
 
 It will then ask you to enter the username value that will be used as an environment variable by the project. Feel free to enter your name.
 
-![CleanShot 2025-09-18 at 05.32.01@2x](/Users/koladev/ritza/speakeasy-developer-docs/mcp/productizing-mcp/how-to-distribute-your-mcp-server/assets/CleanShot 2025-09-18 at 05.32.01@2x.png)
+![Username input dialog](./assets/mcpb-username-input.png)
 
 Once the name is entered, save the changes and open a new conversation in Claude. Make sure the MCP server is activated.
 
-![Selecting MCP echo input server](/Users/koladev/ritza/speakeasy-developer-docs/mcp/productizing-mcp/how-to-distribute-your-mcp-server/assets/CleanShot 2025-09-18 at 05.40.36@2x.png)
+![Selecting MCP echo input server](./assets/mcpb-server-selection.png)
 
 Then enter a message to test the MCP server.
 
@@ -285,7 +285,7 @@ Hi Claude. Use the MCP echo server to echo this. "This is a working MCPB server"
 
 You will have a similar output
 
-![Testing the MCP server](/Users/koladev/ritza/speakeasy-developer-docs/mcp/productizing-mcp/how-to-distribute-your-mcp-server/assets/CleanShot 2025-09-18 at 05.42.16@2x.png)
+![Testing the MCP server](./assets/mcpb-test-result.png)
 
 We have a working `.mcpb` file that you can upload to artifact repositories so users can download and install your MCP server. If you're using CI/CD pipelines, we have a GitHub Action here that builds your `.mcpb` file and publishes it to the GitHub registry automatically on new releases.
 
@@ -307,7 +307,7 @@ Remote servers also provide the smoothest user experience. You get:
 
 - Simple installation in Claude Desktop where remote MCP servers appear as Connectors.
 
-  ![Connectors](/Users/koladev/ritza/speakeasy-developer-docs/mcp/productizing-mcp/how-to-distribute-your-mcp-server/assets/CleanShot 2025-09-18 at 06.31.20@2x.png)
+  ![Connectors](./assets/claude-connectors.png)
 
   And if your users are technical, then you can provide them documentations so they can enter Oauth configurations. And if they are not technical, once the server is added,  there is a connect button that they can click, that will redirect to an oAuth 	authorization page, you will have coded to give access to your API or services.
 
