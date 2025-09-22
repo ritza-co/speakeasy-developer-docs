@@ -5,19 +5,19 @@ description: Learn how to use Gram to host MCP servers for internal APIs, creati
 
 ## Introduction
 
-Customer service workflows break down when teams coordinate across multiple systems. Agents might qualify leads in HubSpot, discuss approvals in Slack, then switch to an internal license system to provision access. Each context switch slows response times and introduces errors.
+Customer service workflows break down when teams coordinate across multiple systems. Agents might qualify leads in HubSpot, discuss approvals in Slack, and then switch to an internal license system to provision access. Each context switch slows response times and introduces errors.
 
-Building an internal dashboard means weeks of development, UX research, and ongoing maintenance. You'd build API integrations, design interfaces, handle authentication, deploy infrastructure, and train the customer service team on another tool. You're adding technical debt instead of reducing complexity.
+Building an internal dashboard means weeks of development, UX research, and ongoing maintenance. Building API integrations, designing interfaces, handling authentication, deploying infrastructure, and training the customer service team to use another tool adds technical debt instead of reducing complexity.
 
-There's a simpler approach: build an MCP server in a few hours, connect it to your existing API, and let your customer service team work through LLM conversations instead. If you already have an API with an OpenAPI document, Gram can have your MCP server ready in minutes.
+There's a simpler approach: Build an MCP server in a few hours, connect it to your existing API, and let your customer service team work through LLM conversations instead. If you already have an API with an OpenAPI document, Gram can have your MCP server ready in minutes.
 
-This guide demonstrates complete customer service automation using three MCP servers: HubSpot for lead data, Slack for team communication, and Gram hosting an internal License MCP server.
+This guide demonstrates complete customer service automation using three MCP servers: a HubSpot MCP server for lead data, a Slack MCP server for team communication, and an internal Gram-hosted License MCP server.
 
 ## What are we building?
 
-We're building a customer service workflow that connects HubSpot, Slack, and an internal License API through MCP servers. Customer service agents will identify qualified leads in HubSpot, check team discussions in Slack, then create licenses in the internal system, all through Claude conversations.
+We're building a customer service workflow that connects HubSpot, Slack, and an internal License API through MCP servers. Customer service agents will identify qualified leads in HubSpot, check team discussions in Slack, and then create licenses in the internal system, all through Claude conversations.
 
-We're technically building one MCP server. HubSpot provides an official [MCP server](https://developers.hubspot.com/mcp). For Slack, we'll use the existing [slack-mcp-server](https://github.com/korotovsky/slack-mcp-server) package. For the internal License API, we'll create and host an MCP server on Gram.
+We're technically building one MCP server. We'll use the official [HubSpot MCP server](https://developers.hubspot.com/mcp) and the existing [slack-mcp-server](https://github.com/korotovsky/slack-mcp-server) package. We only need to create and host the MCP server for the internal License API, which we'll do on Gram.
 
 The goal here is to allow customer service agents to use Claude to distribute licenses for successful leads.
 
@@ -27,41 +27,43 @@ You can replace the License API with your inventory system, user provisioning se
 
 ## Prerequisites
 
-For this guide, you will need:
+For this guide, you need:
 
-- Python 3.11 or higher.
-  - uv installed on your machine.
-- A [Gram account](https://getgram.ai).
-- Slack and HubSpot MCP servers installed in Claude Desktop. Follow the guides:
-  - [Using Slack with MCP quickstart guide](/mcp/using-mcp/mcp-server-providers/slack)
-  - [Using HubSpot with MCP quickstart guide](/mcp/using-mcp/mcp-server-providers/hubspot)
-- Ngrok CLI.
+- Python 3.11 or higher, with uv installed on your machine
+- A [Gram account](https://getgram.ai)
+- The ngrok agent CLI
+- The Slack and HubSpot MCP servers installed in Claude Desktop
 
-## Gram Concepts
+Follow the quickstart guides to install the MCP servers:
 
-Before building with Gram, you need to understand these core components.
+- [Using Slack with MCP](/mcp/using-mcp/mcp-server-providers/slack)
+- [Using HubSpot with MCP](/mcp/using-mcp/mcp-server-providers/hubspot)
+
+## Gram concepts
+
+Before building an MCP server with Gram, you need to understand these core components.
 
 ### Toolsets
 
-MCP standardizes how LLMs access different tools. Instead of writing custom integrations for each service, there's one consistent interface that agents can use. Tools are functions that LLMs can call to execute actions like reading files, making API requests, or querying databases.
+Tools are functions that LLMs can call to execute actions like reading files, making API requests, or querying databases. MCP standardizes how LLMs access different tools. Instead of developers having to write custom integrations for each service, it provides a standardized interface that agents can use to access tools.
 
-Gram organizes tool definitions into [toolsets](https://docs.getgram.ai/concepts/toolsets), enabling specific workflows. When you upload an OpenAPI document, Gram converts every operation into a tool definition that follows MCP specifications.
+When you upload an OpenAPI document, Gram converts every operation into a tool definition that follows the MCP Specification. Gram then organizes tool definitions into [toolsets](https://docs.getgram.ai/concepts/toolsets), enabling specific workflows.
 
 ![Gram toolsets overview](./assets/gram-toolsets-overview.png)
 
-Giving an LLM access to too many tool definitions exhausts the context window and causes agents to choose wrong tools. Toolsets enable you to curate only the tool definitions needed for specific tasks. You can scope separate toolsets for different teams (sales, marketing, support) ensuring agents access only relevant tool definitions.
+Giving an LLM access to too many tool definitions exhausts the context window and causes agents to choose the wrong tools. Toolsets enable you to curate only the tool definitions needed for specific tasks. You can scope separate toolsets for different teams (such as sales, marketing, and support) to ensure agents access only relevant tool definitions.
 
-### Tool Variations
+### Tool variations
 
 OpenAPI endpoints often lack clear summaries and descriptions. When tool definitions inherit vague descriptions, LLMs struggle to understand when and how to invoke tools properly.
 
-Gram provides [Tool Variations](https://docs.getgram.ai/concepts/tool-variations) to improve tool descriptions. You can edit tool names and descriptions to improve LLM understanding. This is prompt engineering for your API tool definitions.
+Gram provides a [tool variations](https://docs.getgram.ai/concepts/tool-variations) feature for improving tool descriptions. You can edit tool names and descriptions to enhance LLM understanding. This is prompt engineering for your API tool definitions.
 
 ## Create the License MCP server
 
 We'll create an MCP server for the TaskMaster License API. This represents any internal service with an OpenAPI specification that you want to connect to Claude.
 
-### Install and run the TaskMaster License API
+### Install and run the Taskmaster License API
 
 First, clone the project.
 
@@ -69,13 +71,13 @@ First, clone the project.
 git clone https://github.com/speakeasy-api/examples.git
 ```
 
-Then, navigate to the TaskMaster License API project.
+Navigate to the Taskmaster License API project.
 
 ```
 cd license-api
 ```
 
-Once it's done, run the following command to install dependencies, and run the server.
+Then run the following command to install dependencies, and once it's done, run the server.
 
 ```
 chmod +x setup.sh
@@ -88,42 +90,42 @@ The project should be running at http://127.0.0.1:8000.
 
 You have two options for creating MCP servers:
 
-- Code the server yourself using MCP SDKs, TypeScript, or FastMCP
-- Use solutions like Speakeasy to generate an MCP server
+- Code the server yourself using MCP SDKs, TypeScript, or FastMCP.
+- Use a solution like Speakeasy to generate an MCP server.
 
 Both options require managing infrastructure: monitoring, scaling, and tracking usage. Instead of building, you end up maintaining. Gram eliminates this overhead by generating MCP servers from OpenAPI documents.
 
 ### Upload an API source document
 
-Let's create the MCP server on Gram by adding an API source first. On the Gram dashboard, navigate to the Toolsets page and click on the **+ ADD API** button.
+Let's create the MCP server on Gram by adding an API source first. On the Gram dashboard, navigate to the **Toolsets** page and click on the **+ Add API** button.
 
 ![Navigate to Toolsets](./assets/gram-navigate-to-toolsets.png)
 
-A modal appears where you'll upload an OpenAPI document and name the API. The License API project contains OpenAPI files in both JSON and YAML formats. Upload the YAML file and name it "License API". Gram will convert each API operation into a tool definition.
+In the **New OpenAPI Source** dialog, you need to upload an OpenAPI document and name the API. The License API project contains OpenAPI files in both JSON and YAML formats. Upload the YAML file and name it `License API`. Gram will convert each API operation into a tool definition.
 
 ![Generate the tools](./assets/gram-generate-tools-from-openapi.png)
 
-Click on **Continue ->** to close the modal. You will see the new License API listed under the API sources.
+Click **Continue** to close the modal. You will see the new **License API** listed under **API Sources**.
 
 ![Listed License API under API sources](./assets/gram-license-api-listed.png)
 
 ### Create a toolset
 
-Next, create a toolset. A toolset is a collection of tool definitions that your MCP server will access. In Gram, toolsets can contain tool definitions from different API sources, enabling cross-service workflows. Selecting only the tool definitions you need reduces tool explosion and improves LLM efficiency.
-
-Click on the **+ ADD TOOLSET** button on the Toolsets page.
+Click the **+ Add Toolset** button on the **Toolsets** page.
 
 ![Click on add toolset button](./assets/gram-add-toolset-button.png)
 
-A modal will be displayed, where you will enter the name of the Toolset. You can enter License.
+In the **Create a Toolset** dialog, enter a name such as `License`.
 
 ![Enter toolset name](./assets/gram-enter-toolset-name.png)
 
-Click **Create** to open the tool selection page. Find the API source named `License_api` and click **Enable all** to add all tool definitions from the License API.
+Then, click **Create** to open the tool selection page.
+
+Find the API source named **License_api** and click **Enable all** to add all the tool definitions from the License API.
 
 ![Enable all tools](./assets/gram-enable-all-tools.png)
 
-Navigate back to the Toolsets page and select the License toolset. A warning appears at the top with a **Set up now** link that opens the environment variables configuration page. If you can't see the warning, navigate to the **Auth** tab.
+Return to the **Toolsets** page and select the **License** toolset. A warning appears at the top of the page with a **Set up now** link that opens the environment variables configuration page. Click on the link, or if you can't see the warning, navigate to the **Auth** tab.
 
 ![Set environment variables](./assets/gram-set-envs.png)
 
@@ -135,42 +137,44 @@ In your terminal, run this command to expose the local License API:
 ngrok http 127.0.0.1:8000
 ```
 
-You will see a forwarding URL displayed by Ngrok.
+Copy the forwarding URL displayed by ngrok.
 
 ![Forwarding URL](./assets/ngrok-forwarding-url.png)
 
-Copy the URL and fill the `LICENSE_API_SERVER_URL` variable with the URL and save the changes.
+Return to Gram, paste the forwarding URL into the **LICENSE_API_SERVER_URL** variable field, and **Save** the changes.
 
 ![Filling server URL](./assets/gram-set-server-url.png)
 
 ### Create a Gram key
 
-Before adding the configuration to `claude_desktop_config.json` , let's create a Gram key.  In your Gram dashboard, go to **Settings** and click **New API Key**.
+Before adding the License MCP server configuration to `claude_desktop_config.json`, you need to create a Gram key.
+
+In your Gram dashboard, go to **Settings** and click **New API Key**.
 
 ![Creating a Gram key](./assets/gram-create-api-key.png)
 
-Copy the API key somewhere safe. You'll need it to configure Claude Desktop in the next section.
+Copy the API key and save it somewhere safe. You need it to configure Claude Desktop in the next section.
 
 ### Install the MCP server in Claude Desktop
 
-Navigate to the MCP tab on the License Toolset page. Click on the **ENABLE** button to enable MCP hosting.
+Still in Gram, navigate to the **MCP** tab on the **License** toolset page. Click the **Enable** button to enable MCP hosting.
 
 ![Enabling MCP settings](./assets/gram-enable-mcp-hosting.png)
 
 Once enabled, scroll down the page. You'll see two configurations for installing the MCP server:
 
-- **Pass-through authentication**: Environment variables are passed directly in the MCP server configuration.
-- **Managed authentication**: Gram stores and manages environment variables.
+- **Pass-through Authentication:** Environment variables are passed directly in the MCP server configuration.
+- **Managed Authentication:** Gram stores and manages environment variables.
 
-You will use managed authentication for this guide.
+For this guide, use **Managed Authentication**.
 
 ![Use Managed authentication](./assets/gram-managed-authentication-config.png)
 
-Open the Claude Desktop application, navigate to **Settings -> Developer** and click on the Edit Config button.
+Open the Claude Desktop application, navigate to **Settings -> Developer**, and click **Edit Config**.
 
 ![Edit config](./assets/claude-desktop-edit-config.png)
 
-Open the `claude_desktop_config.json` file, copy the configuration for Managed authentication from Gram, and replace `<your-key-here>` with the value of the Gram key you have created.
+Open the `claude_desktop_config.json` file, copy the **Managed Authentication** configuration from Gram, and replace `<your-key-here>` with the value of the Gram key you created.
 
 ```json
 {
@@ -193,11 +197,11 @@ Open the `claude_desktop_config.json` file, copy the configuration for Managed a
 }
 ```
 
-Restart Claude Desktop, open a new chat, and ask Claude to create a license for a test user to verify the integration works.
+Restart Claude Desktop, open a new chat, and verify that the integration works by asking Claude to create a license for a test user.
 
 ![Create a license in Claude Desktop](./assets/claude-desktop-license-creation.png)
 
-## The Complete Customer Service Workflow
+## The complete customer service workflow
 
 Now, your `claude_desktop_config.json` should look like this:
 
@@ -240,7 +244,7 @@ Now, your `claude_desktop_config.json` should look like this:
 
 ```
 
-To test the complete workflow, open Claude Desktop and test the complete workflow with this prompt:
+To test the complete workflow, open Claude Desktop and send the following prompt:
 
 ```txt
 Hi Claude. Access the leads channel in Slack using the Slack MCP server and the leads data in HubSpot using the HubSpot MCP server.
@@ -256,19 +260,19 @@ Provide a summary of which leads were processed and confirm license creation.
 
 The specific response will vary based on your actual data, but you'll observe Claude:
 
-- Pull lead information from HubSpot, check related discussions in Slack, and analyze the data to determine which leads are qualified.
+- Pulling lead information from HubSpot, checking related discussions in Slack, and analyzing the data to determine which leads are qualified
 
   ![Pulling information from Slack and HubSpot](./assets/claude-workflow-hubspot-slack-data.png)
 
-- Create licenses for qualified leads using the TaskMaster License MCP server you've created.
+- Creating licenses for qualified leads using the Taskmaster License MCP server you created
 
   ![Claude creating licenses](./assets/claude-workflow-license-creation.png)
 
-You can improve the prompt by including more details on:
+You can improve the prompt by including more details about:
 
-- Specific lead qualification criteria (deal value over $X, lead score above Y, or contains keywords like "enterprise" or "urgent").
-- Exact date ranges for Slack searches ("messages from the last 7 days" or "since September 1st").
-- Validation steps like checking existing licenses, verifying contact information, or confirming lead status hasn't changed.
+- **Specific lead qualification criteria:** For example, *"deal value over $X"*, *"lead score above Y"*, or *"contains keywords like 'enterprise' or 'urgent'"*
+- **Exact date ranges for Slack searches:** For example, *"messages from the last 7 days"* or *"since September 1st"*
+- **Validation steps:** For example, checking existing licenses, verifying contact information, or confirming lead status hasn't changed
 
 ## Optimize the MCP server
 
@@ -276,46 +280,46 @@ In the Gram concepts section, we discussed tool curation and tool variations. Le
 
 ### Tool curation
 
-Navigate to the License toolset page and click the **+ ADD/REMOVE TOOLS** button.
+Navigate to the License toolset page and click the **+ Add/Remove Tools** button.
 
 ![Clicking on update tools button](./assets/gram-add-remove-tools-button.png)
 
-The health check tool can be removed since it's not used in customer service workflows. Disable it by toggling it off.
+The **health_check** tool can be removed since it's not used in customer service workflows. Disable it by toggling it off.
 
 ![Removing the health check tool](./assets/gram-remove-health-check-tool.png)
 
-Return to the License toolset page. The health check tool no longer appears in your toolset. This demonstrates tool curation in practice. With larger APIs containing dozens of endpoints, you can remove irrelevant tools to improve LLM performance and reduce context window usage.
+Return to the **License** toolset page. The **health_check** tool no longer appears in your toolset. This demonstrates tool curation in practice. With larger APIs that contain dozens of endpoints, you can remove irrelevant tools to improve LLM performance and reduce context window usage.
 
 ### Tool variations
 
-You can edit tool names and descriptions to improve LLM understanding. Hover over the `create_taskmaster_license` tool name to see an **Edit** button.
+You can edit tool names and descriptions to improve LLM understanding. Hover over the **create_taskmaster_license** tool name to reveal an **Edit** button.
 
 ![Modifying tool name](./assets/gram-edit-tool-name.png)
 
-Click the button to open the editing modal. You can improve the tool name, but the description is more important for LLM guidance. Hover over the description of the `create_taskmaster_license` tool.
+Click **Edit** to open the editing modal. Here, you can improve the tool name, but the description is more important for LLM guidance. Hover over the description of the **create_taskmaster_license** tool.
 
-Tool descriptions tell the LLM what the tool does and guide it through workflows. Here's the current description for Create a TaskMaster license:
+Tool descriptions tell the LLM what tools do and guide it through workflows. Here's the current description for **create_taskmaster_license**:
 
 ```txt
 <context>
-  This tool creates a new TaskMaster software license in the system. Requires a unique
-  TaskMaster license key and name. Useful for adding new TaskMaster licenses to the system.
+  This tool creates a new Taskmaster software license in the system. Requires a unique
+  Taskmaster license key and name. Useful for adding new TaskMaster licenses to the system.
 </context>
 
 <prerequisites>
-  - TaskMaster license key must be unique across all licenses
+  - Taskmaster license key must be unique across all licenses
   - Name is required and should be descriptive
   - Description is optional but recommended
-  - TaskMaster license will be active by default unless specified otherwise
+  - Taskmaster license will be active by default unless specified otherwise
 </prerequisites>
 ```
 
 The XML structure in tool descriptions helps LLMs parse information systematically. The `<context>` section explains the tool's purpose, while `<prerequisites>` provides specific conditions the LLM should verify before execution. This structured format makes it easier for LLMs to understand not just what the tool does, but when and how to use it appropriately.
 
-You need to specify in the description what the LLM should make sure before creating licenses. Add this bullet under `<prerequisites>`.
+You need to specify in the description what the LLM should make sure of before creating licenses. Add this bullet under `<prerequisites>`.
 
 ```txt
-- Before creating a license, check for leads in Slack and Hubspot first.
+- Before creating a license, check for leads in Slack and HubSpot first.
 ```
 
 This addition ensures Claude validates lead information before creating licenses, demonstrating how tool variations customize the MCP experience for your specific workflows.
@@ -324,8 +328,8 @@ This addition ensures Claude validates lead information before creating licenses
 
 You've built a customer service workflow that connects HubSpot, Slack, and an internal License API through MCP servers. Gram hosted the internal API integration without requiring infrastructure management or custom MCP server code.
 
-The TaskMaster License API can represent any internal service with an OpenAPI specification. You can replace it with your existing systems to create workflows like:
+The Taskmaster License API can represent any internal service with an OpenAPI document. You can replace it with your existing systems to create workflows for:
 
-- **User provisioning**: Combine Slack approvals with HubSpot lead data to automatically create user accounts in your SaaS platform.
-- **Inventory management**: Use customer requests from support tickets and sales data to trigger inventory updates or purchase orders.
-- **Financial reporting**: Aggregate data from CRM, communication tools, and internal billing systems for automated revenue reporting.
+- **User provisioning:** Combine Slack approvals with HubSpot lead data to automatically create user accounts in your SaaS platform.
+- **Inventory management:** Use customer requests from support tickets and sales data to trigger inventory updates or purchase orders.
+- **Financial reporting:** Aggregate data from your CRM, communication tools, and internal billing systems for automated revenue reporting.
