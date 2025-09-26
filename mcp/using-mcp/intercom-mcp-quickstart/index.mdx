@@ -4,9 +4,6 @@ description: "Connect Intercom to Claude Desktop to analyze customer conversatio
 ---
 
 import { Screenshot } from "@/mdx/components";
-import GramCallout from "../.partials/gram-callout.mdx";
-
-<GramCallout />
 
 [Intercom](https://www.intercom.com) is a customer messaging platform that helps teams manage support conversations and customer relationships.
 
@@ -58,7 +55,7 @@ First, create an Intercom app to access your data:
 
 1. In Intercom, go to **Settings** > **Integrations** > **Developer Hub**.
 
-   ![Navigating to developer hub](assets/intercom-developer-hub-navigation.png)
+   <Screenshot src="assets/intercom-developer-hub-navigation.png" alt="Navigating to developer hub" />
 
 2. Click the **New app** button and create an internal integration.
 
@@ -74,11 +71,11 @@ First, create an Intercom app to access your data:
 
 5. If that's not the case, click on the **Edit** button to enable the permissions above.
 
-   ![Edit button](assets/intercom-app-edit-button.png)
+   <Screenshot src="assets/intercom-app-edit-button.png" alt="Edit button" />
 
 6. Copy your **Access Token** from the authentication section.
 
-   ![Copying the Access token](assets/intercom-access-token-copy.png)
+   <Screenshot src="assets/intercom-access-token-copy.png" alt="Copying the Access token" />
 
 ### Configure Intercom MCP server in Claude Desktop
 
@@ -143,4 +140,4 @@ Ask Claude:
 
 ## Conclusion
 
-Now that you can analyze customer conversations in Claude Desktop using the Intercom MCP Server, try combining this functionality with other MCP servers. For example, you could use [Slack integration](/mcp/using-mcp/slack-mcp-guide) to automatically notify your customer success team about urgent cases.
+Now that you can analyze customer conversations in Claude Desktop using the Intercom MCP Server, try combining this functionality with other MCP servers. For example, you could use [Slack integration](/mcp/using-mcp/slack-mcp-quickstart) to automatically notify your customer success team about urgent cases.
