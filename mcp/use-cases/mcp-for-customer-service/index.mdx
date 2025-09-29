@@ -1,23 +1,23 @@
 ---
-title: MCP for customer service
+title: MCP for customer support
 description: Learn how to use Gram to host MCP servers for internal APIs, creating automated workflows that connect Claude to your existing tools.
 ---
 
 ## Introduction
 
-Customer service teams switch between tools constantly: checking Slack for context about customer issues, finding tickets in Zendesk, adding comments, and then handling the issues in internal dashboards or waiting for dedicated teams to handle those issues.
+Customer support teams switch between tools constantly: checking Slack for context about customer issues, finding tickets in Zendesk, adding comments, and then handling the issues in internal dashboards or waiting for dedicated teams to handle those issues.
 
-For customer service teams handling dozens of tickets daily, more time is spent context switching and navigating interfaces when this time could be used to handle more customer complaints. What if you could help more customers faster without losing context or time?
+For customer support teams handling dozens of tickets daily, more time is spent context switching and navigating interfaces when this time could be used to handle more customer complaints. What if you could help more customers faster without losing context or time?
 
 There's a simpler approach: use MCP servers to connect all your tools. Instead of switching between Slack, Zendesk, and your internal systems, handle everything through Claude conversations.
 
-This guide shows you how to connect Zendesk, Slack, and your internal license API through MCP servers, so customer service agents can resolve tickets in minutes.
+This guide shows you how to connect Zendesk, Slack, and your internal license API through MCP servers, so customer support agents can resolve tickets in minutes.
 
 ## What are we building?
 
-We're building a customer service workflow that connects Zendesk, Slack, and an internal License API through MCP servers.
+We're building a customer support workflow that connects Zendesk, Slack, and an internal License API through MCP servers.
 
-The customer service agents can ask Claude to find the customer's ticket in Zendesk, check related Slack discussions, and provision the license through the internal API.
+The customer support agents can ask Claude to find the customer's ticket in Zendesk, check related Slack discussions, and provision the license through the internal API.
 
 <video
   controls={false}
@@ -36,7 +36,7 @@ You'll set up three MCP servers:
 - Slack MCP server to find context about customer issues.
 - An internal API MCP server to provision licenses.
 
-![Customer service workflow diagram](./assets/customer-service-workflow-diagram.png)
+![Customer support workflow diagram](./assets/customer-service-workflow-diagram.png)
 
 ## Prerequisites
 
@@ -63,13 +63,13 @@ Open Claude Desktop and enter the following prompt.
 Find recent support tickets about license issues and check if there are any discussions about them in our #support Slack channel.
 ```
 
-Claude will search both systems and present the information. At this point, the customer service agents have the customer's details and context about their issue. 
+Claude will search both systems and present the information. At this point, the customer support agents have the customer's details and context about their issue. 
 
 ![Claude searches Zendesk and Slack](./assets/claude-searches-zendesk-slack.png)
 
-This integration of Zendesk and Slack already saves time. Instead of going through Zendesk and scrolling through Slack channels, Claude gathers everything in seconds. But the customer service agents still have to switch to another system to handle the license issue.
+This integration of Zendesk and Slack already saves time. Instead of going through Zendesk and scrolling through Slack channels, Claude gathers everything in seconds. But the customer support agents still have to switch to another system to handle the license issue.
 
-The manual step is tedious. The agent logs into the license dashboard, searches through customer records, creates new licenses, updates existing ones, or handles other license operations if necessary. If your customer service team is handling dozens of tickets daily, this adds up quickly to hours of repetitive work.
+The manual step is tedious. The agent logs into the license dashboard, searches through customer records, creates new licenses, updates existing ones, or handles other license operations if necessary. If your customer support team is handling dozens of tickets daily, this adds up quickly to hours of repetitive work.
 
 You can automate this final step by creating an MCP server for the internal License API. If you have an OpenAPI document for your API, Gram can generate the MCP server in minutes.
 
@@ -144,7 +144,7 @@ Restart Claude Desktop, open a new chat, and verify that the integration works b
 
 ![Create a license in Claude Desktop](./assets/claude-desktop-license-creation.png)
 
-## The complete customer service workflow
+## The complete customer support workflow
 
 Your `claude_desktop_config.json` should look like this:
 
@@ -209,7 +209,7 @@ The specific response will vary based on your actual data, but you'll observe Cl
 
 ## Final thoughts
 
-You've built a customer service workflow that connects Zendesk, Slack, and an internal License API through MCP servers. Gram hosted the internal API integration without requiring infrastructure management or custom MCP server code.
+You've built a customer support workflow that connects Zendesk, Slack, and an internal License API through MCP servers. Gram hosted the internal API integration without requiring infrastructure management or custom MCP server code.
 
 The License API represents any internal service with an OpenAPI document. You can replace it with your existing systems to create workflows for:
 
