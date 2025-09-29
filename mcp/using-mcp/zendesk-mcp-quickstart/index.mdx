@@ -41,21 +41,28 @@ Copy the generated token immediately and save it securely. You won't be able to 
 
 To make sure you can make API requests to the Zendesk API with the token, navigate to the **API configuration** page and select the **Allow API token access** option displayed there.
 
-![Claude Desktop configuration](./assets/claude-desktop-config.png)
+![Claude Desktop configuration](./assets/allow-api.png)
 
 ## Installing the Zendesk MCP server in Claude
 
-To install the Zendesk MCP server, you need uv installed on your machine. Execute one of the following commands in your terminal depending on your OS.
+To install the Zendesk MCP server, you need uv installed on your machine.
 
+**For macOS users (recommended):**
 ```bash
-# For macOS and Linux
+# Install with Homebrew (ensures Claude Desktop can find uv)
+brew install uv
+```
+
+**For other platforms:**
+```bash
+# For Linux
 curl -LsSf https://astral.sh/uv/install.sh | sh
-# or
-wget -qO- https://astral.sh/uv/install.sh | sh
 
 # For Windows
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
+
+**Note:** If you install uv using the script method and Claude Desktop can't find the `uv` command, you may need to use the full path in your configuration: `/Users/YOUR_USERNAME/.local/bin/uv` instead of just `uv`.
 
 Once it's done, clone the `zendesk-mcp-server` project. 
 
@@ -69,15 +76,16 @@ Then, navigate to the newly cloned project.
 cd zendesk-mcp-server
 ```
 
-Run the build command: 
+Install the project dependencies and the project itself:
 
 ```bash
-uv build
+uv sync
+uv pip install -e .
 ```
 
 Inside the project, create a file named `.env`. This file will contain your Zendesk credentials:
 
-- `ZENDESK_SUBDOMAIN`: your Zendesk subdomain from `YOUR_SUBDOMAIN.zendesk.com`.
+- `ZENDESK_SUBDOMAIN`: just the subdomain part from your Zendesk URL. For example, if your Zendesk URL is `https://mycompany-123.zendesk.com`, then use `mycompany-123`.
 - `ZENDESK_EMAIL`: the email address associated with the account used to create the APIs tokens. 
 - `ZENDESK_API_KEY` : the API token you created earlier.
 
