@@ -38,7 +38,7 @@ When a manager posts in Slack that a customer called about their delayed license
 - Slack MCP server (existing package) to find context about customer issues.
 - License API MCP server (built with Gram) to provision licenses through your internal tool.
 
-![img](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/upload_792aed7f122c4c99514706d487befe23.png)
+![Customer service workflow diagram](./assets/customer-service-workflow-diagram.png)
 
 ## Prerequisites
 
@@ -67,7 +67,7 @@ Find recent support tickets about license issues and check if there are any disc
 
 Claude will search both systems and present the information. At this point, the customer service agents have the customer's details and context about their issue. 
 
-![Claude searches](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-29 at 07.17.04.png)
+![Claude searches Zendesk and Slack](./assets/claude-searches-zendesk-slack.png)
 
 They can now log into the internal license system and fix the problem manually.
 
@@ -205,11 +205,11 @@ The specific response will vary based on your actual data, but you'll observe Cl
 
 - Finding the support ticket in Zendesk, checking related discussions in Slack, and gathering context about the customer's issue.
 
-  ![CleanShot 2025-09-29 at 07.46.39](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-29 at 07.46.39.png)
+  ![Claude finds ticket and Slack context](./assets/claude-finds-ticket-and-slack-context.png)
 
 - Creating licenses for the customer having issues using the License MCP server you created and adding a comment to the Zendesk ticket.
 
-  ![CleanShot 2025-09-29 at 07.47.09](/Users/koladev/ritza/speakeasy-developer-docs/mcp/use-cases/mcp-for-customer-service/assets/CleanShot 2025-09-29 at 07.47.09.png)
+  ![Claude creates license and updates ticket](./assets/claude-creates-license-and-updates-ticket.png)
 
 ## Final thoughts
 
