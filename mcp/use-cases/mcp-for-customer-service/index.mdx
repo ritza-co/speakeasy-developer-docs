@@ -7,9 +7,9 @@ description: Learn how to use Gram to host MCP servers for internal APIs, creati
 
 Customer support teams switch between tools constantly: checking Slack for context about customer issues, finding tickets in Zendesk, adding comments, and then handling the issues in internal dashboards or waiting for dedicated teams to handle those issues.
 
-For customer support teams handling dozens of tickets daily, more time is spent context switching and navigating interfaces when this time could be used to handle more customer complaints. What if you could help more customers faster without losing context or time?
+For customer support teams handling dozens of tickets daily, more time is spent context-switching and navigating interfaces when this time could be used to handle more customer complaints. What if you could help more customers faster without losing context or time?
 
-There's a simpler approach: use MCP servers to connect all your tools. Instead of switching between Slack, Zendesk, and your internal systems, handle everything through Claude conversations.
+There's a simpler approach: Use MCP servers to connect all your tools. Instead of switching between Slack, Zendesk, and your internal systems, handle everything through Claude conversations.
 
 This guide shows you how to connect Zendesk, Slack, and your internal license API through MCP servers, so customer support agents can resolve tickets in minutes.
 
@@ -32,26 +32,26 @@ The customer support agents can ask Claude to find the customer's ticket in Zend
 
 You'll set up three MCP servers:
 
-- Zendesk MCP server to find tickets and add comments.
-- Slack MCP server to find context about customer issues.
-- An internal API MCP server to provision licenses.
+- A Zendesk MCP server to find tickets and add comments
+- A Slack MCP server for finding context about customer issues
+- An internal API MCP server for provisioning licenses
 
 ![Customer support workflow diagram](./assets/customer-service-workflow-diagram.png)
 
 ## Prerequisites
 
-You need:
+To follow this quickstart, you need:
 
-- [Claude Desktop](https://claude.ai/download) installed.
-- Access to [Zendesk](https://www.zendesk.com/) and Slack accounts.
-- An internal API with OpenAPI documentation.
+- [Claude Desktop](https://claude.ai/download) installed
+- Access to [Zendesk](https://www.zendesk.com/) and Slack accounts
+- An internal API with OpenAPI documentation (or a copy of the [License API](https://github.com/speakeasy-api/examples/license-api))
 
 ## Setting Up Zendesk and Slack
 
 Follow these guides to set up the first two MCP servers:
 
-- [Using Slack with MCP](/mcp/using-mcp/slack-claude-quickstart).
-- [Using Zendesk with MCP](mcp/using-mcp/zendesk-claude-quickstart).
+- [Using Slack with MCP](/mcp/using-mcp/slack-claude-quickstart)
+- [Using Zendesk with MCP](mcp/using-mcp/zendesk-claude-quickstart)
 
 Once you've added both servers to your `claude_desktop_config.json` and restarted Claude Desktop, test the setup.
 
@@ -63,23 +63,23 @@ Open Claude Desktop and enter the following prompt.
 Find recent support tickets about license issues and check if there are any discussions about them in our #support Slack channel.
 ```
 
-Claude will search both systems and present the information. At this point, the customer support agents have the customer's details and context about their issue. 
+Claude will search both systems and present the information. At this point, the customer support agents have the customer's details and the context about their issue. 
 
 ![Claude searches Zendesk and Slack](./assets/claude-searches-zendesk-slack.png)
 
-This integration of Zendesk and Slack already saves time. Instead of going through Zendesk and scrolling through Slack channels, Claude gathers everything in seconds. But the customer support agents still have to switch to another system to handle the license issue.
+The Zendesk and Slack integrations already save time. Instead of customer support agents having to go through Zendesk and scroll through Slack channels, Claude gathers everything in seconds. But the customer support agents still have to switch to another system to handle the license issue.
 
-The manual step is tedious. The agent logs into the license dashboard, searches through customer records, creates new licenses, updates existing ones, or handles other license operations if necessary. If your customer support team is handling dozens of tickets daily, this adds up quickly to hours of repetitive work.
+The manual step is tedious. Customer support agents log in to the License dashboard, search through customer records, create new licenses, update existing ones, and handle other license operations when necessary. If your customer support team is handling dozens of tickets daily, this quickly adds up to hours of repetitive work.
 
 You can automate this final step by creating an MCP server for the internal License API. If you have an OpenAPI document for your API, Gram can generate the MCP server in minutes.
 
 ## Create the License MCP server
 
-You'll now automate the manual license creation step by creating an MCP server for the License API.
+Now, let's automate the manual license creation step by creating an MCP server for the License API.
 
 ### Install and run the Taskmaster License API
 
-If you don't have an internal API ready, use this License API to follow along:
+If you don't have an internal API ready, clone the License API to follow along:
 
 ```bash
 git clone https://github.com/speakeasy-api/examples.git
@@ -88,28 +88,28 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
-The API runs at `http://127.0.0.1:8000` with OpenAPI documentation included. In production, you'd use your actual internal tool API instead.
+The API runs at `http://127.0.0.1:8000` and includes the OpenAPI documentation. In production, you would use your actual internal tool API instead.
 
 ### Create the MCP server on Gram
 
 Building an MCP server manually requires writing code with the MCP SDK, TypeScript, or FastMCP, then managing the hosting infrastructure.
 
-Gram generates MCP servers from OpenAPI documents and handles the hosting. Upload your API spec, configure your environment variables, and the server is ready.
+Gram generates MCP servers from OpenAPI documents and handles the hosting. Upload your OpenAPI document, configure your environment variables, and the server is ready.
 
 [Sign up for Gram](https://getgram.ai) and follow these steps:
 
-1. On the [Toolsets page](https://docs.getgram.ai/build-mcp/create-default-toolset), upload the License API's OpenAPI document.
-2. Create a toolset named "License" and enable the tools you need.
+- On the [**Toolsets** page](https://docs.getgram.ai/build-mcp/create-default-toolset), upload the License API's OpenAPI document.
+- Create a toolset named `License` and enable the tools you need.
 
-![Enable all tools](./assets/gram-enable-all-tools.png)
+    ![Enable all tools](./assets/gram-enable-all-tools.png)
 
-3. In the [Auth tab](https://docs.getgram.ai/concepts/environments), set `LICENSE_API_SERVER_URL` to the URL of your internal tool API. If you're following this guide with the local License API, expose the API with [ngrok](https://ngrok.com/) by running the following command`ngrok http 127.0.0.1:8000` and use the forwarding URL to fill in the `LICENSE_API_SERVER_URL` variable.
+- In the [**Auth** tab](https://docs.getgram.ai/concepts/environments), set `LICENSE_API_SERVER_URL` to the URL of your internal tool API. If you're following this guide with the local License API, expose the API with [ngrok](https://ngrok.com/) by running the `ngrok http 127.0.0.1:8000` command and using the forwarding URL to fill in the `LICENSE_API_SERVER_URL` variable.
 
-4. In Settings, create a [Gram API key](https://docs.getgram.ai/concepts/api-keys).
+- In **Settings**, create a [Gram API key](https://docs.getgram.ai/concepts/api-keys).
 
 ### Install the MCP server in Claude Desktop
 
-In your License toolset's MCP tab, copy the Managed Authentication configuration.
+In your License toolset's MCP tab, copy the **Managed Authentication configuration.
 
 ![Use Managed authentication](./assets/gram-managed-authentication-config.png)
 
@@ -203,7 +203,7 @@ The specific response will vary based on your actual data, but you'll observe Cl
 
   ![Claude finds ticket and Slack context](./assets/claude-finds-ticket-and-slack-context.png)
 
-- Creating licenses for the customer having issues using the License MCP server you created and adding a comment to the Zendesk ticket.
+- Using the License MCP server you set up to create licenses for the customer having issues, and adding a comment to the Zendesk ticket.
 
   ![Claude creates license and updates ticket](./assets/claude-creates-license-and-updates-ticket.png)
 
@@ -213,6 +213,6 @@ You've built a customer support workflow that connects Zendesk, Slack, and an in
 
 The License API represents any internal service with an OpenAPI document. You can replace it with your existing systems to create workflows for:
 
-- User provisioning: Combine Slack discussions with Zendesk tickets to automatically create user accounts in your SaaS platform.
-- Inventory management: Use customer requests from support tickets to trigger inventory updates or purchase orders.
-- Financial reporting: Aggregate data from your support system, communication tools, and internal billing systems for automated reporting.
+- **User provisioning:** Combine Slack discussions with Zendesk tickets to automatically create user accounts in your SaaS platform.
+- **Inventory management:** Use customer requests from support tickets to trigger inventory updates or purchase orders.
+- **Financial reporting:** Aggregate data from your support system, communication tools, and internal billing systems for automated reporting.
