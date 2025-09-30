@@ -345,12 +345,32 @@ Remote distribution allows you to do the following:
 
 - Provide integration options for developers building automated workflows with the Anthropic SDK and OpenAI Agents SDK.
 
-### Select a server type
+### Getting started with remote deployment
+
+Follow these steps to deploy your MCP server remotely:
+
+1. #### Choose your hosting platform
+
+You can use traditional cloud servers (AWS, GCP, Azure), but you will need to handle the server setup on the machine, configure SSL certificates, and manage your server configuration yourself.
+
+For a more streamlined experience:
+
+- If you built your MCP server with FastMCP: Use [FastMCP Cloud](https://gofastmcp.com/deployment/fastmcp-cloud) for simplified deployment.
+- If you have an OpenAPI document ready for your API: Use [Gram](https://docs.getgram.ai/host-mcp/deploy-mcp-server) that can automatically generate and host MCP servers from OpenAPI specifications.
+
+2. #### Set up OAuth authentication
+
+Implement OAuth 2.1 to secure your remote MCP server. You can follow these guides:
+
+- [OAuth implementation with Gram](https://docs.getgram.ai/examples/oauth-external-server) – for Gram-hosted servers.
+- [General OAuth implementation for MCP](https://docs.getgram.ai/host-mcp/adding-oauth) – for custom implementations.
+
+3. #### Distribute to users
 
 Based on your security requirements, decide whether to use a public or private server:
 
-- **Private servers** work best for APIs used by enterprise teams, such as for internal marketing tools. You handle user configuration variables on the server side and control access tightly.
-- **Public servers** work best for APIs requiring broader distribution, such as for SaaS, but they require solid OAuth authentication. Although users set their own configuration variables, you still need secure authorization flows.
+- Private servers work best for APIs used by enterprise teams, such as for internal marketing tools. You handle user configuration variables on the server side and control access tightly.
+- Public servers work best for APIs requiring broader distribution, such as for SaaS, but they require solid OAuth authentication. Although users set their own configuration variables, you still need secure authorization flows.
 
 ### Build and deploy the server
 
