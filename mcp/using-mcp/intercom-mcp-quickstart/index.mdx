@@ -31,7 +31,7 @@ Since we can't directly create conversations in Intercom, we'll use a Messenger 
 
 <Screenshot src="assets/intercom-messenger-install.png" alt="Intercom Messenger installation page showing code snippet options" />
 
-Navigate to **Settings** > **Channels** > **Messenger** in your Intercom workspace. Under **Install** you'll see installation options for different platforms. Choose "Code snippet" and follow the instructions to install the widget.
+Navigate to **Settings** > **Channels** > **Messenger** in your Intercom workspace. Under **Install** you'll see installation options for different platforms including React, Angular, Vue, WordPress, and others. Choose the option that matches your application and follow the instructions to install the widget.
 
 ### Create sample customer conversations
 
@@ -39,11 +39,13 @@ Using the Messenger widget, we'll create several conversations that represent di
 
 These messages will range from satisfied customers asking feature questions to frustrated users reporting technical issues and customers requesting cancellations. Here's an example of what one message might look like:
 
-<Screenshot src="assets/intercom-conversation-example.png" alt="Example conversation showing a customer requesting subscription cancellation" />
+<Screenshot src="assets/intercom-inbox-demo.png" alt="Example conversation showing a customer requesting subscription cancellation" />
 
 James Wilson is a customer who is actively seeking to cancel his subscription due to poor ROI. This is a critical churn signal that needs immediate attention.
 
 We'll create a few more messages with varying sentiment levels to build a realistic idea of what a messy inbox looks like. Once you've created these messages, your Intercom inbox should look like this:
+
+<Screenshot src="assets/intercom-final-inbox.png" alt="Intercom inbox with multiple customer conversations showing various sentiment levels" />
 
 ## Install and configure the Intercom MCP server
 
@@ -59,19 +61,16 @@ First, create an Intercom app to access your data:
 
 2. Click the **New app** button and create an internal integration.
 
-3. Name it "Customer Health Monitor".
+3. Name it "Customer Health Monitor" and click **Create App**.
 
-4. Under **Authentication**, you should have the following permissions enabled.
+4. Under **Permissions**, enable the following:
 
-   - Read conversations.
-   - Read contacts.
-   - Read companies.
-   - Read events.
-   - Write events (for updating customer data).
+   - **Read conversations** - View conversations
+   - **Read one user and one company** - List and view a single user and company
+   - **Read events** - List all events belonging to a single user
+   - **Write events** - Submit events (i.e. user activity)
 
-5. If that's not the case, click on the **Edit** button to enable the permissions above.
-
-   <Screenshot src="assets/intercom-app-edit-button.png" alt="Edit button" />
+5. If that's not the case, click on the **Edit** button in the top right, then select the appropriate permissions.
 
 6. Copy your **Access Token** from the authentication section.
 
@@ -79,10 +78,11 @@ First, create an Intercom app to access your data:
 
 ### Configure Intercom MCP server in Claude Desktop
 
-Open your Claude Desktop configuration file and add the Intercom MCP server:
+Update your Claude Desktop configuration to include the MCP server. In **Settings**, go to **Developer** > **Edit Config**.
 
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+<Screenshot src="assets/claude-desktop-config-settings.png" alt="Claude Desktop configuration" />
+
+In the `claude_desktop_config.json` file that opens, add the Intercom MCP Server configuration:
 
 ```json
 {
@@ -105,7 +105,7 @@ Open your Claude Desktop configuration file and add the Intercom MCP server:
 
 Replace `YOUR_INTERCOM_ACCESS_TOKEN` with the access token you copied from the Intercom authentication page in the previous step.
 
-Restart Claude Desktop. When you first try to use the Intercom tools, Claude will ask for permission to access them. Click "Allow always" or "Allow once" to proceed.
+Restart Claude Desktop to load the server. When you first try to use the Intercom tools, Claude will ask for permission to access them. Click "Allow always" or "Allow once" to proceed.
 
 ## Testing the connection
 
