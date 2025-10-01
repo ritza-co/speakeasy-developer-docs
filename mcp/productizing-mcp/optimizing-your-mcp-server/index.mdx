@@ -3,15 +3,13 @@ title: How to optimize your MCP server with tool curation
 description: Optimize your MCP server with tool selection, organization, and naming that reduces LLM confusion and context window usage.
 ---
 
-You've built an MCP server, deployed it successfully, but now face the optimization challenge. MCP optimization techniques aren't widely documented, but you can achieve significant improvements through tool curation.
-
-After deployment, monitoring helps ensure your server works properly. Monitoring data takes time to collect and interpret, but you can start optimizing immediately. Tool curation involves selecting, naming, and describing your tools for LLMs to improve efficiency, manage context windows, and prevent hallucinations.
+After building and successfully deploying your MCP server, the natural next step is to optimize the server. To achieve this goal you can unlock substantial performance gains by focusing on strategic tool curation — selecting, refining, and organizing tools in ways that reduce overhead and maximize the server's efficiency.
 
 This guide teaches tool curation principles for MCP server optimization. If you use [Gram](https://getgram.ai), you'll learn its specific curation features.
 
-## What is tool curation? 
+## What is tool curation?
 
-Tool curation involves selectively choosing and organizing MCP tools to expose to LLM models. It combines technical optimization with prompt engineering and determines whether your MCP server succeeds or fails in production.
+Tool curation involves selectively choosing and organizing MCP tools to expose to LLM models. This involves selecting, naming, and describing your tools for LLMs to manage context windows, and prevent hallucinations. It combines technical optimization with prompt engineering and determines whether your MCP server performs well in production.
 
 Tool curation matters because:
 
@@ -19,23 +17,20 @@ Tool curation matters because:
 - Tool descriptions have bigger impact than model choice. Optimizing your tool descriptions and names can have a [bigger impact on the quality of your MCP server](https://www.speakeasy.com/blog/cost-aware-pass-rate) than the underlying LLM models your users choose. A well-curated toolset with clear descriptions will outperform a comprehensive but poorly organized toolset, even when using smaller, cheaper models.
 - Curation is prompt engineering for tools. Every tool name and description becomes part of the prompt that guides LLM decision-making. Just like crafting effective prompts, tool curation requires understanding how LLMs process information and make choices.
 
-### When do you need tool curation? 
+### When do you need tool curation?
 
-Premature optimization wastes resources by optimizing without understanding user behavior. Tool curation follows the same principle, wait for warning signs before investing time in curation:
+Just like premature optimization in software, curating tools too early can waste effort if you don't yet understand real user behavior. Instead, wait until clear warning signs emerge that indicate tool curation is needed:
 
-- Tool hallucination: The LLM invents non-existent tools.
+- Tool hallucination: The LLM inventing non-existent tools.
+- Irrelevant tool selection: The LLM using tools not suited to the current goal.
+- Increased end user costs: Clients making many failed attempts and incorrect tool calls.
+- Agent confusion: Tasks that should be simple requiring multiple attempts.
+- Context window exhaustion: Tool definitions consuming too much available context.
 
-- Irrelevant tool selection: The LLM uses tools not suited to the current goal.
+## How to do tool curation effectively?
 
-- Increased end user costs: Clients make many failed attempts and incorrect tool calls.
-
-- Agent confusion: Tasks that should be simple require multiple attempts.
-
-- Context window exhaustion: Tool definitions consume too much available context.
-
-## How to do tool curation effectively? 
-
-If you built an MCP server from your API using tools like FastMCP, start tool curation from your code by adding detailed docstrings or updating function metadata. If you use tools that generate MCP servers based on OpenAPI documents like [Speakeasy](https://www.speakeasy.com/mcp), edit your OpenAPI document directly.
+If you built an MCP server from your API using tools like FastMCP, start tool curation from your code by adding detailed docstrings or updating function metadata. If you use tools like [Speakeasy](https://www.speakeasy.com/mcp) that generate MCP servers based on OpenAPI documents, edit your OpenAPI document directly.
+Below are a few ways to do tool curation effectively.
 
 ### Group tools by workflow, not API structure
 
@@ -46,7 +41,7 @@ API documentation organizes endpoints by resource type because it makes sense fo
 ```txt
 User Management Tools:
 - create_user
-- update_user  
+- update_user
 - delete_user
 - get_user_by_id
 - list_all_users
@@ -81,7 +76,7 @@ Workflow-based organization lets agents complete entire tasks without switching 
 
 ### Include dependency tools in each toolset
 
-Many tools require information from other tools to function properly. If you exclude prerequisite tools from a toolset, agents get stuck with incomplete information and cannot complete workflows.
+Many tools require information from other tools to function properly. If you exclude prerequisite tools from a toolset, agents can get stuck with incomplete information and fail to complete workflows.
 
 **❌ Bad approach - Missing dependencies:**
 
@@ -90,7 +85,7 @@ Quick License Creation Toolset:
 - create_license (requires user_id, product_id, license_type)
 ```
 
-An agent trying to create a license has no way to find the required user_id or determine valid license_type values. The workflow breaks down immediately.
+In the above example if an agent trying to create a license does not know of a way to find the required user_id or determine valid license_type values, the workflow breaks down immediately.
 
 **✅ Good approach - Complete dependency chain:**
 
@@ -143,8 +138,8 @@ API documentation descriptions target developers who understand technical implem
 
 ```txt
 POST /api/v1/tickets
-Description: "Creates a new ticket resource in the database with the 
-provided JSON payload. Returns a 201 status code with the created 
+Description: "Creates a new ticket resource in the database with the
+provided JSON payload. Returns a 201 status code with the created
 ticket object including auto-generated ID and timestamp fields."
 ```
 
@@ -154,9 +149,9 @@ This describes the technical implementation but provides no guidance about when 
 
 ```
 create_support_ticket
-Description: "Creates a new customer support ticket when a customer 
-reports an issue. Use this when customers need help with technical 
-problems, billing questions, or feature requests. Requires customer_id 
+Description: "Creates a new customer support ticket when a customer
+reports an issue. Use this when customers need help with technical
+problems, billing questions, or feature requests. Requires customer_id
 (use search_customers first) and issue description."
 ```
 
@@ -178,12 +173,12 @@ These descriptions treat each tool as independent, providing no guidance about w
 **✅ Good approach - Workflow-aware descriptions:**
 
 ```txt
-create_license: "Creates a new license for a customer. Use after 
-search_customers to get the customer_id, and list_products to choose 
+create_license: "Creates a new license for a customer. Use after
+search_customers to get the customer_id, and list_products to choose
 the right product_id. Always validate the created license afterward."
 
-search_customers: "Finds customers by name, email, or company. Use this 
-first step before creating tickets, licenses, or accessing customer data. 
+search_customers: "Finds customers by name, email, or company. Use this
+first step before creating tickets, licenses, or accessing customer data.
 Returns customer_id needed for other customer operations."
 ```
 
@@ -191,7 +186,7 @@ These descriptions help agents understand tool relationships and natural workflo
 
 ### Avoid the "everything" toolset
 
-Including every available tool in a single toolset creates decision paralysis. Agents spend more time analyzing options than completing actual work. As rule of thumb, organize your toolsets per user persona. A customer service agent might need to have tools to list tickets, list customer, view customer, add internal notes, instead of being exposed to all tools from your MCP server.  
+Including every available tool in a single toolset creates decision paralysis. Agents spend more time analyzing options than completing actual work. As rule of thumb, organize your toolsets per user persona. A customer service agent might need to have tools to list tickets, list customer, view customer, add internal notes, instead of being exposed to all tools from your MCP server.
 
 **❌ Bad approach - The giga-toolset:**
 
@@ -228,26 +223,26 @@ Each toolset has a clear purpose and contains only tools relevant to specific wo
 
 ## Tool curation in Gram
 
-Gram allows you to create and host remote MCP servers with tool curation from the dashboard. You can focus on creating MCP servers without coding while building specific toolsets for deployment. Tool curation in Gram includes:
+[Gram](https://getgram.ai) is a platform by Speakeasy that helps you create, curate, and host MCP servers. To achieve this you upload your OpenAPI document and the platform generates the necessary tools which you can curate into a toolset. Tool curation in Gram includes:
 
-- Create toolsets by selecting only needed tools, even from different API sources
-- Edit tool names and descriptions
+- Creating streamlined toolsets by choosing just the tools you need—even from multiple API sources.
+- Ability to edit/update tool names and descriptions to provide better context to LLMs
 
 ### Curating toolsets in Gram
 
-When you upload an OpenAPI document from your internal tools, Gram generates a default toolset containing all tools from your OpenAPI document, with each tool representing an endpoint. To illustrate this, we are using the Taskmaster API project you can find here.
+When you upload an OpenAPI document from your API, Gram generates a default toolset containing all tools from your OpenAPI document, with each tool representing an endpoint. To illustrate this, we are using the Taskmaster API project you can find [here](https://github.com/speakeasy-api/examples/tree/main/taskmaster-internal-api).
 
-When uploading the OpenAPI document from the Taskmaster project, the default toolset includes tools from different domains: customer service, marketing, and licensing.
+When you upload the OpenAPI document from the Taskmaster API project, the default toolset includes tools from different domains: customer service, marketing, and licensing.
 
 ![Displaying Taskmaster toolset](./assets/taskmaster-default-toolset.png)
 
-If you want this MCP server for a customer service agent, deploying through Gram and installing it on Claude works fine until you ask Claude to create a user as a client.
+If you use this MCP server as is for a customer service agent without curating the tools, deployment and installation to your MCP client will work fine until you prompt Claude desktop for example to create a user as a client.
 
 ![Claude asking for confirmation](./assets/claude-asking-confirmation.png)
 
-Claude notices the different possibilities and asks for confirmation. This works well for interactive use, but automatic agents either stop the thought process or use the tool that seems most adequate, increasing error possibilities.
+Claude will notice the different possibilities and asks for confirmation. This may work well for interactive use, but automatic agents either stop the thought process or use the tool that seems most adequate, increasing error possibilities.
 
-Instead, reorganize the toolset by creating specific workflows for the user. In this case, create a toolset allowing a customer service agent via Claude Desktop to:
+Instead, you can reorganize the toolset by creating specific workflow-optimized toolsets. In this case, you can enable only the necessary tools for a customer service workflow that allows a customer service agent via Claude desktop to:
 
 - List tickets.
 - Create and validate licenses.
@@ -255,22 +250,20 @@ Instead, reorganize the toolset by creating specific workflows for the user. In 
 
 ![Selecting workflow tools](./assets/selecting-workflow-tools.png)
 
-![Selecting customer service workflow](./assets/selecting-customer-service-workflow.png)
-
 This focused toolset reduces tool confusion and improves agent decision-making.
 
 ![New curated toolset](./assets/curated-customer-service-toolset.png)
 
-After organizing toolsets, edit names or descriptions for clarity. Hovering over tool names or descriptions shows an edit icon.
+After organizing toolsets, you can edit names or descriptions to provide more clarity on what the tools do. Hovering over tool names or descriptions shows an "Edit" button to allow you to update the relevant information.
 
 ![Tool edit hover state](./assets/tool-edit-hover-state.png)
 
-Click the icon to open a modal and enter better values for agents.
+Click the edit button to open an edit modal and enter more descriptive values to aid agents in making choices.
 
 ![Edit tool description modal](./assets/edit-tool-description-modal.png)
 
 ## Conclusion
 
-In this guide, you learned how to optimize your MCP server using tool curation. Tool curation provides better experiences for users and agents while reducing costs by enabling smaller models with shorter context windows when you have focused toolsets.
+In this guide, you explored how to optimize your MCP server through tool curation. By narrowing your toolsets to only the essential tools, you not only improve the experience for both users and agents but also lower costs—since even smaller models with shorter context windows can perform effectively with a focused set of tools.
 
 MCP server optimization extends beyond tool curation. You can [monitor](/mcp/productizing-mcp/monitoring) your MCP server to identify other optimization opportunities through data analysis.
