@@ -1,14 +1,13 @@
 ---
 title: MCP for IT helpdesk
-description: Build a realtime IT helpdesk voice agent that checks ticket status in HubSpot and posts updates to Slack by curating an “IT Helpdesk” MCP toolset with Gram and connecting it to a Realtime agent.
+description: Build an IT helpdesk voice agent that checks ticket statuses in HubSpot and posts updates to Slack by curating a Tech Support MCP toolset with Gram and connecting it to a Realtime agent.
 ---
 
+Picture this: Someone forgets their password and submits a HubSpot ticket to have it reset. Your IT team starts working on it in Slack. Meanwhile, the person who submitted the ticket has no idea what's happening. They just want to know whether anyone is working on resetting their password.
 
-Picture this: someone forgot their password and submits a HubSpot ticket for a reset. Your IT team starts working on it in Slack. Meanwhile, the person who submitted the ticket has no idea what's happening. They just want to know: "Is anyone working on my password reset?"
+Right now, they'd have to log in to HubSpot, find their ticket, decipher the status updates, and maybe check for any chatter in Slack. Most people don't bother. Instead, they call IT and ask the same question over and over again.
 
-Right now, they'd have to log into HubSpot, find their ticket, decipher the status updates, maybe check if there's any chatter in Slack. Most people don't bother, they just call IT and ask the same question over and over.
-
-What if they could just say "Hey, what's the status of my password reset request?" and get an instant, spoken answer? Better yet, what if that same voice agent could post updates to your IT team's Slack channel?
+What if they could just ask, "Hey, what's the status of my password reset request?" and get an instant, spoken answer? Better yet, what if the same voice agent they ask could post updates to your IT team's Slack channel?
 
 <video
   controls={true}
@@ -22,164 +21,163 @@ What if they could just say "Hey, what's the status of my password reset request
 
 ## What are we building?
 
-AI agents can chat, but how do you give one the ability to actually check HubSpot tickets or post Slack messages? That's exactly what MCP (Model Context Protocol) solves.
+AI agents can chat, but how do you give one the ability to check HubSpot tickets or post Slack messages? That's precisely the problem the Model Context Protocol (MCP) solves.
 
-We're using MCP to create a toolset that connects an AI voice agent to your existing helpdesk systems. Instead of the agent just talking about tickets, it can actually look them up, check their status, and even coordinate with your team through Slack.
+We'll use MCP to create a toolset that connects an AI voice agent to your existing helpdesk systems. Instead of the agent just talking about tickets, it can actually look them up, check their statuses, and even coordinate with your team through Slack.
 
 ![MCP for IT helpdesk](./assets/diagram.png)
 
-We can use Gram to curate the perfect set of MCP tools from HubSpot and Slack APIs, then host them as a single MCP server. The voice agent connects to this server and therefore has real-world capabilities, not just conversational ones.
+For the purposes of the guide, we've used the OpenAI [Realtime Agent SDK](https://platform.openai.com/docs/guides/voice-agents?voice-agent-architecture=speech-to-speech) to create an IT helpdesk voice agent, which you can access in the
+[demo app](https://github.com/ritza-co/taskmaster-realtime-agent-demo).
 
-We'll use OpenAI's [Realtime Agent SDK](https://platform.openai.com/docs/guides/voice-agents?voice-agent-architecture=speech-to-speech) for the voice agent. You can find the demo app [here](https://github.com/ritza-co/taskmaster-realtime-agent-demo).
+We'll use Gram to curate the perfect set of MCP tools from the HubSpot and Slack APIs and to host that toolset as a single MCP server. By connecting to this server, the voice agent gains real-world capabilities, not just conversational ones.
 
 ### What is Gram?
 
-[Gram](https://gram.ai) allows you to convert APIs into MCP (Model Context Protocol) tools and hosts them as MCP servers. Instead of building your own MCP servers from scratch, you can upload OpenAPI documentation to Gram and it automatically generates the MCP tool definitions.
+[Gram](https://gram.ai) allows you to convert APIs into MCP tools and host them as MCP servers. Instead of building your own MCP servers from scratch, you can upload OpenAPI documentation to Gram, and it automatically generates MCP-compatible tools that AI agents can call. You can then curate these tools into focused toolsets for specific use cases.
 
-### How Gram works
+In this case, instead of exposing HubSpot's entire CRM API to the IT helpdesk agent, you can create a toolset with just the ticket-related operations you need. What's more, supposing you also want the agent to access Slack to check on the team responsible for addressing tickets, you can **curate** a custom toolset with both the Slack tools and the HubSpot tools that the agent needs to call.
 
-Gram takes OpenAPI specifications and transforms them into MCP-compatible tools that AI agents can call. You can then curate these tools into focused toolsets for specific use cases. For example, instead of exposing HubSpot's entire CRM API to your IT helpdesk agent, you create a toolset with just the ticket-related operations you need.
+Gram has a few key concepts that we explore in this use case:
 
-What's more, suppose we want to give our agent access to a tech support Slack channel to check up on the team working on a ticket, we can **curate** a custom toolset with the Slack tools we need along with the HubSpot tools that the agent needs to call.
+- **Tool curation:** Curating focused toolsets from multiple APIs without exposing unnecessary endpoints keeps your agents efficient and reduces errors.
+- **Hosted MCP servers:** Using Gram to host your toolsets as MCP servers means you don't need to manage server infrastructure or handle MCP details.
+- **Tool refinement:** Customizing your tool names and descriptions allows you to give your AI agent better context about when and how to use each tool.
 
-In short Gram has a few key concepts we'll explore in this guide:
+## Prerequisites
 
-**Tool curation**: Build focused toolsets from multiple APIs without exposing unnecessary endpoints. This keeps your agents efficient and reduces errors.
-
-**Hosted MCP servers**: Gram hosts your toolsets as MCP servers, so you don't need to manage server infrastructure or handle MCP protocol details.
-
-**Tool refinement**: You can customize tool names and descriptions to give your AI agent better context about when and how to use each tool.
-
-## Creating an IT Support MCP Toolset (HubSpot + Slack)
-
-We'll set up two API sources in Gram: upload a custom HubSpot tickets OpenAPI spec and enable Gram's prebuilt Slack integration. Then we'll curate a single "IT Helpdesk" toolset that contains only the tools our voice agent needs.
-
-### Prerequisites
-
-For this guide, you will need:
+To follow this guide, you need:
 
 - Node.js 18+ (for the Realtime agent app)
-- An OpenAI API key (Realtime + Responses access)
+- An OpenAI API key (for accessing Realtime + Responses)
 - A Gram account
-- HubSpot Private App token (Service tickets)
-- Slack Web API credentials (e.g., Bot/User token) to post messages via `chat.postMessage`
+- HubSpot Private App token (for accessing service tickets)
+- Slack Web API credentials (for example, using a bot or user token) to post messages via `chat.postMessage`
 
-Optional (if adding an internal API):
+If you want to add an internal API, you also need:
 
 - Python 3.11+
   - uv installed on your machine (for local API samples)
 
-### Upload HubSpot Tickets OpenAPI to Gram
+## Create a Tech Support MCP server
 
-We'll use HubSpots Tickets API for fetching ticket details. The official HubSpot OpenAPI spec is available [here](https://developers.hubspot.com/docs/api/crm/tickets) however it needs some modifications to be used with Token based authentication in Gram.
+Before we can set up the IT helpdesk AI agent, we first need to create the Tech Support MCP server that it will connect to.
 
-You can find our [modified HubSpot OpenAPI spec here](https://github.com/ritza-co/taskmaster-realtime-agent-demo/blob/main/openapi/custom-hubspot-openapi.json).
+In this section, we'll use Gram to:
 
-1. First upload the HubSpot Tickets OpenAPI document and name it "HubSpot Tickets".
+- Enable prebuilt Slack MCP tools
+- Create HubSpot Tickets MCP tools by uploading a custom OpenAPI document
+- Combine selected HubSpot Tickets and Slack tools into a curated Tech Support toolset
+- Host the Tech Support toolset as an MCP server
 
-   **Important**: Name the server exactly "HubSpot Tickets" as this affects the environment variable naming convention. The server name gets converted to `HUBSPOT_TICKETS_BEARER_AUTH` in the environment variables.
+### Upload the HubSpot Tickets OpenAPI document
 
-![Upload HubSpot toolset part 1](./assets/upload-hubspot-toolset-1.png)
+Let's create the HubSpot Tickets MCP tools. We'll use an altered version of the HubSpot API for fetching ticket details because the [official HubSpot OpenAPI spec](https://developers.hubspot.com/docs/api/crm/tickets) requires modification before it can be used with token-based authentication in Gram.
 
-2. Complete the upload process. Gram converts endpoints to MCP tool definitions.
+First, upload the [modified HubSpot OpenAPI document](https://github.com/ritza-co/taskmaster-realtime-agent-demo/blob/main/openapi/custom-hubspot-openapi.json) and name it `HubSpot Tickets`.
 
-![Upload HubSpot toolset](./assets/upload-hubspot-toolset-2.png)
+**Important:** Ensure the name `HubSpot Tickets` is spelled correctly, as this affects the environment variable naming convention. The server name gets converted to `HUBSPOT_TICKETS_BEARER_AUTH` in the environment variables.
 
-At this point, all HubSpot tools are available but not yet enabled for any specific use case.
+![Upload HubSpot Tickets toolset part 1](./assets/upload-hubspot-toolset-1.png)
 
-For more information on how to create a toolset using Gram, you can read the Gram [Quickstart guide](https://docs.getgram.ai/gram-quickstart).
+When you complete the upload process, Gram converts the endpoints to MCP tool definitions.
 
-### Enable Slack integration
+![Upload HubSpot Tickets toolset part 2](./assets/upload-hubspot-toolset-2.png)
 
-Instead of uploading the Slack OpenAPI document, we'll use Gram's prebuilt Slack integration which provides a curated set of Slack tools.
+At this point, all the HubSpot Tickets tools are available, but we haven't yet enabled them for specific use cases.
+
+For more information on creating a toolset using Gram, refer to the Gram [quickstart guide](https://docs.getgram.ai/gram-quickstart).
+
+### Enable the Slack integration
+
+Instead of uploading the Slack OpenAPI document, we'll use Gram's prebuilt Slack integration, which provides a curated set of Slack tools.
 
 Navigate to `https://app.getgram.ai/<your-org>/<your-project>/integrations` and enable the Slack integration:
 
 ![Enable Slack integration](./assets/gram-integrations-slack-enable.png)
 
-This gives you access to essential Slack tools like `chat.postMessage` without needing to manage your own OpenAPI specification.
+This gives you access to essential Slack tools, like `chat.postMessage`, without needing to manage your own OpenAPI document.
 
-### Create and curate the "Tech Support" toolset
+### Create a curated Tech Support toolset
 
-Next, we'll create a single *combined* and *curated* toolset that includes only the essential HubSpot and Slack tools. This focused approach reduces tool explosion and improves LLM efficiency. You can read more on the benefits of curated toolsets [here](/mcp/building-servers/less-is-more).
+Next, we'll combine only the essential HubSpot and Slack tools in a single, curated toolset. This focused approach [reduces tool explosion and improves LLM efficiency](/mcp/building-servers/less-is-more).
 
-Go to *Toolsets* and click on the **+ ADD TOOLSET** button.
+Go to **Toolsets** and click the **+ Add Toolset** button.
 
 ![Curate tech support toolset](./assets/curate-tech-support-toolset.png)
 
-Enter the name of the toolset and click on the **Create** button.
+Name the toolset `Tech Support` and click **Create**.
 
-When creating your Tech Support toolset, be selective about which tools to enable:
+When curating your **Tech Support** toolset, select just the tools needed for your specific use case.
 
+From **HubSpot Tickets**, enable only:
 
-**Only enable these specific tools:**
-
-From `HubSpot` we'll enable the tools for:
-- Get ticket by ID (`get_crm_v3_objects_tickets_ticket_idb3ff2d6e`)
-- Find tickets by contact email (`post_crm_v3_objects_tickets_search_do_search`)
-- Read status/assignee/summary fields (`get_crm_v3_objects_tickets_get_page`)
+- **`get_crm_v3_objects_tickets_ticket_idb3ff2d6e`** for getting tickets by ID
+- **`post_crm_v3_objects_tickets_search_do_search`** for finding tickets by contact email
+- **`get_crm_v3_objects_tickets_get_page`** for reading the status, assignee, and summary fields
 
 ![Enable HubSpot tools](./assets/hubspot-tools-enable.png)
 
-From `Slack` we'll enable the tools for:
-- Fetching Conversations (`conversations_list`)
-- Fetching Conversations by ID (for getting a full thread) (`conversations_info`)
-- Post message to channel/DM (`chat.postMessage`)
+From **Slack**, enable only:
+
+- **`conversations_list`** for fetching conversations
+- **`conversations_info`** for fetching conversations by ID (for example, for getting a full thread)
+- **`chat.postMessage`** for posting messages to the channel and sending DMs
 
 ![Enable Slack tools](./assets/enable-slack-tools.png)
 
 Leave all other tools disabled to keep your agent focused.
 
-Configure authentication for both HubSpot and Slack by setting up the environment variables through the UI:
+Configure authentication for both HubSpot and Slack by setting up the environment variables in the Gram UI:
 
-1. Navigate to **Environments** in the sidebar
-2. Enter the **Default** environment
-3. Click the three dots next to the **Add Variable** button in the top right
-4. Click **Fill for toolset**
-5. Select your IT Helpdesk toolset from the dropdown
-6. Click **Fill variables**
-7. Populate the variables with your actual keys:
-   - `HUBSPOT_TICKETS_BEARER_AUTH`: Your HubSpot Private App token
-   - `HUBSPOT_TICKETS_SERVER_URL`: `https://api.hubapi.com`
-   - `SLACK_SERVER_URL`: `https://slack.com/api`
-   - `SLACK_TOKEN`: Your Slack Bot User OAuth Token
-8. Click **Save**
+- Navigate to **Environments** in the sidebar.
+- Enter the **Default** environment.
+- Open the three-dot menu next to the **Add Variable** button, in the top right.
+- Click **Fill for toolset**.
+- Select the **Tech Support** toolset from the dropdown.
+- Click **Fill variables**.
+- Populate the following variables with your actual keys:
+
+   - **`HUBSPOT_TICKETS_BEARER_AUTH`:** Enter your HubSpot Private App token
+   - **`HUBSPOT_TICKETS_SERVER_URL`:** Enter `https://api.hubapi.com`.
+   - **`SLACK_SERVER_URL`:** Enter `https://slack.com/api`.
+   - **`SLACK_TOKEN`:** Enter your Slack Bot User OAuth token.
+
+- Click **Save**.
 
 ![Configure toolset variables](./assets/fill-toolset-vars.png)
 
-### Enable MCP hosting for the toolset
+### Host the Tech Support toolset as an MCP server
 
-Navigate to the MCP tab on the IT Helpdesk toolset page. Click on the **ENABLE** button to enable MCP hosting.
+Navigate to the **MCP** tab on the **Tech Support** toolset page. Click the **Enable** button to enable MCP hosting.
 
 ![Enable tech support toolset](./assets/enable-tech-support-toolset.png)
 
-Make the server public by clicking the **Public** button and toggling server privacy to public.
+Make the server public by clicking the **Public** button and toggling the **Server Privacy** to public.
 
 ![Make server public](./assets/make-server-public.png)
 
-Save the MCP server endpoint for later by clicking on your MCP server and copying the hosted URL from the MCP details page:
+Save the MCP server endpoint for later by clicking on your MCP server and copying the **Hosted URL** from the **MCP Details** page:
 
 ![Copy MCP server URL](./assets/copy-mcp-server-url.png)
 
-## Setting up a Realtime voice agent
+## Set up an IT helpdesk AI agent
 
-This guide uses our [Realtime voice agent demo](https://github.com/ritza-co/taskmaster-realtime-agent-demo) that connects to your Gram-hosted MCP toolset. The demo uses [OpenAI's Realtime Agent SDK](https://platform.openai.com/docs/guides/voice-agents?voice-agent-architecture=speech-to-speech) to handle both voice interaction and tool calling directly.
+The [Realtime voice agent demo](https://github.com/ritza-co/taskmaster-realtime-agent-demo) uses the OpenAI [Realtime Agent SDK](https://platform.openai.com/docs/guides/voice-agents?voice-agent-architecture=speech-to-speech) to handle both voice interaction and tool calling directly.
 
-When you speak to the agent, it can:
+When you speak to the agent, it can provide:
 
-1. **Direct tool calls**: Call your Gram-hosted MCP tools (HubSpot + Slack) directly and relay the results back in natural speech.
-2. **Voice responses**: Convert tool results back to natural speech in real-time
-3. **Conversational flow**: Maintain natural conversation while executing complex workflows
+- **Direct tool calls:** It calls your Gram-hosted MCP tools (the Tech Support MCP server) directly and relays the results in conversational language.
+- **Voice responses:** It converts tool results to natural speech in real time.
+- **Conversational flow:** It maintains natural conversation while executing complex workflows.
 
-This gives you seamless voice-to-tool integration without needing separate APIs for different functions.
+Altogether, this gives you seamless voice-to-tool integration without needing separate APIs for different functions.
 
-### Connecting the toolset to the Realtime voice agent
+### Set up the Realtime voice agent app
 
-The Realtime agent app allows you to connect to your Gram-hosted MCP toolset through an MCP JSON configuration. The app reads remote MCP servers from this JSON and passes them to the model.
+The Realtime agent app allows you to connect to your Gram-hosted MCP toolset through an MCP JSON configuration. The app reads remote MCP servers from this JSON and passes them to the model. Let's set it up.
 
-First lets set  up the demo app.
-
-You can clone the repo from here: [Realtime voice agent demo](https://github.com/ritza-co/taskmaster-realtime-agent-demo)
+Clone the [demo repository](https://github.com/ritza-co/taskmaster-realtime-agent-demo):
 
 ```bash
 git clone https://github.com/ritza-co/taskmaster-realtime-agent-demo
@@ -188,11 +186,9 @@ cd taskmaster-realtime-agent-demo
 
 Install the dependencies:
 
-
 ```bash
 npm install
 ```
-
 
 Set your OpenAI API key:
 
@@ -207,16 +203,13 @@ Start the app:
 npm run dev
 ```
 
-The app will be available at http://localhost:3000.
+Open the app by navigating to http://localhost:3000 in your browser.
 
+### Connect the Tech Support MCP server to the Realtime voice agent
 
-### Connecting the toolset to the Realtime voice agent
+Now, let's add the MCP JSON configuration to the app.
 
-Navigate to the Settings page and paste the MCP JSON for your toolset.
-
-![Realtime agents settings page](./assets/realtime-agents-settings-page.png)
-
-Fill in the placeholders with your actual tokens and endpoint.
+In the **Realtime Agent Demo** app, navigate to the **Settings** page and paste the following code in the **Remote MCP Configuration** field:
 
 ```json
 {
@@ -236,19 +229,27 @@ Fill in the placeholders with your actual tokens and endpoint.
 }
 ```
 
-Save. Optionally enable Logs and pick a codec (Opus default; PCMU/PCMA simulates PSTN).
+![Realtime agents settings page](./assets/realtime-agents-settings-page.png)
+
+Replace the placeholders with your actual tokens and endpoint.
+
+If you want to, enable **Logs** and pick a **Codec** (Opus is the default and PCMU/PCMA simulates PSTN). Otherwise, leave the settings as is.
+
+Click **Save**.
 
 ### Try it with voice
 
-Let's try it out with voice. We've set up a sample ticket in HubSpot with a password reset request.
+You can replicate the following trial or create a similar scenario to test your Realtime voice agent.
+
+To test the IT helpdesk voice agent, we set up a sample ticket in HubSpot with a password reset request:
 
 ![HubSpot support ticket](./assets/hubspot-support-ticket.png)
 
-In Slack we've set up a channel called #it-support where the IT support team is discussing the ticket.
+We also set up a channel called `#it-support` in Slack, where the IT support team was discussing the ticket:
 
 ![Slack support ticket](./assets/slack-support-ticket.png)
 
-Let's connect to the agent and ask it to check the status of the ticket.
+Then, we connected to the agent and asked it to check the status of the ticket:
 
 <video
   controls={true}
@@ -260,7 +261,7 @@ Let's connect to the agent and ask it to check the status of the ticket.
   <source src="./assets/realtime-agent-demo.mp4" type="video/mp4" />
 </video>
 
-Awesome! It looks like our ticket is being worked on by the IT support team. The Agent has also posted a follow up message in the #it-support channel.
+Awesome! We could see that the IT support team was working on our ticket, and that the IT helpdesk agent had posted a follow-up message in the `#it-support` channel:
 
 ![Slack bot follow up](./assets/slack-bot-follow-up.png)
 
@@ -268,17 +269,19 @@ Awesome! It looks like our ticket is being worked on by the IT support team. The
 
 Pretty cool, right? You just built a voice agent that can check HubSpot tickets and post Slack updates without breaking a sweat. No more digging through support portals or playing phone tag with IT.
 
-The real power here is in the curation. Instead of dumping every possible API endpoint into your agent, you picked exactly what you needed. That's what makes it actually useful instead of just impressive.
+The real power lies in tool curation. Instead of dumping every possible API endpoint into your agent, you picked exactly what you needed. This makes it actually useful, not just impressive.
 
-This same approach works for other IT workflows too. Think about adding password resets from your identity provider, or letting people request software licenses through voice.
+You can use the same approach for other IT workflows too. Think about how else you could extend the Realtime voice agent's capabilities to carry out functions like:
 
-You can even extend the voice agent concept to handling phone calls and give the agent the ability to "hand off" to a human agent if needed.
+- Adding password resets from your identity provider
+- Letting people request software licenses through voice chats
+- Handling phone calls (with the option to "hand off" to a human agent if needed)
 
 Your helpdesk just got a lot more helpful.
 
 ## Further reading
 
 - [Gram](https://getgram.ai)
-- [OpenAI Realtime Agent SDK](https://platform.openai.com/docs/guides/voice-agents?voice-agent-architecture=speech-to-speech)
-- [Tool curation](/mcp/building-servers/less-is-more)
-- [Curating Tools with Gram](https://docs.getgram.ai/build-mcp/advanced-tool-curation)
+- [The OpenAI Realtime Agent SDK](https://platform.openai.com/docs/guides/voice-agents?voice-agent-architecture=speech-to-speech)
+- [Tool curation: Why less is more for MCP](/mcp/building-servers/less-is-more)
+- [Advanced tool curation with Gram](https://docs.getgram.ai/build-mcp/advanced-tool-curation)
