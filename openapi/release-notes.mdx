@@ -15,7 +15,7 @@ Each release of the OpenAPI Specification introduces new features, schema refine
   decide whether to upgrade.
 </Callout>
 
-OpenAPI 3.2.0 (September 2025) is the newest feature release. It adds structured tag navigation, streaming-friendly media types, and fresh OAuth flows onto the JSON Schema-alignment foundation introduced in 3.1. Refer to the [official release notes](https://github.com/OAI/OpenAPI-Specification/releases/tag/3.2.0) for the canonical changelog.
+OpenAPI 3.2.0 (September 2025) is the newest feature release. It adds structured tag navigation, streaming-friendly media types, and fresh OAuth flows onto the JSON Schema-aligned foundation introduced in 3.1. Refer to the [official release notes](https://github.com/OAI/OpenAPI-Specification/releases/tag/3.2.0) for the canonical changelog.
 
 ## OpenAPI version history
 
@@ -28,55 +28,55 @@ OpenAPI 3.2.0 (September 2025) is the newest feature release. It adds structured
 
 ## OpenAPI 3.2 vs 3.1
 
-OpenAPI 3.2.0 builds on the JSON Schema 2020-12 alignment introduced in 3.1.0. It is a feature release: your existing 3.1 descriptions keep working while you opt into new ergonomics for documentation, streaming, and security. The update is particularly useful if you publish Server-Sent Events (SSE) feeds or Model Context Protocol (MCP) connectors and want everything captured in one OpenAPI file.
+OpenAPI 3.2.0 builds on the JSON Schema 2020-12 alignment introduced in 3.1.0. It is a feature release: Your existing 3.1 descriptions keep working while you opt into new ergonomics for documentation, streaming, and security. The update is particularly useful if you publish Server-Sent Events (SSE) feeds or Model Context Protocol (MCP) connectors and want everything captured in one OpenAPI file.
 
 ### At a glance
 
 - **Tag metadata is now standardized** with `summary`, `parent`, and `kind`, replacing the vendor extensions many teams relied on.
-- **Streaming payloads gain first-class support** through `itemSchema`, `prefixEncoding`, and guidance for sequential media types such as SSE, JSON Lines, and multipart feeds.
+- **Streaming payloads gain first-class support** through `itemSchema`, `prefixEncoding`, and guidance for sequential media types, such as SSE, JSON Lines, and multipart feeds.
 - **Security schemes pick up OAuth 2.0 device authorization**, metadata URLs, a `deprecated` flag, and the option to reference shared schemes by URI.
 - **Documentation polish** includes response `summary`, example `dataValue`/`serializedValue`, reusable `components.mediaTypes`, server `name`, and the top-level `$self` field.
 
 #### Quick comparison
 
-| Capability           | OpenAPI 3.1                                                                | OpenAPI 3.2                                                                                                                       |
-|----------------------|----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| Tag navigation       | Relies on `x-displayName` / `x-tagGroups` vendor extensions                | Native `summary`, `parent`, and `kind` fields with registry-backed conventions                                                    |
-| Streaming payloads   | SSE and sequential feeds require callbacks or prose workarounds            | `itemSchema`, `prefixEncoding`, `itemEncoding`, and sequential media types recognized                                             |
-| HTTP operations      | Standard verbs only                                                        | Adds `query` and `additionalOperations` for uncommon verbs                                                                        |
-| Parameters           | `query`, `header`, `path`, `cookie` locations                              | Adds `querystring`, extends `allowReserved`, and introduces a cookie `style`                                                      |
-| Security metadata    | OAuth flows without device support or metadata URLs                        | Device flow, `oauth2MetadataUrl`, `deprecated`, and URI-based references                                                          |
-| Documentation polish | Response `description` required, examples lack structured/serialized split | Optional response `description`, new `summary` field, example `dataValue`/`serializedValue` fields, server `name`, `$self` fields |
+| **Capability**           | **OpenAPI 3.1**                                                            | **OpenAPI 3.2**                                                                                                                   |
+|--------------------------|----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| **Tag navigation**       | Relies on `x-displayName` / `x-tagGroups` vendor extensions                | Native `summary`, `parent`, and `kind` fields with registry-backed conventions                                                    |
+| **Streaming payloads**   | SSE and sequential feeds require callbacks or prose workarounds            | `itemSchema`, `prefixEncoding`, `itemEncoding`, and sequential media types recognized                                             |
+| **HTTP operations**      | Standard verbs only                                                        | Adds `query` and `additionalOperations` for uncommon verbs                                                                        |
+| **Parameters**           | `query`, `header`, `path`, `cookie` locations                              | Adds `querystring`, extends `allowReserved`, and introduces a cookie `style`                                                      |
+| **Security metadata**    | OAuth flows without device support or metadata URLs                        | Device flow, `oauth2MetadataUrl`, `deprecated`, and URI-based references                                                          |
+| **Documentation polish** | Response `description` required, examples lack structured/serialized split | Optional response `description`, new `summary` field, example `dataValue`/`serializedValue` fields, server `name`, `$self` fields |
 
 ### What's new when you move to 3.2?
 
-OpenAPI 3.2 keeps 3.1 descriptions valid while unlocking several headline upgrades. Here's what changes for teams planning the move:
+OpenAPI 3.2 keeps the OpenAPI 3.1 descriptions valid while unlocking several headline upgrades. Here's what changes for teams planning the move:
 
-- **Navigation metadata:** Standard tag fields (`summary`, `parent`, `kind`) replace the common `x-displayName`/`x-tagGroups` pattern. You can keep existing vendor extensions for backwards compatibility, but update doc toolchains so they favor the official fields.
-- **Streaming support:** `itemSchema`, `prefixEncoding`, and sequential media type guidance make SSE, JSON Lines (JSONL), and MCP channels first-class citizens. Preview how your generators or SDKs render stream payloads before switching production specs.
-- **HTTP coverage:** The new `query` operation, `additionalOperations`, and `querystring` parameter location align the spec with real-world verbs and encodings. Check linters and gateways for compatibility—old keywords still work, but new ones may require upgrades.
-- **Docs & security polish:** Addition of response `summary` field, example `dataValue`/`serializedValue` fields, reusable `components.mediaTypes`, server `name`, `$self` fields, OAuth device flows, metadata URLs, and URI-referenced schemes streamline governance. Adopt them incrementally; every feature is opt-in.
+- **Navigation metadata:** Standard tag fields (`summary`, `parent`, and `kind`) replace the common `x-displayName` / `x-tagGroups` pattern. You can keep existing vendor extensions for backwards compatibility, but update doc toolchains so they favor the official fields.
+- **Streaming support:** The `itemSchema`, `prefixEncoding`, and sequential media type guidance makes SSE, JSON Lines (JSONL), and MCP channels first-class citizens. Preview how your generators or SDKs render stream payloads before switching production specs.
+- **HTTP coverage:** The new `query` operation, `additionalOperations`, and `querystring` parameter location align the spec with real-world verbs and encodings. Check linters and gateways for compatibility — old keywords still work, but new ones may require upgrades.
+- **Docs and security polish:** Addition of response `summary` field, example `dataValue`/`serializedValue` fields, reusable `components.mediaTypes`, server `name`, `$self` fields, OAuth device flows, metadata URLs, and URI-referenced schemes all streamline governance. Adopt them incrementally; every feature is opt-in.
 
-Ready for the deep dive? Head to "What's new in OpenAPI 3.2?" for implementation examples and notes.
+Ready for the deep dive? Head to [What's new in OpenAPI 3.2?](#whats-new-in-openapi-32) for implementation examples and notes.
 
 ### Should you upgrade?
 
-**Upgrade now if**
+**Upgrade now if:**
 
-- Your docs currently rely on `x-displayName`/`x-tagGroups` or you want cleaner nested navigation.
-- You expose streaming APIs (SSE, JSON Lines, multipart feeds) or MCP connectors and want generators to understand them.
-- Security reviews would benefit from the OAuth device flow, metadata URLs, or scheme deprecation signals.
-- You plan to publish reusable media type definitions or need a canonical `$self` URL for multi-document specs.
+- Your docs currently rely on `x-displayName` / `x-tagGroups` or you want cleaner nested navigation
+- You expose streaming APIs (SSE, JSON Lines, multipart feeds) or MCP connectors and want generators to understand them
+- Security reviews would benefit from the OAuth device flow, metadata URLs, or scheme deprecation signals
+- You plan to publish reusable media type definitions or need a canonical `$self` URL for multi-document specs
 
-**Hold off if**
+**Hold off if:**
 
-- Your tooling pipeline cannot yet parse `query` operations, the `querystring` parameter location, or the new Example fields.
-- You are mid-migration from OpenAPI 2.0 or 3.0 and prefer to stabilize on 3.1 before adopting new keywords.
-- Third-party consumers depend on current vendor extensions and need time to add support for the standardized fields.
+- Your tooling pipeline cannot yet parse `query` operations, the `querystring` parameter location, or the new example fields
+- You are mid-migration from OpenAPI 2.0 or 3.0 and prefer to stabilize on 3.1 before adopting new keywords
+- Third-party consumers depend on current vendor extensions and need time to add support for the standardized fields
 
 ## OpenAPI 3.2 vs 3.0
 
-If you're still on OpenAPI 3.0, moving straight to 3.2 lets you skip an intermediate upgrade while adopting both the 3.1 JSON Schema alignment and the 3.2 usability improvements. 3.1.0 was a mostly iterative release, with some breaking changes, whereas 3.2.0 is a feature release.
+If you're still on OpenAPI 3.0, moving straight to 3.2 lets you skip an intermediate upgrade while adopting both the OpenAPI 3.1 JSON Schema alignment and the OpenAPI 3.2 usability improvements. OpenAPI 3.1.0 was a mostly iterative release, with some breaking changes, whereas 3.2.0 is a feature release.
 
 ## OpenAPI 3.1 vs 3.0
 
@@ -99,11 +99,11 @@ If your OpenAPI definition spans multiple files, the entry document is the file 
 
 ## What's new in OpenAPI 3.2?
 
-OpenAPI 3.2.0 folds years of community extensions directly into the specification. Use this deep dive when you're ready to implement the changes. The sections below walk through the navigation metadata, streaming semantics, and security tooling with snippets and migration tips.
+OpenAPI 3.2.0 folds years of community extensions directly into the specification. Use this deep dive when you're ready to implement the changes. The sections below walk through the navigation metadata, streaming semantics, and security tooling, including snippets and migration tips.
 
 ### Hierarchical tags and navigation metadata
 
-Tag objects now ship with the `summary`, `parent`, and `kind` fields so documentation tools can build nested navigation without relying on `x-displayName` or `x-tagGroups`. The optional `kind` field works with the OpenAPI registry to keep category names consistent across docs, and it lets you earmark tags for specific audiences (docs-only, SDK badges, internal tooling) without polluting navigation. As you migrate, consider contributing new `kind` values back to the community registry so other teams can reuse the same taxonomy.
+Tag objects now ship with the `summary`, `parent`, and `kind` fields, so documentation tools can build nested navigation without relying on `x-displayName` or `x-tagGroups`. The optional `kind` field works with the OpenAPI registry to keep category names consistent across docs, and it lets you earmark tags for specific audiences (docs-only, SDK badges, internal tooling) without polluting navigation. As you migrate, consider contributing new `kind` values back to the community registry, so other teams can reuse the same taxonomy.
 
 ```yaml
 tags:
@@ -118,13 +118,13 @@ tags:
 
 You can mix these standard fields with existing vendor extensions while your tooling catches up.
 
-### Server-Sent Events (SSE), MCP streams, and other streaming media types
+### SSE, MCP streams, and other streaming media types
 
-OpenAPI 3.2 makes Server-Sent Events (SSE) a first-class citizen. Describe each message with `itemSchema` and tooling will treat the response as a stream rather than an opaque blob. The same technique covers `application/jsonl`, `application/json-seq`, and multipart payloads, and you can adjust chunk boundaries with `prefixEncoding` and `itemEncoding`. If you ship Model Context Protocol (MCP) connectors over SSE, you can now keep the stream contract in the same OpenAPI document as the rest of the API.
+OpenAPI 3.2 makes Server-Sent Events (SSE) a first-class citizen. Describe each message with `itemSchema`, and tooling will treat the response as a stream rather than an opaque blob. The same technique covers `application/jsonl`, `application/json-seq`, and multipart payloads, and you can adjust chunk boundaries with `prefixEncoding` and `itemEncoding`. If you ship Model Context Protocol (MCP) connectors over SSE, you can now keep the stream contract in the same OpenAPI document as the rest of the API.
 
 The spec explicitly recognizes `text/event-stream`, `application/jsonl`, `application/json-seq`, and `multipart/mixed`, which gives generators consistent guidance for chat, AI, IoT, and financial-data feeds that were previously awkward to document.
 
-With the stream semantics defined in OpenAPI, MCP server generators can wire up REST setup endpoints and SSE tool channels from one source instead of juggling separate manifests.
+With the stream semantics defined in OpenAPI, MCP server generators can wire up REST setup endpoints and SSE tool channels from one source, instead of juggling separate manifests.
 
 ```yaml
 content:
@@ -144,19 +144,19 @@ content:
         contentType: image/png
 ```
 
-With `itemSchema` in place, documentation portals can render example SSE payloads line-by-line, and client SDKs can surface typed callbacks such as `onPriceUpdate` without additional vendor extensions. You can also pre-register shared SSE schemas under `components.mediaTypes` to keep event definitions consistent across multiple endpoints.
+With `itemSchema` in place, documentation portals can render example SSE payloads line-by-line, and client SDKs can surface typed callbacks, such as `onPriceUpdate`, without additional vendor extensions. You can also pre-register shared SSE schemas under `components.mediaTypes` to keep event definitions consistent across multiple endpoints.
 
 #### SSE authoring checklist
 
-- Model each SSE field (`event`, `id`, `retry`, `data`) in the schema so consumers know which keys to expect.
+- Model each SSE field (`event`, `id`, `retry`, and `data`) in the schema, so consumers know which keys to expect.
 - Document reconnection behavior by pairing the SSE response with `Last-Event-ID` headers or query parameters.
 - Add an example showing the literal wire format (`serializedValue`) alongside the structured `dataValue` object that will be parsed by the client.
 - Mention compatible client tooling (for example, browsers' `EventSource` API or server frameworks) in accompanying guides to capture discovery traffic.
-- If your API powers MCP connectors, note the tool IDs or channel names so agent builders can map SSE topics to MCP tools without hunting through extra docs.
+- If your API powers MCP connectors, note the tool IDs or channel names, so agent builders can map SSE topics to MCP tools without hunting through extra docs.
 
 ### HTTP operation and parameter updates
 
-3.2 expands HTTP coverage with a dedicated `query` method and an `additionalOperations` bucket for less common verbs. The `query` verb formalizes safe, idempotent payload-driven lookups so you no longer have to overload `POST` to support complex search builders. Parameters can target the entire `querystring`, letting you model structured filters as a single Schema Object, `allowReserved` works wherever percent-encoding would normally apply, and cookies gain a purpose-built `cookie` style that preserves delimiters.
+OpenAPI 3.2 expands HTTP coverage with a dedicated `query` method and an `additionalOperations` bucket for less common verbs. The `query` verb formalizes safe, idempotent payload-driven lookups, so you no longer have to overload `POST` to support complex search builders. Parameters can target the entire `querystring`, letting you model structured filters as a single Schema Object, `allowReserved` works wherever percent-encoding would normally apply, and cookies gain a purpose-built `cookie` style that preserves delimiters.
 
 ```yaml
 paths:
@@ -181,7 +181,7 @@ paths:
 
 ### Examples, responses, and documentation polish
 
-The example object gains `dataValue` and `serializedValue` fields so you can show both structured data and the literal payload. Responses now support a short `summary` and no longer require `description`, and `components.mediaTypes` lets you register reusable content definitions. A new `name` field for servers plus the top-level `$self` URI make multi-environment docs easier to navigate.
+The Example Object gains `dataValue` and `serializedValue` fields, so you can show both structured data and the literal payload. Responses now support a short `summary` and no longer require `description`, and `components.mediaTypes` lets you register reusable content definitions. A new `name` field for servers, plus the top-level `$self` URI, make multi-environment docs easier to navigate.
 
 ```yaml
 components:
