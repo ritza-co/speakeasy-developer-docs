@@ -53,7 +53,7 @@ OpenAPI 3.2.0 builds on the JSON Schema 2020-12 alignment introduced in 3.1.0. I
 OpenAPI 3.2 keeps the OpenAPI 3.1 descriptions valid while unlocking several headline upgrades. Here's what changes for teams planning the move:
 
 - **Navigation metadata:** Standard tag fields (`summary`, `parent`, and `kind`) replace the common `x-displayName` / `x-tagGroups` pattern. You can keep existing vendor extensions for backwards compatibility, but update doc toolchains so they favor the official fields.
-- **Streaming support:** The `itemSchema`, `prefixEncoding`, and sequential media type guidance makes SSE, JSON Lines (JSONL), and MCP channels first-class citizens. Preview how your generators or SDKs render stream payloads before switching production specs.
+- **Streaming support:** The addition of `itemSchema`, `prefixEncoding`, and sequential media type guidance makes SSE, JSON Lines (JSONL), and MCP channels first-class citizens. Preview how your generators or SDKs render stream payloads before switching production specs.
 - **HTTP coverage:** The new `query` operation, `additionalOperations`, and `querystring` parameter location align the spec with real-world verbs and encodings. Check linters and gateways for compatibility — old keywords still work, but new ones may require upgrades.
 - **Docs and security polish:** Addition of response `summary` field, example `dataValue`/`serializedValue` fields, reusable `components.mediaTypes`, server `name`, `$self` fields, OAuth device flows, metadata URLs, and URI-referenced schemes all streamline governance. Adopt them incrementally; every feature is opt-in.
 
