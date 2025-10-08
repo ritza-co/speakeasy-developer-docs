@@ -109,7 +109,7 @@ For centralized monitoring across multiple server instances, [FastMCP Cloud](htt
 
 ### Server-level monitoring with Sentry
 
-Server-level monitoring tracks your MCP server's overall health: error rates, uptime, resource usage. Sentry captures errors with full context, showing you what was happening when failures occurred. You can instrument MCP tool calls for distributed tracing using @sentry/node v8 (manual instrumentation example below):
+Server-level monitoring tracks your MCP server's overall health: error rates, uptime, resource usage. Sentry captures errors with full context, showing you what was happening when failures occurred. You can instrument MCP tool calls for distributed tracing using @sentry/node (manual instrumentation example below):
 
 ```ts
 import * as Sentry from "@sentry/node";
