@@ -109,7 +109,7 @@ For centralized monitoring across multiple server instances, [FastMCP Cloud](htt
 
 ### Server-level monitoring with Sentry
 
-Server-level monitoring tracks your MCP server's overall health: error rates, uptime, resource usage. Sentry captures errors with full context, showing you what was happening when failures occurred. If you're using the TypeScript MCP SDK, Sentry added native MCP support that automatically instruments tool calls with distributed tracing:
+Server-level monitoring tracks your MCP server's overall health: error rates, uptime, resource usage. Sentry captures errors with full context, showing you what was happening when failures occurred. You can instrument MCP tool calls for distributed tracing using @sentry/node v8 (manual instrumentation example below):
 
 ```ts
 import * as Sentry from "@sentry/node";
@@ -122,16 +122,17 @@ const registerTool = (server, name, schema, handler) => {
           name: `mcp.tool/${name}`,
           attributes: {
             "tool.name": name,
-            "tool.params": JSON.stringify(args)
+            // Avoid logging raw tool parameters; sanitize or omit sensitive input
+            "tool.params_present": args != null
           }
         },
         async (span) => {
           try {
             const result = await handler(args);
-            span.setStatus({ code: 1 }); // success
+            span.setAttribute("tool.status", "success");
             return result;
           } catch (err) {
-            span.setStatus({ code: 2 }); // error
+            span.setAttribute("tool.status", "error");
             Sentry.captureException(err);
             throw err;
           }
@@ -177,7 +178,7 @@ from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExport
 
 # MONITOR: Check if user enabled telemetry (disabled by default)
 TELEMETRY_ENABLED = os.getenv("MCP_TELEMETRY_ENABLED", "false").lower() == "true"
-TELEMETRY_ENDPOINT = os.getenv("MCP_TELEMETRY_ENDPOINT", "https://your-telemetry-endpoint.com")
+TELEMETRY_ENDPOINT = os.getenv("MCP_TELEMETRY_ENDPOINT", "https://your-telemetry-endpoint")
 
 if TELEMETRY_ENABLED:
     # MONITOR: Initialize OpenTelemetry only when user opts in
@@ -221,7 +222,7 @@ Users need to know what data you collect and how to control it. You can document
 MCP_TELEMETRY_ENABLED=false
 ```
 
-You should allow the user of your MCP server to set the value to True or False when configuring the MCP server. For a complete OpenTelemetry implementation with multiple language examples, see [SigNoz's guide on MCP observability](https://signoz.io/blog/mcp-observability-with-otel/).
+You should allow users of your MCP server to enable or disable telemetry in configuration. For a complete OpenTelemetry implementation with multiple language examples, see [SigNoz's guide on MCP observability](https://signoz.io/blog/mcp-observability-with-otel/).
 
 ## What to avoid monitoring
 
