@@ -3,7 +3,7 @@ title: Using Google Sheet with MCP quickstart
 description: Learn how to connect the open-source MCP Google Sheets to Claude Desktop.
 ---
 
-This guide shows you how to connect your Google Sheet data to Claude Desktop using the Model Context Protocol (MCP). Once connected, you can create a document, list documents, edit the spreadsheet, and manipulate columns and rows. 
+This guide shows you how to connect your Google Sheet data to Claude Desktop using the Model Context Protocol (MCP). Once connected, you can create a document, list documents, edit the spreadsheet, and manipulate columns and rows.
 
 With this setup, you can ask Claude "summarize the Q3 financial report" or "add a row for John's $15K sale" without switching to Google Sheets. You stay in one interface instead of opening multiple tabs.
 
@@ -13,7 +13,7 @@ With this setup, you can ask Claude "summarize the Q3 financial report" or "add 
 
 - A [Google Cloud](https://cloud.google.com) account.
 
-- An MCP client like [Claude Destkop](https://claude.ai/download).
+- An MCP client like [Claude Desktop](https://claude.ai/download).
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) Python package manager is installed on your machine.
 
 ## Setting up Google Cloud configuration
@@ -24,7 +24,7 @@ This server requires Google Cloud credentials, specifically an OAuth configurati
 
 ### Enable the APIs
 
-In the GCP console, navigate to **APIs & Services** -> **Library**.
+In the GCP console, navigate to **APIs & Services -> Library**.
 
 ![Navigate to APIs & Services](./assets/apis-services-navigation.png)
 
@@ -35,44 +35,44 @@ Search and enable the following APIs:
 
 ### Enabling OAuth
 
-On the GCP console, navigate to **APIs & Services** -> **OAuth consent screen**. 
+On the GCP console, navigate to **APIs & Services -> OAuth consent screen**.
 
 ![OAuth consent screen navigation](./assets/oauth-consent-screen-navigation.png)
 
-Click **Get started**, enter `MCP Sheets` as the application name, and select an email address.
+Click **Get started**, enter `MCP Sheets` as the application name, and select a support email address. Click **Next**.
 
 ![Entering name and selecting email address](./assets/oauth-app-name-setup.png)
 
-Select **External** for the the Audience.
+Select **External** for the Audience. Click **Next**.
 
 ![Select External for audience](./assets/oauth-external-audience.png)
 
-Create the project and navigate to the **Data access** page. 
+Enter your contact email and agree to the user data policy. Finish creating the project and navigate to the **Data access** page.
 
 ![Data access navigating](./assets/oauth-data-access-navigation.png)
 
-Click on **Add or remove scopes** and add the following scopes: 
+Click on **Add or remove scopes** and add the following scopes:
 
 - **https://wwww.googleapis.com/auth/spreadsheets**
 - **https://wwww.googleapis.com/auth/drive**
 
 ![OAuth scopes selection](./assets/oauth-scopes-selection.png)
 
-Save the page to validate the changes.
+Click **Update** and then **Save** the page to validate the changes.
 
 ![Adding scopes](./assets/oauth-scopes-added.png)
 
 ### Adding OAuth credentials
 
-In the GCP console, navigate to **APIs & Services** -> **Credentials**.
+In the GCP console, navigate to **APIs & Services -> Credentials**.
 
 ![Navigate to credentials](./assets/credentials-navigation.png)
 
-Click the **+ Create credentials** then the **Oauth client ID** option.
+Click on **+ Create credentials** then select the **Oauth client ID** option.
 
 ![Create OAuth client ID](./assets/create-oauth-client-id.png)
 
-Select Desktop app for Application type and name it **MCP Sheet Desktop App**.
+Select "Desktop app" for Application type and name it **MCP Sheet Desktop App**.
 
 ![Desktop app configuration](./assets/desktop-app-configuration.png)
 
@@ -80,15 +80,15 @@ Create the OAuth client and download the JSON file.
 
 ![Download OAuth credentials](./assets/oauth-credentials-download.png)
 
-Add your email address to the test users list at **APIs & Services** -> **OAuth consent screen** -> **Audience** -> **Test users**. Click **Add Users**, enter your email address, and click **Save**. Without this, authentication will fail when you connect Claude Desktop if your app is in testing mode.
+Add your email address to the test users list at **APIs & Services -> OAuth consent screen -> Audience -> Test users**. Click **Add Users**, enter your email address, and click **Save**. Without this, authentication will fail when you connect Claude Desktop if your app is in testing mode.
 
 ## Adding the MCP Google Sheets server in Claude Desktop
 
 Now update your Claude Desktop configuration to include the MCP server.
 
-In **Settings**, go to **Developer** > **Edit Config**.
+In **Settings**, go to **Developer -> Edit Config**.
 
-![Claude Desktop configuration settings](./assets/claude-desktop-config-settings.3d29fda6.png)
+![Claude Desktop configuration settings](./assets/claude-desktop-config-settings.png)
 
 In the `claude_desktop_config.json` file, add this configuration:
 
@@ -107,9 +107,9 @@ In the `claude_desktop_config.json` file, add this configuration:
 }
 ```
 
-Replace `CREDENTIALS_PATH` with the path to your downloaded OAuth credentials. Replace `TOKEN_PATH` with the absolute path where the token will be stored. No need to pre-create the file, just ensure the directory is writable. The token can be in the same directory as the credentials file.RetryClaude does not have the ability to run the code it generates yet.
+Replace `CREDENTIALS_PATH` with the path to your downloaded OAuth credentials. Replace `TOKEN_PATH` with the absolute path where the token will be stored. Ensure Claude has write access to the specified path. On macOS, you may need to enable this access under **Privacy & Security -> Files & Folders -> Claude**. The token can be in the same directory as the credentials file.
 
-Reload Claude Desktop. You'll be redirected to a login page. Validate and select all services for MCP Auth access.
+Restart Claude Desktop. You'll be redirected to a login page. Validate and select all services for MCP Auth access.
 
 ![Google authentication validation](./assets/google-auth-validation.png)
 
