@@ -7,12 +7,21 @@ This guide shows you how to connect your Google Sheet data to Claude Desktop usi
 
 With this setup, you can ask Claude "summarize the Q3 financial report" or "add a row for John's $15K sale" without switching to Google Sheets. You stay in one interface instead of opening multiple tabs.
 
-<video src="./assets/demo.mp4" controls=""></video>
+
+<video
+  controls={true}
+  autoPlay={true}
+  muted={true}
+  loop={true}
+  width="100%"
+  className="mt-4 mb-4"
+>
+  <source src="/assets/demo.mp4" type="video/mp4" />
+</video>
 
 ## Prerequisites
 
 - A [Google Cloud](https://cloud.google.com) account.
-
 - An MCP client like [Claude Desktop](https://claude.ai/download).
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) Python package manager is installed on your machine.
 
@@ -30,8 +39,8 @@ In the GCP console, navigate to **APIs & Services -> Library**.
 
 Search and enable the following APIs:
 
-- **Google Sheets API**
-- **Google Drive API**
+- Google Sheets API
+- Google Drive API
 
 ### Enabling OAuth
 
@@ -53,8 +62,8 @@ Enter your contact email and agree to the user data policy. Finish creating the 
 
 Click on **Add or remove scopes** and add the following scopes:
 
-- **https://wwww.googleapis.com/auth/spreadsheets**
-- **https://wwww.googleapis.com/auth/drive**
+- `https://wwww.googleapis.com/auth/spreadsheets`
+- `https://wwww.googleapis.com/auth/drive`
 
 ![OAuth scopes selection](./assets/oauth-scopes-selection.png)
 
