@@ -22,6 +22,17 @@ Google doesn't provide an official MCP server. You'll use [mcp-google-sheets](ht
 
 This server requires Google Cloud credentials, specifically an OAuth configuration JSON file with necessary permissions configured.
 
+### Enable the APIs
+
+In the GCP console, navigate to **APIs & Services** -> **Library**.
+
+![Navigate to APIs & Services](./assets/apis-services-navigation.png)
+
+Search and enable the following APIs:
+
+- **Google Sheets API**
+- **Google Drive API**
+
 ### Enabling OAuth
 
 On the GCP console, navigate to **APIs & Services** -> **OAuth consent screen**. 
@@ -36,16 +47,14 @@ Select **External** for the the Audience.
 
 ![Select External for audience](./assets/oauth-external-audience.png)
 
-> **Note:** Add your email address to the test users list. Without this, authentication will fail when you connect Claude Desktop.
-
 Create the project and navigate to the **Data access** page. 
 
 ![Data access navigating](./assets/oauth-data-access-navigation.png)
 
 Click on **Add or remove scopes** and add the following scopes: 
 
-- **.../auth/spreadsheets**
-- **.../auth/drive**
+- **https://wwww.googleapis.com/auth/spreadsheets**
+- **https://wwww.googleapis.com/auth/drive**
 
 ![OAuth scopes selection](./assets/oauth-scopes-selection.png)
 
@@ -70,6 +79,8 @@ Select Desktop app for Application type and name it **MCP Sheet Desktop App**.
 Create the OAuth client and download the JSON file.
 
 ![Download OAuth credentials](./assets/oauth-credentials-download.png)
+
+Add your email address to the test users list at **APIs & Services** -> **OAuth consent screen** -> **Audience** -> **Test users**. Click **Add Users**, enter your email address, and click **Save**. Without this, authentication will fail when you connect Claude Desktop if your app is in testing mode.
 
 ## Adding the MCP Google Sheets server in Claude Desktop
 
@@ -96,7 +107,7 @@ In the `claude_desktop_config.json` file, add this configuration:
 }
 ```
 
-Replace `CREDENTIALS_PATH` with the path to your downloaded OAuth credentials. Replace `TOKEN_PATH` with the absolute path where the token will be stored. The token can be in the same directory as the credentials file.
+Replace `CREDENTIALS_PATH` with the path to your downloaded OAuth credentials. Replace `TOKEN_PATH` with the absolute path where the token will be stored. No need to pre-create the file, just ensure the directory is writable. The token can be in the same directory as the credentials file.RetryClaude does not have the ability to run the code it generates yet.
 
 Reload Claude Desktop. You'll be redirected to a login page. Validate and select all services for MCP Auth access.
 
