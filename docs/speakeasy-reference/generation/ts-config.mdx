@@ -188,6 +188,25 @@ typescript:
 />
 
 
+## Property naming configuration
+
+```yml
+typescript:
+  modelPropertyCasing: "camel"
+```
+
+<Table
+  data={[
+    { property: "modelPropertyCasing", description: "Controls the casing of model property names in generated TypeScript types. Options: `camel` (camelCase) or `snake` (snake_case).", type: "string", default: "camel" }
+  ]}
+  columns={[
+    { key: "property", header: "Property" },
+    { key: "description", header: "Description" },
+    { key: "type", header: "Type" },
+    { key: "default", header: "Default" }
+  ]}
+/>
+
 ## Error and response handling
 
 ```yml
@@ -197,11 +216,30 @@ typescript:
   enumFormat: "union"
 ```
 
-<Table 
+<Table
   data={[
     { property: "[responseFormat](/docs/customize/responses/responses)", description: "Defines how responses are structured. Options: `envelope`, `envelope-http`, or `flat`.", type: "string", default: "envelope-http" },
     { property: "enumFormat", description: "Determines how enums are generated. Options: `enum` (TypeScript enums) or `union` (union types).", type: "string", default: "union" },
     { property: "clientServerStatusCodesAsErrors", description: "Treats `4XX` and `5XX` status codes as errors. Set to `false` to treat them as normal responses.", type: "boolean", default: "true" }
+  ]}
+  columns={[
+    { key: "property", header: "Property" },
+    { key: "description", header: "Description" },
+    { key: "type", header: "Type" },
+    { key: "default", header: "Default" }
+  ]}
+/>
+
+## Server-sent events configuration
+
+```yml
+typescript:
+  sseFlatResponse: true
+```
+
+<Table 
+  data={[
+    { property: "sseFlatResponse", description: "When enabled, hoists the `data` field content to the top level for server-sent events, eliminating the need to destructure data from yielded items. Consumers can directly access the data without additional parsing.", type: "boolean", default: "true" }
   ]}
   columns={[
     { key: "property", header: "Property" },
