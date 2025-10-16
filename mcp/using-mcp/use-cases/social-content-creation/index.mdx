@@ -59,18 +59,18 @@ Your marketing team likely has a keyword strategy, specific terms you want to ta
 
 You could use the Google Sheets MCP server from the quickstart [guide](/mcp/using-mcp/google-sheet-claude-quickstart), but that's overkill:
 
-- Claude only needs to read the spreadsheet. 
+- Claude only needs to read the spreadsheet.
 - The Google Sheets MCP server exposes 15+ operations when you need three at most. For internal data, building your own API gives you better control over privacy and security.
 
 If you already have an API, make sure you have an OpenAPI document. You can create an MCP server by uploading the OpenAPI document to Gram.
 
-For this guide, we've built a basic Google Sheets API with three operations: reading sheet data, listing sheets, and getting spreadsheet details. Clone the [example repository](https://github.com/ritza-co/speakeasy-examples/pull/15), follow the `README` to deploy it and generate an OpenAPI document, then continue to the next section.
+For this guide, we've built a basic Google Sheets API with three operations: reading sheet data, listing sheets, and getting spreadsheet details. Clone the [example repository](https://github.com/speakeasy-api/examples/tree/main/google-sheet-mcp-server-api), follow the `README` to host it and generate an OpenAPI document, then continue to the next section.
 
 ### Creating the internal Google Sheet MCP server on Gram
 
-Gram generates MCP servers from OpenAPI documents and handles hosting. Upload your OpenAPI document, configure your environment variables, and the server is ready.
+[Gram](https://getgram.ai/) generates MCP servers from OpenAPI documents and handles hosting. Upload your OpenAPI document, configure your environment variables, and the server is ready.
 
- [Sign up for Gram]([https://getgram.ai](https://getgram.ai/)) and follow these steps:
+[Sign up for Gram](https://getgram.ai/) and follow these steps:
 
 - On the [**Toolsets** page](https://docs.getgram.ai/build-mcp/create-default-toolset), upload your Google Sheets API's OpenAPI document.
 
@@ -84,11 +84,11 @@ Gram generates MCP servers from OpenAPI documents and handles hosting. Upload yo
 
 ### Install the MCP server in Claude Desktop
 
-In your Google Sheets Internal toolset's MCP tab, copy the **Managed Authentication** configuration.
+In your Google Sheets toolset's MCP tab, click the **View** button on the **MCP Installation** section to view the installation configuration.
 
-![Use Managed authentication](./assets/authentication-on-gram-choice.png.png)
+![Use Managed authentication](./assets/authentication-on-gram-choice.png)
 
-Open Claude Desktop, navigate to **Settings** → **Developer**, and click **Edit Config**. Open the `claude_desktop_config.json` file, paste the **Managed Authentication** configuration from Gram, and replace `<your-key-here>` with your Gram API key.
+Open Claude Desktop, navigate to **Settings** → **Developer**, and click **Edit Config**. Open the `claude_desktop_config.json` file, paste the installation configuration from Gram, and replace `<your-key-here>` with your Gram API key. Your configuration will be similar to the one below.
 
 ```json
 {
@@ -114,13 +114,13 @@ Open Claude Desktop, navigate to **Settings** → **Developer**, and click **Edi
 Restart Claude Desktop, open a new chat, and verify the integration by asking Claude to create posts based on your SEO keywords:
 
 ```txt
-Find threads in the #threads channel that have 🚀 emoji reactions. Read those thread messages, analyze the key points, then check for the SEO keywords spreadsheet file using the GramGoogleSheetsInternal MCP server, and create engaging X posts using the Postiz MCP server.
+Find threads in the #threads channel that have 🚀 emoji reactions. Read those thread messages, analyze the key points, then check for the SEO keywords spreadsheet file using the GramGoogleSheets MCP server, and create engaging X posts using the Postiz MCP server.
 ```
 
 ![Testing Google Sheet integration](./assets/testing-the-google-sheet-integration.png)
 
 ## Conclusion
 
-Clause can now automatically turn your best Slack threads into social media posts by finding threads marked with 🚀 reactions. With the Google Sheets MCP integration, Claude Desktop ensures your content targets your priority keywords.
+Claude can now automatically turn your best Slack threads into social media posts by finding threads marked with 🚀 reactions. With the Google Sheets MCP integration, Claude Desktop ensures your content targets your priority keywords.
 
 Customize this workflow to suit your team's needs and skills. For example, telling Claude to focus on messages from specific channels or users may help it create content that resonates with your audience.
