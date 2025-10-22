@@ -34,7 +34,7 @@ We'll use Gram to create a curated set of MCP tools from the HubSpot API, and co
 
 ### What is Gram?
 
-[Gram](https://gram.ai) allows you to convert APIs into MCP tools and host them as MCP servers. Instead of building your own MCP servers from scratch, you can upload OpenAPI documentation to Gram, and it automatically generates MCP-compatible tools that AI agents can call. You can then curate these tools into focused toolsets for specific use cases.
+[Gram](https://app.getgram.ai/) allows you to convert APIs into MCP tools and host them as MCP servers. Instead of building your own MCP servers from scratch, you can upload OpenAPI documentation to Gram, and it automatically generates MCP-compatible tools that AI agents can call. You can then curate these tools into focused toolsets for specific use cases.
 
 In this case, instead of exposing HubSpot's entire CRM API to the IT helpdesk agent, you can create a toolset with just the ticket-related operations you need. For Slack functionality, we'll use a dedicated Slack MCP server that provides messaging capabilities.
 
@@ -70,7 +70,11 @@ In this section, we'll:
 
 Let's create the HubSpot Tickets MCP tools. We'll use an altered version of the HubSpot API for fetching ticket details because the [official HubSpot OpenAPI spec](https://developers.hubspot.com/docs/api/crm/tickets) requires modification before it can be used with token-based authentication in Gram.
 
-First, upload the [modified HubSpot OpenAPI document](https://github.com/ritza-co/taskmaster-realtime-agent-demo/blob/main/openapi/custom-hubspot-openapi.json) and name it `HubSpot Tickets`.
+Navigate to **MCP** in the sidebar and click **Get Started**.
+
+![Navigate to MCP and click Get Started](./assets/navigate-to-mcp-get-started.png)
+
+Upload the [modified HubSpot OpenAPI document](https://github.com/ritza-co/taskmaster-realtime-agent-demo/blob/main/openapi/custom-hubspot-openapi.json) and name it `HubSpot Tickets`.
 
 **Important:** Ensure the name `HubSpot Tickets` is spelled correctly, as this affects the environment variable naming convention. The server name gets converted to `HUBSPOT_TICKETS_BEARER_AUTH` in the environment variables.
 
@@ -205,13 +209,13 @@ In the **Realtime Agent Demo** app, navigate to the **Settings** page and paste 
 ```json
 {
   "mcpServers": {
-    "GramTechsupporttoolset": {
+    "tech-support": {
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://app.getgram.ai/mcp/<your-gram-hubspot-endpoint>",
+        "https://app.getgram.ai/mcp/<your-gram-endpoint>",
         "--header",
-        "MCP-HUBSPOT-TICKETS-BEARER-AUTH:<your-hubspot-private-app-token>"
+        "Mcp-Hubspot-Tickets-Bearer-Auth:<your-hubspot-private-app-token>"
       ]
     },
     "Slack": {
@@ -223,9 +227,9 @@ In the **Realtime Agent Demo** app, navigate to the **Settings** page and paste 
         "stdio"
       ],
       "env": {
-             "SLACK_MCP_XOXC_TOKEN": "xoxc-...",
-             "SLACK_MCP_XOXD_TOKEN": "xoxd-..."
-           }
+        "SLACK_MCP_XOXC_TOKEN": "xoxc-...",
+        "SLACK_MCP_XOXD_TOKEN": "xoxd-..."
+      }
     }
   }
 }
@@ -236,9 +240,11 @@ In the **Realtime Agent Demo** app, navigate to the **Settings** page and paste 
 
 Replace the placeholders with your actual tokens and endpoint:
 
-- `<your-gram-hubspot-endpoint>`: Your Gram-hosted HubSpot Tickets MCP server endpoint
-- `<your-hubspot-private-app-token>`: Your HubSpot Private App token
+- `<your-gram-endpoint>`: Your Gram MCP endpoint. To find this, navigate to **Toolsets** in the sidebar, click on your **Tech Support** toolset, and look at the URL. The endpoint is the last part of the URL (for example, if the URL is `https://app.getgram.ai/<your-org>/<your-workspace>/toolsets/tech-support`, your endpoint is `tech-support`).
+- `<your-hubspot-private-app-token>`: Your HubSpot Private App token.
 - `SLACK_MCP_XOXC_TOKEN` and `SLACK_MCP_XOXD_TOKEN`: Follow the instructions in the [Slack MCP server documentation on GitHub](https://github.com/korotovsky/slack-mcp-server/blob/master/docs/01-authentication-setup.md).
+
+**Note on naming conventions:** When using `mcp-remote` with Gram, the header format follows a specific pattern. You configured the environment variable in Gram as `HUBSPOT_TICKETS_BEARER_AUTH` (all uppercase with underscores), the header name in the `mcp-remote` configuration uses title case with hyphens: `Mcp-Hubspot-Tickets-Bearer-Auth`. 
 
 If you want to, enable **Logs** and pick a **Codec** (Opus is the default and PCMU/PCMA simulates PSTN). Otherwise, leave the settings as is.
 
