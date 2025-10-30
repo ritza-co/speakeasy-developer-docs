@@ -63,33 +63,33 @@ The token value starts with `xoxd-`. Save this somewhere.
 
 ## Downloading the DXT file
 
-Claude Desktop supports MCP installations using DXT files. The [`slack-mcp-server`](https://github.com/korotovsky/slack-mcp-server) releases provide DXT files you can install in Claude Desktop. Download the release file on [GitHub](https://github.com/username/slack-mcp-server/releases).
+Claude Desktop supports MCP installations using DXT files. The [`slack-mcp-server`](https://github.com/korotovsky/slack-mcp-server) releases provide DXT files you can install in Claude Desktop. Download the release file on [GitHub](https://github.com/korotovsky/slack-mcp-server/releases). The file will have a name like `slack-mcp-server-1.1.26.dxt` (the version number may vary).
 
 ## Installing the MCP server in Claude
 
 Open Claude Desktop and go to **Settings** >  **Extensions** > **Advanced settings**. 
 
-![Navigating to advanced setttings](./assets/navigating-advanced-settings.png)
+![Navigating to advanced setttings](/assets/mcp/using-mcp/slack-claude-quickstart/navigating-advanced-settings.png)
 
 Disable auto-updates for extensions. This prevents Claude from looking for the latest version of the locally installed package in its MCP servers directory, which would cause an error when Claude tries to start the MCP server.
 
-![CleanShot 2025-09-29 at 12.37.15](./assets/disabling-auto-updates.png)
+![CleanShot 2025-09-29 at 12.37.15](/assets/mcp/using-mcp/slack-claude-quickstart/disabling-auto-updates.png)
 
 Scroll down and click on **Install Extension**.
 
-![Installing extension](./assets/installing-dxt-file.png)
+![Installing extension](/assets/mcp/using-mcp/slack-claude-quickstart/installing-dxt-file.png)
 
 Select the downloaded DXT file and validate the installation.
 
-![Validating the installation](/Users/koladev/ritza/speakeasy-developer-docs/mcp/using-mcp/mcp-server-providers/assets/validating-the-installation.png)
+![Validating the installation](/assets/mcp/using-mcp/slack-claude-quickstart/validating-the-installation.png)
 
 On the configuration page, set the authentication method to `xoxc/xoxd` as you're using browser-based tokens. Fill in the values for the `xoxc-` and `xoxd-` tokens.
 
-![Setting tokens](./assets/setting-tokens.png)
+![Setting tokens](/assets/mcp/using-mcp/slack-claude-quickstart/setting-tokens.png)
 
 Enable the extension after saving the changes.
 
-![Enabling extension](./assets/enabling-extension.png)
+![Enabling extension](/assets/mcp/using-mcp/slack-claude-quickstart/enabling-extension.png)
 
 To test that the connection is working, ask Claude to list the current channels in your Slack workspace.
 
