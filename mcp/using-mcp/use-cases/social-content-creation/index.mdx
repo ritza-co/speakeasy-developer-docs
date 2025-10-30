@@ -55,7 +55,7 @@ Claude schedules the posts using Postiz, so you can review them at [platform.pos
 
 ## Adding keyword targeting with Google Sheets and Gram
 
-Your marketing team likely has a keyword strategy, specific terms you want to target in social content. Instead of manually checking if Slack conversations mention these keywords, you can store them in a Google Sheet, in a Google Drive folder, and have Claude reference them automatically.
+Your marketing team likely has a keyword strategy for including specific terms they want to target in social content. Instead of manually checking if Slack conversations mention these keywords, you can store them in a Google Sheet (in a Google Drive folder) and have Claude reference them automatically.
 
 You could use the Google Sheets MCP server from the quickstart [guide](/mcp/using-mcp/google-sheet-claude-quickstart), but that's overkill:
 
@@ -64,31 +64,31 @@ You could use the Google Sheets MCP server from the quickstart [guide](/mcp/usin
 
 If you already have an API, make sure you have an OpenAPI document. You can create an MCP server by uploading the OpenAPI document to Gram.
 
-For this guide, we've built a basic Google Sheets API with three operations: reading sheet data, listing sheets, and getting spreadsheet details. Clone the [example repository](https://github.com/speakeasy-api/examples/tree/main/google-sheet-mcp-server-api), follow the `README` to host it and generate an OpenAPI document, then continue to the next section.
+For this guide, we've built a basic Google Sheets API with three operations: reading sheet data, listing sheets, and getting spreadsheet details. Clone the [example repository](https://github.com/speakeasy-api/examples/tree/main/google-sheet-mcp-server-api), follow the `README` to host it, and generate an OpenAPI document. Then continue to the next section.
 
-### Creating the internal Google Sheet MCP server on Gram
+### Creating the internal Google Sheets MCP server on Gram
 
 [Gram](https://getgram.ai/) generates MCP servers from OpenAPI documents and handles hosting. Upload your OpenAPI document, configure your environment variables, and the server is ready.
 
 [Sign up for Gram](https://getgram.ai/) and follow these steps:
 
-- On the [**Toolsets** page](https://docs.getgram.ai/build-mcp/create-default-toolset), upload your Google Sheets API's OpenAPI document.
+- On the [**Toolsets** page](https://docs.getgram.ai/build-mcp/create-default-toolset), upload the OpenAPI document for your Google Sheets API.
 
 - Create a toolset named `Google Sheets Tools` and enable the tools you need.
 
   ![Enabling tools](./assets/enabling-tools.png)
 
-- In the [**Auth** tab](https://docs.getgram.ai/concepts/environments), set `SERVER_URL` to your deployed API's URL. If you're running the API locally, expose it with [ngrok](https://ngrok.com/) by running `ngrok http 127.0.0.1:8000` and using the forwarding URL for `SERVER_URL`.
+- In the [**Auth** tab](https://docs.getgram.ai/concepts/environments), set `SERVER_URL` to your deployed API's URL. If you're running the API locally, expose it with [ngrok](https://ngrok.com/) by running `ngrok http 127.0.0.1:8000` and use the forwarding URL for `SERVER_URL`.
 
 - In **Settings**, create a [Gram API key](https://docs.getgram.ai/concepts/api-keys).
 
 ### Install the MCP server in Claude Desktop
 
-In your Google Sheets toolset's MCP tab, click the **View** button on the **MCP Installation** section to view the installation configuration.
+In your Google Sheets toolset's **MCP** tab, click the **View** button on the **MCP Installation** section to view the installation configuration.
 
 ![Use Managed authentication](./assets/authentication-on-gram-choice.png)
 
-Open Claude Desktop, navigate to **Settings** → **Developer**, and click **Edit Config**. Open the `claude_desktop_config.json` file, paste the installation configuration from Gram, and replace `<your-key-here>` with your Gram API key. Your configuration will be similar to the one below.
+Open Claude Desktop, navigate to **Settings** → **Developer**, and click **Edit Config**. Open the `claude_desktop_config.json` file, paste the installation configuration from Gram, and replace `<your-key-here>` with your Gram API key. Your configuration will be similar to the following example:
 
 ```json
 {
