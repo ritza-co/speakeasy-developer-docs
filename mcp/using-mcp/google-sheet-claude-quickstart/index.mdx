@@ -1,11 +1,11 @@
 ---
-title: Using Google Sheet with MCP quickstart
+title: Using Google Sheets with MCP quickstart
 description: Learn how to connect the open-source MCP Google Sheets to Claude Desktop.
 ---
 
-This guide shows you how to connect your Google Sheet data to Claude Desktop using the Model Context Protocol (MCP). Once connected, you can create a document, list documents, edit the spreadsheet, and manipulate columns and rows.
+This guide shows you how to connect your Google Sheets data to Claude Desktop using the Model Context Protocol (MCP). Once connected, you can create, list, and edit spreadsheets, as well as manipulate columns and rows within specific spreadsheets.
 
-With this setup, you can ask Claude "summarize the Q3 financial report" or "add a row for John's $15K sale" without switching to Google Sheets. You stay in one interface instead of opening multiple tabs.
+With this setup, you can ask Claude to *"Summarize the Q3 financial report,"* or *"Add a row for John's $15K sale,"* without switching to Google Sheets. This allows you to stay in one interface instead of opening multiple tabs.
 
 
 <video
@@ -21,9 +21,11 @@ With this setup, you can ask Claude "summarize the Q3 financial report" or "add 
 
 ## Prerequisites
 
-- A [Google Cloud](https://cloud.google.com) account.
-- An MCP client like [Claude Desktop](https://claude.ai/download).
-- [uv](https://docs.astral.sh/uv/getting-started/installation/) Python package manager is installed on your machine.
+To follow this quickstart guide, you need:
+
+- A [Google Cloud](https://cloud.google.com) account
+- An MCP client like [Claude Desktop](https://claude.ai/download)
+- The [uv](https://docs.astral.sh/uv/getting-started/installation/) Python package manager installed on your machine
 
 ## Setting up Google Cloud configuration
 
@@ -33,7 +35,7 @@ This server requires Google Cloud credentials, specifically an OAuth configurati
 
 ### Enable the APIs
 
-In the GCP console, navigate to **APIs & Services -> Library**.
+In the Google Cloud Platform (GCP) console, navigate to **APIs & Services -> Library**.
 
 ![Navigate to APIs & Services](./assets/apis-services-navigation.png)
 
@@ -60,10 +62,10 @@ Enter your contact email and agree to the user data policy. Finish creating the 
 
 ![Data access navigating](./assets/oauth-data-access-navigation.png)
 
-Click on **Add or remove scopes** and add the following scopes:
+Click **Add or remove scopes** and add the following scopes:
 
-- `https://wwww.googleapis.com/auth/spreadsheets`
-- `https://wwww.googleapis.com/auth/drive`
+- `https://www.googleapis.com/auth/spreadsheets`
+- `https://www.googleapis.com/auth/drive`
 
 ![OAuth scopes selection](./assets/oauth-scopes-selection.png)
 
@@ -77,11 +79,11 @@ In the GCP console, navigate to **APIs & Services -> Credentials**.
 
 ![Navigate to credentials](./assets/credentials-navigation.png)
 
-Click on **+ Create credentials** then select the **Oauth client ID** option.
+Click on **+ Create credentials** then select the **OAuth client ID** option.
 
 ![Create OAuth client ID](./assets/create-oauth-client-id.png)
 
-Select "Desktop app" for Application type and name it **MCP Sheet Desktop App**.
+Select **Desktop app** for **Application type** and name it `MCP Sheet Desktop App`.
 
 ![Desktop app configuration](./assets/desktop-app-configuration.png)
 
@@ -89,7 +91,7 @@ Create the OAuth client and download the JSON file.
 
 ![Download OAuth credentials](./assets/oauth-credentials-download.png)
 
-Add your email address to the test users list at **APIs & Services -> OAuth consent screen -> Audience -> Test users**. Click **Add Users**, enter your email address, and click **Save**. Without this, authentication will fail when you connect Claude Desktop if your app is in testing mode.
+Add your email address to the test users list at **APIs & Services -> OAuth consent screen -> Audience -> Test users**. Click **Add Users**, enter your email address, and click **Save**. Without this, authentication will fail when you connect to Claude Desktop if your app is in testing mode.
 
 ## Adding the MCP Google Sheets server in Claude Desktop
 
@@ -134,4 +136,4 @@ Ask Claude to create a new spreadsheet with a template for an annual user growth
 
 ## Conclusion
 
-Claude can now create and update Google spreadsheets through natural language. Explore other MCP servers in the [official MCP servers repository](https://github.com/modelcontextprotocol/servers) to connect more tools.
+You can now use Claude to create and update Google spreadsheets through natural language. Explore other MCP servers in the [official MCP servers repository](https://github.com/modelcontextprotocol/servers) to connect more tools.
