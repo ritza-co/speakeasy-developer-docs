@@ -51,13 +51,13 @@ To follow this guide, you need:
 - Node.js 18+ (for the Realtime agent app)
 - An OpenAI API key (for accessing Realtime + Responses)
 - A Gram account
-- HubSpot Private App token (for accessing service tickets)
-- Slack authentication token (xoxp user token or xoxc/xoxd browser tokens)
+- A HubSpot Private App token (for accessing service tickets)
+- A Slack authentication token (xoxp user token or xoxc/xoxd browser tokens)
 - npm or npx installed for running the Slack MCP server
 
 ## Set up the MCP servers
 
-Before we can set up the IT helpdesk AI agent, we need to configure the MCP servers it will connect to.
+Before we can set up the IT helpdesk AI agent, we need to configure the MCP servers that it will connect to.
 
 In this section, we'll:
 
@@ -202,7 +202,7 @@ Open the app by navigating to http://localhost:3000 in your browser.
 
 ### Connect the MCP servers to the Realtime voice agent
 
-Now, let's configure both the HubSpot and Slack MCP servers in the app.
+Now, let's configure both the HubSpot MCP server and the Slack MCP server in the app.
 
 In the **Realtime Agent Demo** app, navigate to the **Settings** page and paste the following code in the **Remote MCP Configuration** field:
 
@@ -239,10 +239,10 @@ In the **Realtime Agent Demo** app, navigate to the **Settings** page and paste 
 
 ![Realtime agents settings page](./assets/realtime-agents-settings-page.png)
 
-Replace the placeholders with your actual tokens and endpoint:
+Replace the placeholders with your actual tokens and endpoint.
 
-- `<your-gram-endpoint>`: Your Gram MCP endpoint. To find this, navigate to **Toolsets** in the sidebar, click on your **Tech Support** toolset, and look at the URL. The endpoint is the last part of the URL (for example, if the URL is `https://app.getgram.ai/<your-org>/<your-workspace>/toolsets/tech-support`, your endpoint is `tech-support`).
-- `<your-hubspot-private-app-token>`: Your HubSpot Private App token.
+- `<your-gram-endpoint>`: To find your Gram MCP endpoint, navigate to **Toolsets** in the sidebar, click on your **Tech Support** toolset, and look at the URL. The endpoint is the last part of the URL (for example, if the URL is `https://app.getgram.ai/<your-org>/<your-workspace>/toolsets/tech-support`, your endpoint is `tech-support`).
+- `<your-hubspot-private-app-token>`: Use your HubSpot Private App token.
 - `SLACK_MCP_XOXC_TOKEN` and `SLACK_MCP_XOXD_TOKEN`: Follow the instructions in the [Slack MCP server documentation on GitHub](https://github.com/korotovsky/slack-mcp-server/blob/master/docs/01-authentication-setup.md).
 
 **Note on naming conventions:** When using `mcp-remote` with Gram, the header format follows a specific pattern. You configured the environment variable in Gram as `HUBSPOT_TICKETS_BEARER_AUTH` (all uppercase with underscores), the header name in the `mcp-remote` configuration uses title case with hyphens: `Mcp-Hubspot-Tickets-Bearer-Auth`. 
@@ -297,6 +297,6 @@ Your helpdesk just got a lot more helpful.
 
 - [Gram](https://getgram.ai)
 - [The OpenAI Realtime Agent SDK](https://platform.openai.com/docs/guides/voice-agents?voice-agent-architecture=speech-to-speech)
-- [Slack MCP Server](https://github.com/korotovsky/slack-mcp-server)
+- [The Slack MCP Server](https://github.com/korotovsky/slack-mcp-server)
 - [Tool curation: Why less is more for MCP](/mcp/building-servers/less-is-more)
 - [Advanced tool curation with Gram](https://docs.getgram.ai/build-mcp/advanced-tool-curation)
