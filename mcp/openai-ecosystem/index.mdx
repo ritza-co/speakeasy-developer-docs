@@ -16,12 +16,12 @@ OpenAI offers two main paths for building agents. The code-first route gives you
 You'll likely start with one and migrate to the other, or run both in parallel. Here's how they compare:
 
 |                  | Code-first APIs                                             | No-code builders                                             |
-| ---------------- | ----------------------------------------------------------- | ------------------------------------------------------------ |
+|------------------|-------------------------------------------------------------|--------------------------------------------------------------|
 | Control level    | Total control over prompts, state, infrastructure           | Configuration only, OpenAI hosts                             |
 | Who maintains it | Developers                                                  | Product managers, support staff, operations, also developers |
 | Tool integration | Call any external service via code                          | Use built-in connectors or workspace-approved integrations   |
 | When to use      | Custom apps, compliance-driven workloads, advanced copilots | Fast pilots, embedded assistants, business-run automations   |
-| Key products     | Responses API, Realtime API, Agents API, Agents SDK         | AgentKit, ChatGPT GPT Builder, Workflows, Operator           |
+| Key products     | Responses API, Realtime API, Agents SDK                     | AgentKit, ChatGPT GPT Builder, Workflows, Operator           |
 
 The rest of this guide digs into each path and explains how they work.
 
@@ -40,30 +40,34 @@ Here's a basic example calling the Responses API directly:
 ```ts
 import OpenAI from "openai";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-const response = await openai.responses.create({
-  model: "gpt-5",
-  input: "What's the weather in San Francisco?",
-  tools: [
-    {
-      type: "function",
-      function: {
-        name: "get_weather",
-        description: "Get current weather for a location",
-        parameters: {
-          type: "object",
-          properties: {
-            location: { type: "string" },
-          },
-          required: ["location"],
-        },
-      },
-    },
-  ],
-});
+async function main() {
+    const response = await openai.responses.create({
+        model: "gpt-5",
+        input: "What's the weather in San Francisco?",
+        tools: [
+            {
+                name: "get_weather",
+                type: "function",
+                function: {
+                    description: "Get current weather for a location",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            location: { type: "string" },
+                        },
+                        required: ["location"],
+                    },
+                },
+            },
+        ],
+    });
 
-console.log(response.output_text);
+    console.log(response.output_text);
+}
+
+main();
 ```
 
 
@@ -79,7 +83,7 @@ The diagram below shows the Realtime API architecture. Your application establis
 
 This architecture enables natural voice interactions. The model can ask clarifying questions, call tools to fetch data, and respond with synthesized speech in real time without breaking the conversation flow.
 
-Check out our [Realtime Agents MCP Use Case guide](/using-mcp) for an example of how to build a voice assistant with the Realtime API.
+Check out our [Realtime Agents MCP Use Case guide](/mcp/using-mcp) for an example of how to build a voice assistant with the Realtime API.
 
 ### Agents API: managed orchestration and state
 
@@ -171,7 +175,7 @@ This visual approval workflow works well for code reviews. A reviewer can ask Co
 
 ## Building agents without code
 
-When you want distribution, guardrails, or quick experiments, you reach for these tools. These are great for non-technical users who want to launch agents without touching source control.
+When you want distribution, guardrails, or quick experiments, you reach for these tools. These are great for non-technical users who want to launch agents without touching source code.
 
 ### AgentKit: visual agent building
 
@@ -224,7 +228,7 @@ ChatKit handles user identity automatically. Pass a `userId` and the assistant r
 
 #### ChatKit Studio
 
-A visual interface for building and configuring ChatKit instances without code. The Studio lets you configure models, instructions, data sources, tools, and UI themes, with a live preview panel to test the assistant before deploying.
+A visual interface for building and configuring ChatKit instances without code. The studio lets you configure models, instructions, data sources, tools, and UI themes, with a live preview panel to test the assistant before deploying.
 
 ![ChatKit Studio interface](./assets/chatkit-studio.png)
 
@@ -241,9 +245,9 @@ MCP servers connect to ChatGPT via remote endpoints using Server-Sent Events (SS
 
 #### Atlas Browser
 
-OpenAI launched ChatGPT Atlas in October 2025, a Chromium browser with ChatGPT built into the browsing experience. 
+OpenAI launched ChatGPT Atlas in October 2025, a Chromium-based browser with ChatGPT built into the browsing experience.
 
-Agent mode (available for Plus, Pro, and Business users) lets ChatGPT work autonomously within the browser, researching topics, automating tasks, planning events, or booking appointments while you browse. 
+Agent mode (available for Plus, Pro, and Business users) lets ChatGPT work autonomously within the browser, researching topics, automating tasks, planning events, or booking appointments while you browse.
 
 Atlas also has first-class support for ChatGPT connectors as well as Apps SDK-based integrations.
 
@@ -322,7 +326,7 @@ For internal tools, skip OAuth and rely on ChatGPT's workspace auth. If an admin
 
 #### WidgetKit
 
-Built on top of the Apps SDK, WidgetKit lets you return rich UI components from your MCP tools instead of plain text. When ChatGPT calls your tool, you respond with interactive widgets: data tables, forms, charts, or custom visualizations. The user sees these rendered directly in the ChatGPT interface.
+Built on top of the Apps SDK, WidgetKit lets you return rich UI components from your MCP tools instead of plain text. When ChatGPT calls your tool, it responds with interactive widgets: data tables, forms, charts, or custom visualizations. The user sees these rendered directly in the ChatGPT interface.
 
 ![WidgetKit builder interface](./assets/widget-builder.png)
 
