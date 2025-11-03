@@ -85,11 +85,13 @@ This architecture enables natural voice interactions. The model can ask clarifyi
 
 Check out our [Realtime Agents MCP Use Case guide](/mcp/using-mcp) for an example of how to build a voice assistant with the Realtime API.
 
-### Agents API: managed orchestration and state
+### Agents SDK: orchestration in code
 
-The Agents API is the successor to the legacy Assistants API. It handles multi-step workflows, persistent state, and evaluation traces. Unlike the Responses API (which is stateless), the Agents API stores conversation history, tool outputs, and run metadata for you.
+The Agents SDK is for developers who want to define agent logic in code rather than configuration. It works with the Responses API and Realtime API, and lets you programmatically define workflows in Python (with Node.js support coming). The SDK is open source, so you can version control your agent definitions and test them locally before deploying.
 
-**How it works:** You create an agent by defining its instructions, tool catalog, and model. Then you create a thread (a conversation) and add messages to it. When you run the thread, the agent executes: reads the messages, calls tools as needed, and generates a response. The API stores all of this, so you can resume the thread later or inspect what happened.
+**How it works:** You define agents with instructions, tool catalogs, and models in code. The SDK handles multi-step workflows, persistent state, and evaluation traces. Unlike the stateless Responses API, the SDK manages conversation history, tool outputs, and run metadata for you.
+
+Here's a basic example:
 
 ```python
 import asyncio
@@ -130,23 +132,17 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-**Run steps and tool calls:** The Agents API exposes run steps, which show you exactly what the agent did during a run: which tools it called, what parameters it used, and what the tools returned. This is critical for debugging and evaluation. You can inspect failed runs to see which tool timed out or which LLM call hallucinated.
+**Run steps and tool calls:** The SDK exposes run steps, which show you exactly what the agent did during execution: which tools it called, what parameters it used, and what the tools returned. This is critical for debugging and evaluation. You can inspect failed runs to see which tool timed out or which LLM call hallucinated.
 
-Run steps also let you forward tool calls to MCP servers. When the agent decides to call a tool, the API pauses the run and emits a `requires_action` status. Your code reads the tool name and parameters, calls your MCP server (via stdio or HTTP), and submits the tool output back to the API. The agent resumes and continues the workflow.
+Run steps also let you forward tool calls to MCP servers. When the agent decides to call a tool, you read the tool name and parameters, call your MCP server (via stdio or HTTP), and submit the tool output back. The agent resumes and continues the workflow.
 
-**Multi-model runs:** The Agents API switches models mid-run. For example, start with GPT-5-mini for simple questions, but if the agent determines it needs deeper reasoning, it escalates to GPT-5. This saves cost on routine queries while maintaining quality for complex cases.
+**Multi-model runs:** The SDK can switch models mid-run. For example, start with GPT-5-mini for simple questions, but if the agent determines it needs deeper reasoning, it escalates to GPT-5. This saves cost on routine queries while maintaining quality for complex cases.
 
-**Evaluation traces:** The API logs every decision the agent makes: which tools it considered, which it rejected, what prompts it sent to the model, and what responses it received. These traces feed into the Evals framework (covered later) so you can benchmark agent performance, spot regressions, and fine-tune instructions.
-
-**Migration from legacy Assistants:** Legacy Assistants remains online for projects still using built-in file search or code interpreter, but new features land in the Agents API first. If you're migrating, expect two main differences: the new API uses the same tool schema as Responses, and run steps expose richer event data for debugging and evaluation.
-
-### Agents SDK
-
-The Agents SDK is for developers who want to define agent logic in code rather than configuration. It works with both the Responses API and the Agents API, and lets you programmatically define flows in Python (with Node.js support coming). The SDK is open source and integrates with the API, so you can version control your agent definitions and test them locally before deploying.
-
-You define agent behaviors, tool schemas, and orchestration logic in code. The SDK handles the runtime details: maintaining conversation state, routing between tools, and managing multi-step workflows. This is useful when you want full programmatic control but don't want to manage all the plumbing yourself.
+**Evaluation traces:** The SDK logs every decision the agent makes: which tools it considered, which it rejected, what prompts it sent to the model, and what responses it received. These traces can help you benchmark agent performance, spot regressions, and fine-tune instructions.
 
 **MCP integration:** The Agents SDK uses the same tool schema as MCP, so you can define your tool catalog once and reference it from both your SDK agents and your MCP servers. When an agent needs to call a tool, you can delegate to an MCP server via stdio or HTTP, keeping your agent logic portable across runtimes.
+
+> **Note:** OpenAI also offers the Assistants API, a REST API for building assistants with threads and runs. The Assistants API is being deprecated in 2026 in favor of the Responses API, which will incorporate all assistant features. For new projects, use the Agents SDK for code-based workflows or the Responses API for stateless interactions.
 
 ### Codex: AI for software development
 
@@ -253,9 +249,9 @@ Atlas also has first-class support for ChatGPT connectors as well as Apps SDK-ba
 
 ![ChatGPT Atlas](assets/chatgpt-atlas.png)
 
-### WidgetKit and Apps SDK: from limited tools to full dev support
+### Widget Builder and Apps SDK: from limited tools to full dev support
 
-ChatGPT's development story started with `/search` and `/fetch` as the only tools available for deep research. Today, that's evolved into full developer support through WidgetKit and the Apps SDK.
+ChatGPT's development story started with `/search` and `/fetch` as the only tools available for deep research. Today, that's evolved into full developer support through Widget Builder and the Apps SDK.
 
 #### Apps SDK
 
@@ -324,11 +320,11 @@ The `context` object gives you access to the authenticated user, their workspace
 
 For internal tools, skip OAuth and rely on ChatGPT's workspace auth. If an admin registers your app in a Team or Enterprise workspace, the SDK trusts that all users in that workspace are authorized.
 
-#### WidgetKit
+#### Widget Builder
 
-Built on top of the Apps SDK, WidgetKit lets you return rich UI components from your MCP tools instead of plain text. When ChatGPT calls your tool, it responds with interactive widgets: data tables, forms, charts, or custom visualizations. The user sees these rendered directly in the ChatGPT interface.
+Built on top of the Apps SDK, Widget Builder lets you return rich UI components from your MCP tools instead of plain text. When ChatGPT calls your tool, it responds with interactive widgets: data tables, forms, charts, or custom visualizations. The user sees these rendered directly in the ChatGPT interface.
 
-![WidgetKit builder interface](./assets/widget-builder.png)
+![Widget Builder interface](./assets/widget-builder.png)
 
 Widgets bind to data using placeholders like `{{task.title}}` that fill in when your tool returns results. You can rapidly develop widgets using the low-code Widget Builder.
 
@@ -383,7 +379,7 @@ OpenAI's model names shift frequently. As of early 2025, the main families are:
 - **GPT-5-nano:** The smallest, cheapest model in the family. Fast responses for simple queries.
 - **GPT-5-codex-high, GPT-5-codex-medium, GPT-5-codex-low:** Specialized models for code generation and software development tasks. High offers the most accuracy, low prioritizes speed.
 
-All these models are available through the Responses API, Agents API, and ChatGPT (depending on your tier). The codex variants power the Codex developer tools. Pricing varies by model. Route expensive models through a dedicated MCP tool to audit usage.
+All these models are available through the Responses API and ChatGPT (depending on your tier). The codex variants power the Codex developer tools. Pricing varies by model. Route expensive models through a dedicated MCP tool to audit usage.
 
 ### Creative endpoints: images, audio, video
 
@@ -422,7 +418,7 @@ Define your tool schema once, register it in ChatGPT Team workspaces and Claude 
 
 ### Web search: built-in tools and Deep Research
 
-**Responses API web search:** The Responses API includes a `web_search` tool that you enable per account. Pass the tool in your request, and the model decides when to use it. When triggered, the API returns responses with URL citations and source annotations. This tool works across the Responses API and Agents API.
+**Responses API web search:** The Responses API includes a `web_search` tool that you enable per account. Pass the tool in your request, and the model decides when to use it. When triggered, the API returns responses with URL citations and source annotations.
 
 ![OpenAI built-in search and fetch tools](./assets/openai-built-in-tools.png)
 
@@ -440,7 +436,7 @@ OpenAI's offerings cluster into several pricing tiers. Here's a snapshot as of e
 
 ### API pay-as-you-go
 
-Required for Responses API, Realtime API, Agents API, embeddings, vector stores, fine-tuning, batch jobs, and creative endpoints. You pay per token or per request, with pricing varying by model.
+Required for Responses API, Realtime API, Assistants API, embeddings, vector stores, fine-tuning, batch jobs, and creative endpoints. You pay per token or per request, with pricing varying by model.
 
 Most regions require a verified billing method and a $5 prepayment to activate the account. Reasoning models (`o1`, `o3`) cost significantly more per token. Route them through a dedicated MCP tool to audit usage.
 
@@ -456,7 +452,7 @@ Pricing is per search query (roughly $10 per 1,000 searches). To avoid this cost
 
 If you're a developer, start by building MCP servers that expose your own tools and data sources. Create servers that query your databases, call your internal APIs, access your file systems, or integrate with services you use (GitHub, Stripe, CRMs). Define each tool using JSON Schema, handle authentication, and test locally before deploying. This gives you a reusable catalog of tools that works across Claude, Cursor, ChatGPT, and any other MCP-compatible runtime.
 
-If you're building a platform, decide whether to centralize tools in the Agents API or expose them directly through ChatGPT workspaces with the Apps SDK. A common approach is both: maintain one MCP catalog that powers both API-driven agents and workspace GPTs.
+If you're building a platform, decide whether to centralize tools using the Agents SDK or expose them directly through ChatGPT workspaces with the Apps SDK. A common approach is both: maintain one MCP catalog that powers both SDK-driven agents and workspace GPTs.
 
 For ChatGPT Team or Enterprise, register your MCP servers in the workspace so every GPT inherits them automatically. This model means you approve tools once and they become available everywhere, including ChatKit embeds and the desktop apps.
 
