@@ -73,7 +73,9 @@ Open Claude Desktop and go to **Settings** >  **Extensions** > **Advanced settin
 
 Disable auto-updates for extensions. This prevents Claude from looking for the latest version of the locally installed package in its MCP servers directory, which would cause an error when Claude tries to start the MCP server.
 
-![CleanShot 2025-09-29 at 12.37.15](/assets/mcp/using-mcp/slack-claude-quickstart/disabling-auto-updates.png)
+If you run into server connection issues during installation, you may need to disable the **Use Built-in Node.js for MCP** option.
+
+![Disabling auto-updates for extensions](/assets/mcp/using-mcp/slack-claude-quickstart/disabling-auto-updates.png)
 
 Scroll down and click on **Install Extension**.
 
@@ -102,6 +104,37 @@ In Claude Desktop, start a new chat. Click the **Search and tools** button to se
 Add reaction emojis to messages in your Slack workspace, then ask Claude to show you messages with reactions to test the server's reaction-reading functionality.
 
 ![Slack messages with reactions displayed in Claude](/assets/mcp/using-mcp/slack-claude-quickstart/slack-messages-with-reactions.png)
+
+## Troubleshooting
+
+If you encounter issues setting up the Slack MCP server, the following solutions address common problems.
+
+### DXT file installation fails
+
+If the DXT file fails to install:
+
+- Disable the **Use Built-in Node.js for MCP** option in **Settings** > **Extensions** > **Advanced settings**
+- Ensure auto-updates for extensions are disabled
+- Download the latest DXT file from the [GitHub releases page](https://github.com/korotovsky/slack-mcp-server/releases)
+- Restart Claude Desktop and attempt the installation again
+
+### MCP server not working after installation
+
+If the Slack MCP server doesn't appear or fails to start:
+
+- Verify both the `xoxc` and `xoxd` tokens are correctly entered in the configuration
+- Check that the extension is enabled in **Settings** > **Extensions**
+- Restart Claude Desktop to reload the extension
+- Update Claude Desktop to the latest version if the issue persists
+
+### Claude can't access Slack channels
+
+If Claude cannot list channels or access Slack data:
+
+- Log into Slack in your browser to verify your session is still active
+- Regenerate both tokens following the steps in "Getting your Slack `xoxc` and `xoxd` auth tokens"
+- Update the token values in the extension configuration
+- Disable and re-enable the extension to refresh the connection
 
 ## Conclusion
 
