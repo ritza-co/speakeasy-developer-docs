@@ -36,11 +36,11 @@ Instead of connecting to the Slack API, which would require admin access, we'll 
 
 To get the `xoxc` token:
 
-1. Open the Slack workspace in your browser.
-2. Open the developer console by pressing `Ctrl+Shift+I` (`Cmd+Option+I` on macOS) or `F12`.
-3. Switch to the **Console** tab.
-4. Type "allow pasting" into the console and press `Enter`.
-5. Paste the following snippet into the console and press `Enter`:
+* Open the Slack workspace in your browser.
+* Open the developer console by pressing `Ctrl+Shift+I` (`Cmd+Option+I` on macOS) or `F12`.
+* Switch to the **Console** tab.
+* Type "allow pasting" into the console and press `Enter`.
+* Paste the following snippet into the console and press `Enter`:
 
    ```text
    JSON.parse(localStorage.localConfig_v2).teams[document.location.pathname.match(/^\/client\/([A-Z0-9]+)/)[1]].token
@@ -52,10 +52,10 @@ The token will be returned in the console. It starts with `xoxc-`. Save this som
 
 To get the `xoxd` token:
 
-1. Switch to the **Application** tab (**Storage** in Firefox and Safari).
-2. In the sidebar, under **Storage**, click **Cookies**.
-3. Find the cookie named `d` in the table.
-4. Copy the cookie's value to the clipboard.
+* Switch to the **Application** tab (**Storage** in Firefox and Safari).
+* In the sidebar, under **Storage**, click **Cookies**.
+* Find the cookie named `d` in the table.
+* Copy the cookie's value to the clipboard.
 
 ![Developer tools cookies panel showing how to locate and copy the Slack xoxd authentication token](/assets/mcp/using-mcp/slack-claude-quickstart/slack-xoxd-token-cookie.png)
 
@@ -63,7 +63,9 @@ The token value starts with `xoxd-`. Save this somewhere.
 
 ## Downloading the DXT file
 
-Claude Desktop supports MCP installations using DXT files. The [`slack-mcp-server`](https://github.com/korotovsky/slack-mcp-server) releases provide DXT files you can install in Claude Desktop. Download the release file on [GitHub](https://github.com/korotovsky/slack-mcp-server/releases). The file will have a name like `slack-mcp-server-1.1.26.dxt` (the version number may vary).
+Claude Desktop supports MCP installations using DXT files. The [`slack-mcp-server`](https://github.com/korotovsky/slack-mcp-server) releases provide DXT files you can install in Claude Desktop.
+
+Download the release file from [GitHub](https://github.com/korotovsky/slack-mcp-server/releases). It will have a name like `slack-mcp-server-1.1.26.dxt` (the version number may vary).
 
 ## Installing the MCP server in Claude
 
@@ -85,23 +87,23 @@ Select the downloaded DXT file and validate the installation.
 
 ![Validating the installation](/assets/mcp/using-mcp/slack-claude-quickstart/validating-the-installation.png)
 
-On the configuration page, set the authentication method to `xoxc/xoxd` as you're using browser-based tokens. Fill in the values for the `xoxc-` and `xoxd-` tokens.
+On the configuration page, set the authentication method to `xoxc/xoxd` (because you're using browser-based tokens) and fill in the values for the `xoxc-` and `xoxd-` tokens.
 
 ![Setting tokens](/assets/mcp/using-mcp/slack-claude-quickstart/setting-tokens.png)
 
-Enable the extension after saving the changes.
+Enable the extension after saving your changes.
 
 ![Enabling extension](/assets/mcp/using-mcp/slack-claude-quickstart/enabling-extension.png)
 
-To test that the connection is working, ask Claude to list the current channels in your Slack workspace.
+To test the connection, ask Claude to list the current channels in your Slack workspace.
 
 ## Testing reaction functionality
 
-In Claude Desktop, start a new chat. Click the **Search and tools** button to see the MCP server listed. Enable all tools if needed.
+In Claude Desktop, start a new chat. Click the **Search and tools** button to see the MCP server listed. Enable all tools if necessary.
 
 ![Screenshot showing how to locate the Slack MCP Server in Claude Desktop "Search and tools"](/assets/mcp/using-mcp/slack-claude-quickstart/claude-mcp-server-settings.png)
 
-Add reaction emojis to messages in your Slack workspace, then ask Claude to show you messages with reactions to test the server's reaction-reading functionality.
+Add reaction emojis to messages in your Slack workspace, then ask Claude to show you the messages that have reactions to test the server's reaction-reading functionality.
 
 ![Slack messages with reactions displayed in Claude](/assets/mcp/using-mcp/slack-claude-quickstart/slack-messages-with-reactions.png)
 
@@ -113,28 +115,28 @@ If you encounter issues setting up the Slack MCP server, the following solutions
 
 If the DXT file fails to install:
 
-- Disable the **Use Built-in Node.js for MCP** option in **Settings** > **Extensions** > **Advanced settings**
-- Ensure auto-updates for extensions are disabled
-- Download the latest DXT file from the [GitHub releases page](https://github.com/korotovsky/slack-mcp-server/releases)
-- Restart Claude Desktop and attempt the installation again
+* Disable the **Use Built-in Node.js for MCP** option in Gram, under **Settings** > **Extensions** > **Advanced settings**.
+* Ensure you have disabled auto-updates for extensions in Gram.
+* Download the latest DXT file from the [GitHub releases page](https://github.com/korotovsky/slack-mcp-server/releases).
+* Restart Claude Desktop and attempt the installation again.
 
 ### MCP server not working after installation
 
 If the Slack MCP server doesn't appear or fails to start:
 
-- Verify both the `xoxc` and `xoxd` tokens are correctly entered in the configuration
-- Check that the extension is enabled in **Settings** > **Extensions**
-- Restart Claude Desktop to reload the extension
-- Update Claude Desktop to the latest version if the issue persists
+* Verify that you entered both the `xoxc` and `xoxd` tokens correctly in the configuration.
+* Check that the extension is enabled in Gram, under **Settings** > **Extensions**.
+* Restart Claude Desktop to reload the extension.
+* Update Claude Desktop to the latest version if the issue persists.
 
 ### Claude can't access Slack channels
 
 If Claude cannot list channels or access Slack data:
 
-- Log into Slack in your browser to verify your session is still active
-- Regenerate both tokens following the steps in "Getting your Slack `xoxc` and `xoxd` auth tokens"
-- Update the token values in the extension configuration
-- Disable and re-enable the extension to refresh the connection
+* Log in to Slack in your browser to verify your session is still active.
+* Regenerate both tokens following the steps for [getting your Slack `xoxc` and `xoxd` auth tokens](#getting-your-slack-xoxc-and-xoxd-auth-tokens).
+* Update the token values in the extension configuration.
+* Disable and re-enable the extension to refresh the connection.
 
 ## Conclusion
 
