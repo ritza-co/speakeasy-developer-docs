@@ -1,15 +1,15 @@
 ---
 title: "Slack"
-description: Learn how to connect the open-source Slack MCP Server to Claude Desktop.
+description: Learn how to connect the open-source Slack MCP server to Claude Desktop.
 ---
 
-# Use Slack from your MCP Client
+# Use Slack from your MCP client
 
-This guide demonstrates how to connect your Slack workspace to your MCP Client. 
+This guide demonstrates how to connect your Slack workspace to your MCP client. 
 
 As Slack doesn't provide an official MCP server, and Anthropic's reference implementation was deprecated due to [security vulnerabilities](https://embracethered.com/blog/posts/2025/security-advisory-anthropic-slack-mcp-server-data-leakage/), this guide uses the open-source [`slack-mcp-server`](https://github.com/korotovsky/slack-mcp-server) instead.
 
-After following this guide you'll be able to read and summarize conversations, search message history, and analyze team communications without leaving Claude Desktop or whatever client you prefer. Here's an example where Claude finds all messages with reactions in a specific channel:
+After following this guide you'll be able to read and summarize conversations, search message history, and analyze team communications without leaving Claude Desktop or any other client you prefer. Here's an example where Claude finds all messages with reactions in a specific channel:
 
 <video
   controls={false}
@@ -27,12 +27,12 @@ After following this guide you'll be able to read and summarize conversations, s
 To follow along, you'll need
 
 * A user account on a Slack workspace
-* An MCP Client like Claude Desktop
+* An MCP client like Claude Desktop
 * Ideally some familiarity with editing JSON files and using your browser's developer tools
 
 ## Getting your Slack `xoxc` and `xoxd` auth tokens 
 
-Instead of connecting to the Slack API, which would require admin access, we'll use the browser session tokens to authorize the Slack MCP Server to connect to your Slack workspace. Your MCP client will then have access to anything that you would in Slack. To get these, you'll need to log into your Slack workspace using a browser like Google Chrome.
+Instead of connecting to the Slack API, which would require admin access, we'll use the browser session tokens to authorize the Slack MCP server to connect to your Slack workspace. Your MCP client will then have access to anything that you would in Slack. To get these, you'll need to log into your Slack workspace using a browser like Google Chrome.
 
 To get the `xoxc` token:
 
@@ -101,7 +101,7 @@ To test the connection, ask Claude to list the current channels in your Slack wo
 
 In Claude Desktop, start a new chat. Click the **Search and tools** button to see the MCP server listed. Enable all tools if necessary.
 
-![Screenshot showing how to locate the Slack MCP Server in Claude Desktop "Search and tools"](/assets/mcp/using-mcp/slack-claude-quickstart/claude-mcp-server-settings.png)
+![Screenshot showing how to locate the Slack MCP server in Claude Desktop "Search and tools"](/assets/mcp/using-mcp/slack-claude-quickstart/claude-mcp-server-settings.png)
 
 Add reaction emojis to messages in your Slack workspace, then ask Claude to show you the messages that have reactions to test the server's reaction-reading functionality.
 
