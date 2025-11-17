@@ -28,7 +28,36 @@ Once your Taskmaster MCP server is ready, you can connect it to your IDE. The fo
 
 ## Adding the Gram-hosted MCP server to Cursor
 
-Cursor's built-in configuration interface makes it easy to add and manage MCP servers directly from settings.
+You can install your Gram-hosted MCP server in Cursor using the automated Gram CLI command, or configure it manually.
+
+### Quick Setup with Gram CLI (Recommended)
+
+The easiest way to add your Gram-hosted MCP server to Cursor is using the `gram install` command:
+```bash
+gram install cursor --toolset your-taskmaster-slug
+```
+
+This will open Cursor and prompt you to install the MCP server.
+
+![Gram opening Cursor to install the MCP server](./assets/opening-cursor-to-install-mcp-server.png)
+
+### Setting up authentication
+
+You'll need to configure the `MCP_TASK_MASTER_API_KEY` environment variable for authentication. You can do this in two ways:
+
+**Option 1**: Set it in your shell environment before running the install command:
+```bash
+export MCP_TASK_MASTER_API_KEY='your-api-key-value'
+gram install cursor --toolset your-taskmaster-slug
+```
+
+**Option 2**: Configure it directly in Cursor's MCP configuration screen after installation.
+
+![Screenshot showing the MCP configuration screen in Cursor](./assets/mcp-configuration-screen.png)
+
+### Manual setup
+
+Alternatively, you can configure Cursor manually using the built-in configuration interface.
 
 <div className="flex justify-center">
   <video controls>

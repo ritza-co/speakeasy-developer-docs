@@ -26,12 +26,28 @@ To follow this tutorial, you need:
 
 Before connecting Claude Desktop to a Taskmaster MCP server, you first need to create one. Follow our guide to [creating a Taskmaster MCP server](/docs/gram/examples/creating-taskmaster-mcp-server).
 
-Once your Taskmaster MCP server is ready, there are two ways you can connect it to Claude Desktop:
+Once your Taskmaster MCP server is ready, there are three ways you can connect it to Claude Desktop:
 
+- Use the Gram CLI for automated installation.
 - Use the MCP configuration file in Claude Desktop.
 - Use the Claude Connectors feature to connect directly to your Gram-hosted MCP server.
 
-## Connecting Claude Desktop to your Gram-hosted MCP server using the MCP configuration file
+## Connecting Claude Desktop using the Gram CLI (Recommended)
+
+The easiest way to add your Gram-hosted MCP server to Claude Desktop is using the `gram install` command:
+```bash
+gram install claude-desktop --toolset your-taskmaster-slug
+```
+
+This command generates a `.mcpb` file in your machine Downloads folder that you can open to install the MCP server in Claude Desktop.
+
+### Installing the MCP server
+
+Once the `.mcpb` file is generated, double-click the file to install the MCP server in Claude Desktop. Claude Desktop will prompt you to confirm the installation and set the `MCP_TASKMASTER_API_KEY` environment variable value.
+
+![Screenshot showing the Claude Desktop MCP server installation prompt](/assets/docs/gram/img/guides/claude-desktop/claude-desktop-mcp-install.png)
+
+## Connecting Claude Desktop using the MCP configuration file
 
 <div className="flex justify-center">
   <video controls>
@@ -59,8 +75,7 @@ Select **Developer** from the left sidebar, then click **Edit Config**. This wil
 Add your Taskmaster MCP server configuration to the file.
 
 - For **Pass-through Authentication**, the configuration looks like this:
-
-    ```json
+```json
     {
       "mcpServers": {
         "GramTaskmaster": {
@@ -74,11 +89,10 @@ Add your Taskmaster MCP server configuration to the file.
         }
       }
     }
-    ```
+```
 
 - For a **Managed Authentication** server, the configuration looks like:
-
-    ```json
+```json
     {
       "mcpServers": {
         "GramTaskmaster": {
@@ -95,27 +109,26 @@ Add your Taskmaster MCP server configuration to the file.
         }
       }
     }
-    ```
+```
 
 Replace `your-taskmaster-slug` with your slug from your Taskmaster MCP server configuration and `<your-gram-api-key>` with your Gram API key.
 
-### 4. Test the connection
+### Test the connection
 
 Save the configuration file, then close Claude Desktop completely and reopen it. When the application has restarted, click the hamburger icon in the chat field to see the available tools.
 
 Test the connection by asking:
-
 ```
 Create a new task called "Test MCP connection" with description "Verify that the Taskmaster MCP server is working correctly"
 ```
 
 Claude will use your Gram-hosted MCP server to create a task by calling the Taskmaster API.
 
-## Connecting Claude Desktop to your Gram-hosted MCP server using Claude Connectors
+## Connecting Claude Desktop using Claude Connectors
 
 Claude Connectors allow you to connect Claude Desktop to your Gram-hosted MCP server without manually editing the configuration file. This is more user-friendly, but comes with one important limitation: **Your MCP server must be public** and must not require environment variables.
 
-If you need to use an authenticated server or an environment variable, you need to use the MCP configuration file method described above.
+If you need to use an authenticated server or an environment variable, you need to use the Gram CLI or MCP configuration file method described above.
 
 Here's how to set up a connection using Claude Connectors:
 
@@ -153,21 +166,22 @@ Claude should prompt you with a tool call request. This means the connection is 
 
 ## Deciding which method to use
 
-Both methods connect Claude Desktop to your Gram-hosted MCP server, but they have different use cases:
+All three methods connect Claude Desktop to your Gram-hosted MCP server, but they have different use cases:
 
-- **MCP configuration file:** Use this method if you need to connect to an authenticated MCP server or if you want more control over the configuration.
-- **Claude Connectors:** Use this method for a simpler setup with public MCP servers. It's more user-friendly and doesn't require manual configuration file editing.
+- **Gram CLI:** The recommended method for most users. It provides automated installation and supports both public and authenticated servers.
+- **MCP configuration file:** Use this method if you need more control over the configuration or prefer manual setup.
+- **Claude Connectors:** Use this method for a simpler setup with public MCP servers only. It's user-friendly but doesn't support authenticated servers.
 
 ## Comparison of connection methods
 
-| Attribute/Requirement          | MCP Configuration File | Claude Desktop Connectors |
-|--------------------------------|------------------------|---------------------------|
-| Public MCP server              | ✅                      | ✅                         |
-| Local MCP server               | ✅                      | ❌                         |
-| Supports authenticated server  | ✅                      | ❌                         |
-| Manual configuration needed    | ✅                      | ❌                         |
-| User-friendly setup            | ❌                      | ✅                         |
-| Supports passthrough variables | ✅                      | ❌                         |
+| Attribute/Requirement          | Gram CLI | MCP Configuration File | Claude Desktop Connectors |
+|--------------------------------|----------|------------------------|---------------------------|
+| Public MCP server              | ✅        | ✅                      | ✅                         |
+| Local MCP server               | ✅        | ✅                      | ❌                         |
+| Supports authenticated server  | ✅        | ✅                      | ❌                         |
+| Manual configuration needed    | ❌        | ✅                      | ❌                         |
+| User-friendly setup            | ✅        | ❌                      | ✅                         |
+| Supports passthrough variables | ✅        | ✅                      | ❌                         |
 
 ## Troubleshooting
 
@@ -178,6 +192,7 @@ If you're experiencing issues:
 - Ensure the `npx` command is available (reinstall Node.js if needed).
 - Try restarting Claude Desktop after making configuration changes.
 - For authenticated servers, verify your Gram API key in the dashboard under **Settings > API Keys**.
+- If using the Gram CLI, ensure the `.dxt` file was generated successfully and try opening it again.
 
 ## What's next
 

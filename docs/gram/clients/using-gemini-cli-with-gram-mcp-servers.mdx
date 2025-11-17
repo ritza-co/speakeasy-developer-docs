@@ -30,21 +30,18 @@ To follow this tutorial, you need:
 Use one of the following two options to install Gemini CLI:
 
 - Run it directly with npx.
-
-    ```bash
+```bash
     npx https://github.com/google-gemini/gemini-cli
-    ```
+```
 
 - Install it globally.
-
-    ```bash
+```bash
     npm install -g @google/gemini-cli
-    ```
+```
 
 ## Verifying the installation
 
 Test that Gemini CLI is working:
-
 ```bash
 gemini --help
 ```
@@ -61,7 +58,28 @@ Before connecting Gemini CLI to a Taskmaster MCP server, you first need to creat
 
 ## Connecting Gemini CLI to your Gram-hosted MCP server
 
-Now let's connect Gemini CLI to your Taskmaster MCP server.
+You can connect your Gram-hosted MCP server with Gemini using the automated Gram CLI command, or configure it manually.
+
+### Quick Setup with Gram CLI (Recommended)
+
+The easiest way to add your Gram-hosted MCP server to Gemini CLI is using the `gram install` command:
+```bash
+gram install gemini-cli --toolset your-taskmaster-slug
+```
+
+This command automatically creates or updates your Gemini CLI configuration file with the correct MCP server settings.
+
+#### Setting up authentication
+
+You'll need to configure the `MCP_TASK_MASTER_API_KEY` environment variable for authentication. Set it in your shell environment before running the install command:
+```bash
+export MCP_TASK_MASTER_API_KEY='your-api-key-value'
+gram install gemini-cli --toolset your-taskmaster-slug
+```
+
+### Manual configuration
+
+Alternatively, you can manually configure Gemini CLI by editing the settings file directly.
 
 Gemini CLI uses a `settings.json` configuration file to manage MCP servers. You can configure MCP servers in one of two files:
 
@@ -71,8 +89,7 @@ Gemini CLI uses a `settings.json` configuration file to manage MCP servers. You 
 Copy your public or authenticated MCP server configuration from Gram and add it to the `.gemini/settings.json` file.
 
 - For **Pass-through Authentication**, the configuration looks like this:
-
-    ```json
+```json
     {
       "mcpServers": {
         "GramTaskmaster": {
@@ -86,11 +103,10 @@ Copy your public or authenticated MCP server configuration from Gram and add it 
         }
       }
     }
-    ```
+```
 
 - For a **Managed Authentication** server, the configuration looks like this:
-
-    ```json
+```json
     {
       "mcpServers": {
         "GramTaskmaster": {
@@ -107,7 +123,7 @@ Copy your public or authenticated MCP server configuration from Gram and add it 
         }
       }
     }
-    ```
+```
 
 Replace `your-taskmaster-slug` with the actual slug from your Taskmaster MCP server configuration and `<your-gram-api-key>` with your Gram API key.
 
@@ -116,13 +132,11 @@ Replace `your-taskmaster-slug` with the actual slug from your Taskmaster MCP ser
 ## Verifying the connection
 
 Start Gemini CLI:
-
 ```bash
 gemini
 ```
 
 Then use the `/mcp` command to view the MCP server status:
-
 ```bash
 /mcp
 ```
@@ -149,7 +163,6 @@ Ask Gemini a basic question like, *"Can you create a new task called 'Test MCP c
 ### Testing tool permissions
 
 Ask Gemini to create a new task:
-
 ```
 Create a new task called "Implement user authentication" with description "Add login and registration functionality to the app"
 ```
