@@ -8,10 +8,10 @@ import { Callout } from "@/mdx/components";
 ## Deploy your first ChatGPT App
 
 This walkthrough demonstrates how to build and deploy an interactive ChatGPT App using the OpenAI Apps SDK backed
-by Gram Functions. You'll learn how to:
+by Gram Functions. It covers the following:
 
-- Create a ChatGPT Apps SDK example and use it in your ChatGPT client
-- Serve MCP tools and resources from a hosted Gram Functions MCP Server
+- Creating a ChatGPT Apps SDK example and using it in a ChatGPT client
+- Serving MCP tools and resources from a hosted Gram Functions MCP Server
 
 The finished experience lets a user ask for pizza recommendations, watch ChatGPT
 drop pins onto an interactive map, and keep the conversation flowing — all without
@@ -19,21 +19,20 @@ leaving the chat.
 
 ![Pizza Map widget rendered inside ChatGPT](/assets/docs/gram/img/functions/successful-pizza-map.png)
 
-If you're new to Apps, the official OpenAI
+For those new to Apps, the official OpenAI
 [Apps SDK documentation](https://openai.com/index/introducing-apps-in-chatgpt/)
-provides a great overview of how connectors appear in the product. You can
-view the full code for this pizza example, starting with the pizza-app-gram 
+provides a great overview of how connectors appear in the product. The full code for this pizza example is available in the pizza-app-gram 
 [README](https://github.com/speakeasy-api/openai-apps-sdk-examples/blob/main/pizzaz_server_node/pizza-app-gram/README.md).
 
 The OpenAI Apps SDK gives you a fast way to package tools, resources, and UI
 widgets for ChatGPT. Gram Functions provide the same ergonomic developer
-experience for deployments and observability. In this guide, we'll rebuild the
-Pizza Map sample from the official Apps SDK examples and ship it as a hosted
-Gram MCP server so you can light it up inside ChatGPT in a few minutes.
+experience for deployments and observability. This guide rebuilds the
+Pizza Map sample from the official Apps SDK examples and ships it as a hosted
+Gram MCP server to get it running inside ChatGPT in a few minutes.
 
 ## Enable ChatGPT developer mode
 
-Custom connectors only appear after you enable developer mode in ChatGPT:
+Custom connectors only appear after enabling developer mode in ChatGPT:
 
 - Open [ChatGPT](https://chatgpt.com).
 - Navigate to **Settings → Apps & Connectors → Advanced Settings**.
@@ -46,25 +45,25 @@ Custom connectors only appear after you enable developer mode in ChatGPT:
   for the latest availability details.
 </Callout>
 
-With developer mode enabled, you can install and test the Pizza Map app directly in your ChatGPT sidebar.
+With developer mode enabled, the Pizza Map app can be installed and tested directly in the ChatGPT sidebar.
 
-## What you'll do
+## What this guide covers
 
-This guide teaches you to do the following:
+This guide covers the following:
 
-- Inline the Pizza Map widget so it can be shipped as a Gram function bundle.
-- Deploy the packaged function to Gram.
-- Implement the MCP server that exposes both tools and HTML widget resources.
-- Install your new MCP server in ChatGPT and use it as an app.
+- Inlining the Pizza Map widget so it can be shipped as a Gram function bundle.
+- Deploying the packaged function to Gram.
+- Implementing the MCP server that exposes both tools and HTML widget resources.
+- Installing the MCP server in ChatGPT and using it as an app.
 
 ## Prerequisites
 
-To follow the guide, you need:
+Following this guide requires:
 
 - Node.js 22.18 or later and `pnpm`
 - The Gram CLI (which you can install using the [official guide](/docs/gram/command-line/installation))
 - The OpenAI Apps SDK CLI and an API key that can create ChatGPT Apps
-- Basic familiarity with MCP concepts (like MPC tools and resources)
+- Basic familiarity with MCP concepts (such as MCP tools and resources)
 
 ## Project layout
 
@@ -85,9 +84,9 @@ The sample contains two sibling directories:
 
 ## Inline the widget assets
 
-The base Pizza Map example expects you to host the widget's JS/CSS/HTML from a
+The base Pizza Map example expects the widget's JS/CSS/HTML to be hosted from a
 separate asset server. Gram Functions can proxy that setup, but to keep
-deployment simple, we'll inline everything into a static blob that the MCP server can
+deployment simple, everything can be inlined into a static blob that the MCP server can
 serve directly. The project ships an `inline:app` script that snapshots the
 Pizza Map React UI into a `widget-template.ts` module:
 
@@ -97,40 +96,81 @@ pnpm inline:app
 
 Under the hood, `scripts/build-inlined.ts` walks the Pizza Map web assets, minifies
 them, and writes a `WIDGET_HTML_TEMPLATES` map that the MCP server can read
-without making additional network calls. Rerun the script whenever you touch
-the UI.
+without making additional network calls. Rerun the script whenever the UI changes.
 
 ## Build the MCP server
 
 All of the interesting Apps SDK wiring happens inside
-`pizzaz_server_node/src/mcp-server.ts`. The sample sets up everything you
-need — no edits required — but it helps to understand how the tool and widget are
+`pizzaz_server_node/src/mcp-server.ts`. The sample sets up everything
+needed — no edits required — but it helps to understand how the tool and widget are
 structured. The module defines a single `pizza-map` tool, the HTML resource that
 backs the widget, and enough metadata for ChatGPT to know it can render inline
 UI. Here's the core of that file:
 
 ```typescript filename="pizzaz_server_node/src/mcp-server.ts"
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import {
+  CallToolRequestSchema,
+  ListResourcesRequestSchema,
+  ListToolsRequestSchema,
+  ReadResourceRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { WIDGET_HTML_TEMPLATES } from "./widget-templates.ts";
 
-const widgets = [
+type PizzazWidget = {
+  id: string;
+  title: string;
+  templateUri: string;
+  invoking: string;
+  invoked: string;
+  html: string;
+  responseText: string;
+};
+
+function getWidgetHtml(componentName: string): string {
+  const html = WIDGET_HTML_TEMPLATES[componentName as keyof typeof WIDGET_HTML_TEMPLATES];
+  if (!html) {
+    throw new Error(`Widget HTML template for "${componentName}" not found.`);
+  }
+  return html;
+}
+
+function widgetMeta(widget: PizzazWidget) {
+  return {
+    "openai/outputTemplate": widget.templateUri,
+    "openai/toolInvocation/invoking": widget.invoking,
+    "openai/toolInvocation/invoked": widget.invoked,
+    "openai/widgetAccessible": "true",
+    "openai/resultCanProduceWidget": "true",
+  } as const;
+}
+
+const widgets: PizzazWidget[] = [
   {
     id: "pizza-map",
     title: "Show Pizza Map",
     templateUri: "ui://widget/pizza-map.html",
     invoking: "Hand-tossing a map",
     invoked: "Served a fresh map",
-    html: WIDGET_HTML_TEMPLATES.pizzaz,
+    html: getWidgetHtml("pizzaz"),
     responseText: "Rendered a pizza map!",
   },
 ];
 
+const widgetsById = new Map<string, PizzazWidget>();
+widgets.forEach((widget) => widgetsById.set(widget.id, widget));
+
+const widgetsByUri = new Map<string, PizzazWidget>();
+widgets.forEach((widget) => widgetsByUri.set(widget.templateUri, widget));
+
 const toolInputParser = z.object({ pizzaTopping: z.string() });
 
 export function createPizzazServer(): Server {
-  const server = new Server({ name: "pizzaz-node", version: "0.1.0" }, { capabilities: { resources: {}, tools: {} } });
+  const server = new Server(
+    { name: "pizzaz-node", version: "0.1.0" },
+    { capabilities: { resources: {}, tools: {} } }
+  );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: widgets.map((widget) => ({
@@ -138,31 +178,57 @@ export function createPizzazServer(): Server {
       description: widget.title,
       inputSchema: {
         type: "object",
-        properties: { pizzaTopping: { type: "string", description: "Topping to mention in the widget." } },
+        properties: {
+          pizzaTopping: { type: "string", description: "Topping to mention when rendering the widget." },
+        },
         required: ["pizzaTopping"],
       },
-      _meta: {
-        "openai/outputTemplate": widget.templateUri,
-        "openai/resultCanProduceWidget": "true",
-        "openai/widgetAccessible": "true",
+      _meta: widgetMeta(widget),
+      annotations: {
+        destructiveHint: false,
+        openWorldHint: false,
+        readOnlyHint: true,
       },
     })),
   }));
 
+  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+    resources: widgets.map((widget) => ({
+      uri: widget.templateUri,
+      name: widget.title,
+      description: `${widget.title} widget markup`,
+      mimeType: "text/html+skybridge",
+      _meta: widgetMeta(widget),
+    })),
+  }));
+
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+    const widget = widgetsByUri.get(request.params.uri);
+    if (!widget) {
+      throw new Error(`Unknown resource: ${request.params.uri}`);
+    }
+    return {
+      contents: [
+        {
+          uri: widget.templateUri,
+          mimeType: "text/html+skybridge",
+          text: widget.html,
+          _meta: widgetMeta(widget),
+        },
+      ],
+    };
+  });
+
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
-    const args = toolInputParser.parse(request.params.arguments ?? {});
-    const widget = widgets.find((w) => w.id === request.params.name);
+    const widget = widgetsById.get(request.params.name);
     if (!widget) {
       throw new Error(`Unknown tool: ${request.params.name}`);
     }
+    const args = toolInputParser.parse(request.params.arguments ?? {});
     return {
       content: [{ type: "text", text: widget.responseText }],
       structuredContent: { pizzaTopping: args.pizzaTopping },
-      _meta: {
-        "openai/outputTemplate": widget.templateUri,
-        "openai/toolInvocation/invoking": widget.invoking,
-        "openai/toolInvocation/invoked": widget.invoked,
-      },
+      _meta: widgetMeta(widget),
     };
   });
 
@@ -185,12 +251,15 @@ export const server = createPizzazServer();
 import { withGram } from "@gram-ai/functions/mcp";
 import { server } from "./mcp.ts";
 
-export default withGram(server);
+export default withGram(server, {
+  // Describe environment variables required by the function here. These will be
+  // available to fill in the Gram dashboard and hosted MCP servers.
+});
 ```
 
-Because `withGram` automatically speaks MCP over stdio, you don't have to write
+Because `withGram` automatically speaks MCP over stdio, there is no need to write
 an HTTP transport or worry about session stickiness. Gram handles the hosting,
-authentication, and scaling for you once you've pushed the bundle.
+authentication, and scaling once the bundle is pushed.
 
 ## Build and deploy to Gram
 
@@ -200,8 +269,8 @@ gram auth    # once per machine
 pnpm push    # wraps `gf push` to upload the bundle
 ```
 
-After the push completes, your Gram project exposes a hosted MCP endpoint. Copy
-the connection string (or hosted URL) from the Gram dashboard — you'll need it for
+After the push completes, the Gram project exposes a hosted MCP endpoint. Copy
+the connection string (or hosted URL) from the Gram dashboard — it's needed for
 the Apps SDK transport config in the next step.
 
 ## Create a Gram toolset and an MCP server
@@ -212,7 +281,7 @@ Open the Gram dashboard and wire everything together:
 2. Add the `pizza-map` tool that shipped with your deployment.
 3. Attach the `pizza-map` resource so ChatGPT can fetch the widget HTML.
 
-![Adding the Pizza App tool to your toolset](/assets/docs/gram/img/functions/add-pizza-app-tool.png)
+![Adding the Pizza App tool to the toolset](/assets/docs/gram/img/functions/add-pizza-app-tool.png)
 
 ![Adding the Pizza Map resource to the toolset](/assets/docs/gram/img/functions/add-pizza-map-resource.png)
 
@@ -221,10 +290,10 @@ can reach it over HTTPS.
 
 ![Creating a public Pizza MCP server](/assets/docs/gram/img/functions/create-public-pizza-mcp-server.png)
 
-## Add your MCP server to ChatGPT
+## Add the MCP server to ChatGPT
 
 In ChatGPT, navigate to **Settings → Apps & Connectors**, click **Create**, and
-register a new connector that points to the public Gram MCP endpoint URL you
-just created.
+register a new connector that points to the public Gram MCP endpoint URL
+created in the previous step.
 
 ![Adding the Pizza MCP server inside ChatGPT](/assets/docs/gram/img/functions/app-pizza-app-connector-to-gpt.png)
