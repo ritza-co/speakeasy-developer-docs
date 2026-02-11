@@ -1,0 +1,549 @@
+---
+title: "Use MCP to send a custom report"
+description: "Learn how to use MCP to send a custom report to a user using Claude Desktop, Resend, and Pandadoc."
+---
+
+import { Screenshot } from "@/mdx/components";
+
+# Use MCP to send a custom report
+
+Your sales manager needs yesterday's task completion numbers for the board meeting in an hour. Your current reporting system only runs monthly batches overnight. Do you wait three weeks for the next scheduled run, or ask developers to manually extract data and format a report?
+
+Most companies face this dilemma daily. Monthly reports work fine for planned meetings, but business decisions happen in real-time. When executives ask "How are our internal projects progressing?" or "Which operational tasks are falling behind?" waiting for batch processes isn't an option.
+
+With MCP servers and the evolution of agentic workflows, the on-demand reporting problem becomes easy to solve. AI agents just need access to the right tools, and you can generate reports on demand through simple conversation.
+
+In this article, you will build an automated reporting system that pulls task data from your API, creates professional documents with PandaDoc, and emails them to stakeholders, all through simple conversations with Claude.
+
+## Why use MCP? 
+
+Traditional reporting requires multiple tools and manual handoffs:
+
+- Data extraction – Developers write custom queries or run batch scripts.
+- Report formatting – Someone designs layouts and populates templates.
+- Distribution – IT configures email lists and sends documents.
+
+This works for scheduled reports, but breaks down for ad-hoc requests. When your CEO asks "How did our development team perform last week?" you can't wait for the next monthly batch. Developers either spend hours creating one-off reports or you make decisions with stale data.
+
+MCP eliminates these bottlenecks by connecting your existing systems through a single interface.
+
+### The MCP Advantages
+
+MCP standardizes how AI agents access tools. Instead of writing custom AI integrations for your API, PandaDoc, and Resend, you get one interface that works across any platform.
+
+The workflow is the following:
+
+1. Claude pulls task data from your Reports MCP server hosted on Gram.
+2. Claude generates a document using the PandaDoc MCP server.
+3. Claude emails the report through the Resend MCP server.
+
+With [Gram](https://getgram.ai/), you don't implement MCP protocol code. Upload your OpenAPI document and Gram automatically creates a hosted MCP server so you can focus on building your API, and not wasting time on integration complexities.
+
+<Screenshot
+  image={{
+    src: "./assets/claude-desktop-example-flow.png",
+    alt: "Flow of the report workflow",
+  }}
+/>
+
+## Prerequisites
+
+You'll build a todo task reporting system using three MCP servers: a custom API for task data, PandaDoc for document generation, and Resend for email delivery. The code for the Todo Items API is available in [this repository](https://github.com/ritza-co/speakeasy-examples/acme-api).
+
+You will also need: 
+
+- **Python 3.11 or higher** – For the todo API server.
+
+- **Node v22.0.0 or higher** – For the Resend MCP server.
+
+- **[Gram account](https://app.getgram.ai/)** – To host your custom todo MCP server.
+
+- **[Resend account](https://resend.com/)** – To send report emails.
+
+- **[PandaDoc account](https://www.pandadoc.com/)** – To generate professional documents. They provide a 14-day free trial, enough for this article.
+
+- **[Ngrok](https://ngrok.com/)** – To expose your local API during development.
+
+## Create a Reports API
+
+Claude needs access to your business data to generate reports. For this tutorial, you'll use a todo task API as the data source. While this is a simplified example, it demonstrates the core pattern and the same approach works for any API with an OpenAPI document whether it's sales data, customer metrics, or financial reports.
+
+Instead of building an API from scratch, you'll use the [existing todo project](https://github.com/ritza-co/speakeasy-examples/acme-todo-api) and modify its OpenAPI document for MCP integration.
+
+### Clone the project
+
+Clone the todo API project. It's a Flask project API exposing endpoints for handling todo items. 
+
+```bash
+git clone https://github.com/ritza-co/speakeasy-examples.git
+cd speakeasy-examples/acme-todo-api
+```
+
+### Install dependencies
+
+Create a virtual environment and install requirements:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Run the server
+
+Start the Flask API server:
+
+```bash
+python app.py
+```
+
+### Expose the server
+
+In a new terminal, expose the API with ngrok:
+
+```bash
+ngrok http 5004
+```
+
+Copy the HTTPS forwarding URL – you'll need it for the OpenAPI document updates. Ngrok creates a secure tunnel to your local API so Gram can access it over the internet. Without this, your Gram MCP server can't reach your localhost development server.
+
+### Update the OpenAPI document
+
+The project includes `acmetodo.yaml` with the API specification. Update the server URL to point to your ngrok endpoint:
+
+```yaml
+openapi: 3.1.0
+info:
+  title: Simple Todo API
+  description: A RESTful API for managing todo items with basic CRUD operations
+  version: 1.0.0
+...
+servers:
+  - url: https://your-ngrok-url
+```
+
+Replace `https://your-ngrok-url` with your actual ngrok URL, without the `/` at the end.
+
+## Turn the Reports API into an MCP server
+
+Now you'll convert your todo API into an MCP server using Gram. This makes your API accessible to Claude Desktop as a set of tools for data retrieval.
+
+The process involves three steps:
+
+- Upload your OpenAPI document to Gram.
+- Create a toolset with your API endpoints.
+- Get the MCP server configuration for Claude Desktop.
+
+### Upload the OpenAPI document
+
+Navigate to the **Toolsets** page in your Gram dashboard.
+
+<Screenshot
+  image={{
+    src: "./assets/gram-nav-to-toolsets.png",
+    alt: "Navigate to Gram Toolsets page",
+  }}
+/>
+
+Click the **+ ADD API** button to add an API source. 
+
+<Screenshot
+  image={{
+    src: "./assets/gram-adding-api-source.png",
+    alt: "Add an API source",
+  }}
+/>
+
+Upload the `acmetodo.yaml` file you generated and give your API source a descriptive name like **Todo Reports API.**
+
+<Screenshot
+  image={{
+    src: "./assets/gram-upload-openapi.png",
+    alt: "Upload OpenAPI document to Gram",
+  }}
+/>
+
+### Create a toolset
+
+Click the **+ ADD TOOLSET** button on the Toolsets page. A modal will appear asking for a toolset name – enter something like "Reports tools" and click **Create**.
+
+<Screenshot
+  image={{
+    src: "./assets/gram-create-toolset.png",
+    alt: "Create toolset in Gram",
+  }}
+/>
+
+You'll be redirected to a new page showing all available tools from your APIs. You can see the tool definitions you created from the **Todo  Reports API** API source. Click **Enable All** to include all tools in your toolset.
+
+<Screenshot
+  image={{
+    src: "./assets/gram-enable-all-tools.png",
+    alt: "Enable all tools in Gram toolset",
+  }}
+/>
+
+### Create a Gram API key
+
+You'll need a Gram API key to connect your agent to the MCP server. In your Gram dashboard, go to Settings and click **Create API Key**.
+
+<Screenshot
+  image={{
+    src: "./assets/gram-create-api-key.png",
+    alt: "Create Gram API key",
+  }}
+/>
+
+Save the key somewhere safe for the moment.
+
+<Screenshot
+  image={{
+    src: "./assets/gram-copy-api-key.png",
+    alt: "Copy Gram API key",
+  }}
+/>
+
+## Install the Reports MCP server in Claude Desktop
+
+With the Reports MCP server created from your Reports API, let's connect the MCP server to Claude Desktop. On the details page of your created toolset, navigate to the "MCP" tab.
+
+<Screenshot
+  image={{
+    src: "./assets/gram-mcp-tab-selection.png",
+    alt: "Navigate to MCP tab in Gram",
+  }}
+/>
+
+Choose "Private Server" since you're working with internal task data that shouldn't be publicly accessible. Private servers require authentication and aren't discoverable by other users, while public servers can be used by anyone.
+
+<Screenshot
+  image={{
+    src: "./assets/gram-private-server-selection.png",
+    alt: "Select private server option",
+  }}
+/>
+
+Copy the configuration under the `Pass-through Authentication` section. Add this configuration in your `claude_desktop_config.json` file. 
+
+```json
+{
+  "mcpServers": {
+    "GramReporttools": {
+      "command": "npx",
+      "args": [
+          "mcp-remote",
+          "https://app.getgram.ai/mcp/xxxxx",
+          "--header",
+          "Authorization:${GRAM_KEY}"
+        ],
+      "env": {
+        "GRAM_KEY": "Bearer YOUR_GRAM_API_KEY"
+      }
+    }
+  }
+}
+```
+
+Replace `YOUR_GRAM_API_KEY` with your actual Gram API key.
+
+Test the connection by asking Claude Desktop to "list my current tasks" or "show me todo items".
+
+## Add the PandaDoc MCP server
+
+PandaDoc is a document automation platform that generates professional documents from templates. Beyond digital signatures, their core strength is programmatic document creation. You can build templates once and fill them with dynamic data through their API.
+
+Their MCP server lets Claude create and populate documents directly. You'll use it to generate task reports that combine your todo data with professional formatting.
+
+First, create a document template and get your API key.
+
+### Create a template
+
+Claude needs a document template to populate with your task data. In the PandaDoc dashboard, navigate to **Templates** and click **+ Template**.
+
+<Screenshot
+  image={{
+    src: "./assets/pandadoc-create-template.png",
+    alt: "Create new template in PandaDoc",
+  }}
+/>
+
+Select "Blank Template" when prompted to create a clean template that Claude can fill with your todo data.
+
+<Screenshot
+  image={{
+    src: "./assets/pandadoc-select-blank-template.png",
+    alt: "Select blank template option",
+  }}
+/>
+
+Rename your template "Progress Report Template" so you can reference it clearly when instructing Claude.
+
+<Screenshot
+  image={{
+    src: "./assets/pandadoc-rename-template.png",
+    alt: "Rename template to Progress Report Template",
+  }}
+/>
+
+With the template created, you can now retrieve the API Key.
+
+### Retrieve the API Key
+
+In the PandaDoc dashboard, navigate to **Settings → API and Integrations**. Scroll down and click "API".
+
+<Screenshot
+  image={{
+    src: "./assets/pandadoc-api-settings.png",
+    alt: "Navigate to PandaDoc API settings",
+  }}
+/>
+
+This redirects you to the API configuration page where you can view your sandbox and production keys. Copy the Sandbox API Key and save it. You'll need it for the Claude Desktop configuration.
+
+<Screenshot
+  image={{
+    src: "./assets/pandadoc-api-key-button.png",
+    alt: "Click the API key button",
+  }}
+/>
+
+### Install the PandaDoc MCP server
+
+Add the PandaDoc configuration to your `claude_desktop_config.json` file:
+
+```json
+{
+  "mcpServers": {
+    ...
+    "pandadoc": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://developers.pandadoc.com/mcp",
+        "--header",
+        "Authorization: API-Key ${AUTH_TOKEN}"
+      ],
+      "env": {
+        "AUTH_TOKEN": "YOUR_SANDBOX_KEY"
+      }
+    }
+  }
+}
+```
+
+Replace `YOUR_SANDBOX_KEY` with the sandbox key you copied from PandaDoc.
+
+Restart Claude Desktop and test the integration by asking Claude to "find the Progress Report Template". If Claude locates the template, PandaDoc is connected successfully.
+
+## Install Resend MCP server
+
+PandaDoc can notify document recipients directly, but you often need more control over email distribution. You might want to send reports to existing user segments, mailing lists, or stakeholders from your database.
+
+Resend handles programmatic email delivery. You'll use their MCP server to send document links to your chosen recipients after Claude generates the reports.
+
+Unlike PandaDoc's remote MCP server, Resend requires building the project locally. You'll clone their repository, build it, and point Claude Desktop to the local build.
+
+### Create an API key
+
+In the Resend dashboard, navigate to API Keys and click **+ Create API Key**.
+
+<Screenshot
+  image={{
+    src: "./assets/resend-create-api-key.png",
+    alt: "Create API key in Resend dashboard",
+  }}
+/>
+
+Enter a name for your API key. Leave the Permission and Domain fields at their default values. These control sending limits and domain restrictions and the defaults allow unlimited sending from any domain, which works for development. In production, you'd restrict these for security.
+
+<Screenshot
+  image={{
+    src: "./assets/resend-api-key-settings.png",
+    alt: "Configure API key settings in Resend",
+  }}
+/>
+
+Copy the API key and save it somewhere safe. You'll need it for the MCP server configuration.
+
+<Screenshot
+  image={{
+    src: "./assets/resend-copy-api-key.png",
+    alt: "Copy Resend API key",
+  }}
+/>
+
+### Build the project
+
+Clone the Resend MCP project:
+
+```bash
+git clone https://github.com/resend/mcp-send-email.git
+cd mcp-send-email
+```
+
+Build the project:
+
+```bash
+npm install
+npm run build
+```
+
+This generates an `index.js` file in a `build` directory. Building compiles the TypeScript source code into JavaScript that Claude Desktop can execute. The build step also bundles dependencies so the MCP server runs standalone.
+
+Copy the absolute path to the `index.js` file. You'll need it for the Claude Desktop configuration.
+
+### Install the MCP server
+
+Add the Resend configuration to your `claude_desktop_config.json` file:
+
+```json
+{
+  "mcpServers": {
+    ...
+    "resend": {
+      "command": "node",
+      "args": ["ABSOLUTE_PATH_TO_MCP_SEND_EMAIL_PROJECT/build/index.js"],
+      "env": {
+        "RESEND_API_KEY": "YOUR_RESEND_API_KEY"
+      }
+    }
+  }
+}
+```
+
+Replace the path with your actual project location and `YOUR_RESEND_API_KEY` with your Resend API key.
+
+Restart Claude Desktop and test by asking Claude to "send a test email to my address" or "list my Resend audiences."
+
+## Test the integration
+
+You now have three MCP servers connected to Claude Desktop: your custom Reports API for task data, PandaDoc for document generation, and Resend for email delivery. Before testing the complete workflow, verify all three servers are properly configured.
+
+Here's how your `claude_desktop_config.json` file should look:
+
+```json
+{
+  "mcpServers": {
+    "resend": {
+      "command": "node",
+      "args": ["ABSOLUTE_PATH_TO_MCP_SEND_EMAIL_PROJECT/build/index.js"],
+      "env": {
+        "RESEND_API_KEY": "re_dBrFQ..."
+      }
+    },
+    "pandadoc": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://developers.pandadoc.com/mcp",
+        "--header",
+        "Authorization: API-Key ${AUTH_TOKEN}"
+      ],
+      "env": {
+        "AUTH_TOKEN": "d4d8..."
+      }
+    },
+
+    "Reports": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://app.getgram.ai/mcp/txxxxxodo",
+        "--header",
+        "Authorization:${GRAM_KEY}"
+      ],
+      "env": {
+        "GRAM_KEY": "Bearer gram_live_..."
+      }
+    }
+  }
+}
+
+```
+
+Now, let's test the integration. The prompts below are specific because PandaDoc's MCP server requires Claude to explore the API structure first, then execute requests. If Claude doesn't respond as expected, try breaking the request into smaller steps or ask Claude to 'list available PandaDoc tools' first.
+
+Ask Claude to retrieve the list of todo items. 
+
+Use this prompt:
+
+```txt
+Hi. I'm looking to generate a report and send it via email today. First, pull the current tasks into the todo items from the report MCP server.
+```
+
+<Screenshot
+  image={{
+    src: "./assets/claude-retrieve-todo-items.png",
+    alt: "Claude retrieving todo items",
+  }}
+/>
+
+Next, test PandaDoc document creation. The PandaDoc MCP server provides Claude with tools to explore API endpoints and then execute requests. This requires specific prompting to guide Claude through the workflow.
+
+Use this prompt:
+
+```txt
+Great! Now use the blank template from PandaDoc called "Progress Report Template" to create a document, wait for the document to reach draft status, then add reporting fields programmatically and fill the document with the current todo task data you pulled above. Use the PandaDoc tools to understand the API requests needed, and execute the complete workflow.
+```
+
+<Screenshot
+  image={{
+    src: "./assets/claude-create-pandadoc.png",
+    alt: "Claude creating PandaDoc document",
+  }}
+/>
+
+After Claude completes the document creation, check your PandaDoc dashboard to verify the new document was generated successfully.
+
+<Screenshot
+  image={{
+    src: "./assets/pandadoc-generated-document.png",
+    alt: "Generated document in PandaDoc dashboard",
+  }}
+/>
+
+Finally, test email delivery. Ask Claude to send the document URL to a recipient using Resend. You can send to individual email addresses or existing Resend audiences.
+
+Use this prompt:
+
+```txt
+Great! Construct the URL to the document and send that URL to xxxx@xxxx.com using the Resend tool. Send it from onboarding@resend.dev. The email can just be a simple "Hi. Here is the report for the current tasks."
+```
+
+<Screenshot
+  image={{
+    src: "./assets/claude-send-email.png",
+    alt: "Claude sending email with report",
+  }}
+/>
+
+Check your email inbox to confirm the message was delivered successfully.
+
+<Screenshot
+  image={{
+    src: "./assets/email-received.png",
+    alt: "Email received with report link",
+  }}
+/>
+
+Click the document link to view the generated report.
+
+<Screenshot
+  image={{
+    src: "./assets/generated-report-example.png",
+    alt: "Example of generated report",
+  }}
+/>
+
+The generated report includes an executive summary with total tasks and completion rates, task breakdowns by category showing different workstreams, detailed status for individual items with IDs and priorities and actionable recommendations like "Remove duplicate tasks".
+
+## Final thoughts
+
+You built an on-demand reporting system using three MCP servers: a custom Reports API hosted on Gram, PandaDoc for document generation, and Resend for email delivery. Claude Desktop orchestrates all three through simple conversation.
+
+This demonstrates MCP's core value: standardizing how AI agents and LLMs interact with tools. Instead of writing custom integrations between your database, document platform, and email service, you connected existing MCP servers that any AI agent can use.
+
+You can enhance this system by:
+
+- Creating professional document templates in PandaDoc with charts and branding.
+- Adding data filtering such as reports for specific date ranges or team members.
