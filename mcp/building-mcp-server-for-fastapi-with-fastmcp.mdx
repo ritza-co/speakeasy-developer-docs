@@ -1,0 +1,361 @@
+---
+title: "Building an MCP server for your FastAPI application with FastMCP and Speakeasy"
+description: "Learn how to build MCP servers for FastAPI applications using FastMCP and Speakeasy. Compare approaches with step-by-step tutorials, code examples, and guidance on choosing the right tool."
+---
+
+import { Callout } from "@/mdx/components";
+import { Screenshot } from "@/mdx/components";
+
+If you want to make your FastAPI application work with Claude, Cursor, and other AI agents, you need an MCP server. But building one from scratch is tedious when you already have routes and schemas in place.
+
+FastMCP and Speakeasy can both generate an MCP server directly from an existing API without rewriting logic or duplicating schemas, making your backend instantly agent-ready.
+
+This article shows you how to build an MCP server for a FastAPI application using either [FastMCP](https://gofastmcp.com/getting-started/welcome) or [Speakeasy](https://www.speakeasy.com/), and compares the tools in terms of ease of setup, visibility into generated code, and the long-term maintainability of your MCP server.
+
+## Setting up the example project
+
+We'll build an MCP server with each tool using the [APItizing Burgers example project](https://github.com/speakeasy-api/examples/tree/main/fastmcp-speakeasy-project/base).
+
+Start by cloning the project with the following command:
+
+```bash
+git clone https://github.com/speakeasy-api/examples
+cd examples/fastmcp-speakeasy-project/base
+```
+
+To make the setup easier, we'll use the `uv` environment manager. You can use any Python environment creation tool you're familiar with.
+
+```bash
+uv venv
+source .venv/bin/activate
+```
+
+Next, install the required dependencies for the project. The `apitizing-burger` project is already set up with FastAPI, so install the FastAPI package and its dependencies:
+
+```bash
+uv pip install "fastapi[all]"
+```
+
+Now run the API:
+
+```bash
+uvicorn app.main:server --reload
+```
+
+It's a good idea to have [Claude Desktop](https://claude.ai/download) installed on your machine to test the MCP servers. 
+
+## Building an MCP server with FastAPI and FastMCP
+
+FastMCP is a Python package that provides a high-level implementation of the MCP Python SDK. You can use FastMCP to quickly build an MCP server without worrying about low-level implementation details, like managing component lifecycles, defining tools, handling resources, or configuring prompts. Through its [FastAPI integration](https://gofastmcp.com/servers/openapi#fastapi-integration), FastMCP automatically transforms your routes into MCP tools.
+
+### 1. Installing FastMCP
+
+First, install the [FastMCP package](https://github.com/jlowin/fastmcp?tab=readme-ov-file#installation):
+
+```bash
+uv pip install fastmcp
+```
+
+### 2. Creating the MCP server file
+
+Create a file in the `app` directory called `mcp_server.py`:
+
+```bash
+cd app/ && touch mcp_server.py
+```
+
+### 3. Creating the MCP server
+
+Add the code below to the `mcp_server.py` file: 
+
+```python
+from fastmcp import FastMCP
+from app.main import server
+
+# Create an MCP server from your FastAPI app
+mcp = FastMCP.from_fastapi(app=server)
+
+if __name__ == "__main__":
+  mcp.run()
+```
+
+This code first registers your FastAPI app with FastMCP. Then, FastMCP inspects the app, finds the declared routes in `app/main.py`, and turns each route into an MCP tool without needing any additional configuration.
+
+### 4. Adding the MCP server to Claude Desktop
+
+There is no need to write the configuration to add the MCP server to Claude Desktop. Navigate to the `app` directory and run the following command:
+
+```bash
+fastmcp install mcp_server.py
+```
+
+FastMCP will return output similar to below, confirming that your server has been installed in Claude.
+
+<Screenshot url="url/here">![FastMCP Installing MCP server](./assets/building-mcp-server-for-fastapi-with-fastmcp/fastmcp-installing-mcp-server.png)</Screenshot>
+
+However, the MCP server won't work yet because the configuration is missing the `fastapi[all]` dependency and the Python path environment variable. Let's fix that now.
+
+In Claude Desktop, go to **Settings -> Developer -> Edit config in Claude Desktop** and open the `claude-desktop-config.json` file. Update the generated configuration in `claude-desktop-config.json` to match the following:
+
+```json
+{
+  "mcpServers": {
+    "mcp_server": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--with",
+        "fastmcp",
+        "--with",
+        "fastapi[all]",
+        "fastmcp",
+        "run",
+        "path/to/project/fastmcp-speakeasy-project/base/app/mcp_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "path/to/project/fastmcp-speakeasy-project/base/"
+      }
+    }
+  }
+}
+```
+
+This updated configuration adds the `fastapi[all]` dependency and the `PYTHONPATH` environment variable.
+
+The integration of FastAPI and FastMCP is now complete, and you can test the MCP server in Claude Desktop.
+
+### Testing the integration
+
+In Claude Desktop, click **Search and tools**.
+
+<Screenshot url="url/here">![Clicking on the search and tools button](./assets/building-mcp-server-for-fastapi-with-fastmcp/mcp-server-search-and-tools-button.png)</Screenshot>
+
+Your configured MCP servers will appear in the menu that opens.
+
+<Screenshot url="url/here">![Selecting the MCP server](./assets/building-mcp-server-for-fastapi-with-fastmcp/mcp-server-fastmcp-claude.png)</Screenshot>
+
+Your MCP server will appear as `mcp_server`. Click on it to see the tools that have been added.
+
+<Screenshot url="url/here">![Listing the tools](./assets/building-mcp-server-for-fastapi-with-fastmcp/mcp-server-fastmcp-claude-listing-tools.png)</Screenshot>
+
+These tools correspond to your FastAPI routes and can now be used by Claude.
+
+Now test the MCP server by asking Claude to create a burger. As shown in the screenshot below, Claude successfully calls your API to create a burger.
+
+<Screenshot url="url/here">![Creating a burger](./assets/building-mcp-server-for-fastapi-with-fastmcp/claude-creating-a-burger.png)</Screenshot>
+
+### More configuration with FastMCP
+
+FastMCP gives you some flexibility in how tools are exposed. You can customize the server name, set timeout values, rename tools, and control which endpoints are included or excluded.
+
+For example, the code below renames the server, overrides a tool name, and excludes the route for deleting a burger:
+
+```python
+mcp = FastMCP.from_fastapi(
+    app=server,
+    name="Apitizer MCP Server",
+    timeout=5.0,
+    mcp_names={"createBurger": "Create a burger menu"},
+    route_maps=[
+        # Exclude delete burger route
+        RouteMap(methods="DELETE", pattern=r".*", mcp_type=MCPType.EXCLUDE, tags={"burger"}),
+    ],
+  )
+```
+
+### Considerations for FastMCP in FastAPI
+
+FastMCP avoids code duplication by reusing your existing FastAPI endpoints. Typing and schema definitions are preserved, including inheritance and Pydantic validations. This preservation also extends to dependencies, middleware, and authentication, all of which carry over into the MCP layer.
+
+FastMCP behaves like a black box. You get speed and simplicity, but not much visibility into how tools, prompts, or resources are constructed. In contrast, when you use the MCP Python SDK directly, you build things manually but retain full control. You can interact with the component lifecycle, adjust behavior, and trace execution more easily.
+
+Without visibility, debugging tool behavior can be difficult when something breaks or doesn't work as expected.
+
+## Building an MCP server with FastAPI and Speakeasy
+
+[Speakeasy](https://www.speakeasy.com/) generates SDKs in multiple languages, documentation, Terraform providers, and MCP servers from OpenAPI documents. Speakeasy's support for [generating MCP servers](https://www.speakeasy.com/docs/model-context-protocol) is currently limited to TypeScript SDKs, with additional language support coming soon. All you need is an OpenAPI document and a [Speakeasy account](https://www.speakeasy.com/docs/introduction#sign-up).
+
+### 1. Installing the Speakeasy CLI
+
+First, install the [Speakeasy CLI](https://www.speakeasy.com/docs/introduction#install-the-speakeasy-cli) on your machine. 
+
+On macOS or Linux:
+
+```bash
+# Homebrew (macOS)
+brew install speakeasy-api/homebrew-tap/speakeasy
+
+# or script Installation (macOS and Linux)
+curl -fsSL https://go.speakeasy.com/cli-install.sh | sh
+```
+
+On Windows:
+
+```bash
+# Windows Installation
+# Using winget:
+winget install speakeasy
+
+# or Using Chocolatey:
+choco install speakeasy
+```
+
+### 2. Uploading the OpenAPI document
+
+The APItizing Burgers project already has `openapi.yaml` and `openapi.json` OpenAPI documents. If you're building an MCP server from an existing FastAPI project, you might need to generate these files. Take a look at our [tutorial on generating an OpenAPI document with FastAPI](/openapi/frameworks/fastapi#basic-fastapi-setup) for step-by-step instructions.
+
+To start the process, run the following command from the project's root directory:
+
+```bash
+speakeasy quickstart
+```
+
+You'll be prompted to authenticate with Speakeasy and then enter the path to the OpenAPI document. Enter `./openapi.yaml`.
+
+<Screenshot url="url/here">![OpenAPI document path](./assets/building-mcp-server-for-fastapi-with-fastmcp/speakeasy-openapi-path.png)</Screenshot>
+
+### 3. Naming the SDK
+
+Name the SDK `mcp-burger-sdk`.
+
+<Screenshot url="url/here">![Choosing the SDK name](./assets/building-mcp-server-for-fastapi-with-fastmcp/speakeasy-choosing-sdk-name.png)</Screenshot>
+
+### 4. Selecting the output
+
+Speakeasy will ask what you want to generate. Choose **Model Context Protocol (MCP) Server**, and then the sub-option **TypeScript SDK with Server**.
+
+<Screenshot url="url/here">![Choosing the SDK type](./assets/building-mcp-server-for-fastapi-with-fastmcp/speakeasy-choosing-sdk-type.png)</Screenshot>
+
+Speakeasy will ask you where to save the generated SDK and what to name the npm package. Press **Enter** to use the current directory and the default package name, or modify them.
+
+Speakeasy will generate a TypeScript SDK in the `mcp-burger-sdk-typescript` directory. The MCP server code will be located at `mcp-burger-sdk-typescript/src/mcp-server`, with a built version at `mcp-burger-sdk-typescript/bin/mcp-server.js` (this is the file you'll reference in your Claude Desktop configuration).
+
+### 5. Adding the MCP server to Claude Desktop
+
+Now configure the MCP server in the `claude-desktop-config.json` file:
+
+```json
+{
+  "mcpServers": {
+    "McpBurgerSDK": {
+      "command": "node",
+      "args": [
+        "path/to/mcp-burger-sdk-typescript/bin/mcp-server.js",
+        "start"
+      ]
+    }
+  }
+}
+```
+
+Reload Claude Desktop and you should see the server and its available tools.
+
+<Screenshot url="url/here">![Viewing the MCP server](./assets/building-mcp-server-for-fastapi-with-fastmcp/mcp-typescript-sdk.png)</Screenshot>
+
+You now have a working MCP server generated with Speakeasy.
+
+### More configuration with Speakeasy
+
+With Speakeasy, you can [customize your MCP server](https://www.speakeasy.com/docs/model-context-protocol#configuration-options) using the `x-speakeasy-mcp` extension in your OpenAPI document.
+
+For example, to disable the generation of a tool for an operation:
+
+```yaml
+paths:
+  /products:
+    post:
+      operationId: createProduct
+      tags: [products]
+      summary: Create a product
+      description: API endpoint for creating a product in the CMS
+      x-speakeasy-mcp:
+        disabled: true
+        name: create-product
+        scopes: [products, create, ecommerce]
+        description: |
+          Creates a new product using the provided form. The product name should
+          not contain any special characters or harmful words.
+```
+
+In this code configuration, `disabled: true` specifies that the tool should be ignored.
+
+You can use `name` to change the name of the MCP tool, or use `scopes` to tag tools, which allows you to run the MCP server with only specific groups of tools.
+
+When you start the MCP server with Speakeasy, you can specify which scopes to include with the `--scope` flag:
+
+```json
+{
+  "mcpServers": {
+    "EcommerceSDK": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "--package",
+        "e-commerce-sdk",
+        "mcp",
+        "start",
+        "--scope",
+        "products"
+      ],
+      "env": {
+        "API_TOKEN": "your-api-token-here"
+      }
+    }
+  }
+}
+```
+
+If you can't or don't want to modify an OpenAPI document, Speakeasy [overlays](https://www.speakeasy.com/openapi/overlays) provide a way to use the `x-speakeasy-mcp` extension without changing the original file, for example:
+
+```yaml
+overlay: 1.0.0
+info:
+  title: Add MCP scopes
+  version: 0.0.0
+actions:
+  - target: $.paths.*["post","head","query"]
+    update: { "x-speakeasy-mcp": { "scopes": ["products"] } }
+```
+
+The code above instructs Speakeasy to generate tools for operations with the tag `products` and HTTP operations of types `POST`, `HEAD`, and `QUERY`.
+
+## FastMCP vs Speakeasy: Which tool should you choose?
+
+FastMCP and Speakeasy offer two different paths to building an MCP server from your FastAPI application. The right choice depends on your priorities around development speed, code transparency, and long-term maintenance needs.
+
+### Initial setup and configuration
+
+**FastMCP** gets you running quickly by reusing your existing FastAPI app with minimal configuration. If your routes are typed and documented, FastMCP can expose them as tools with almost no additional work.
+
+**Speakeasy** requires an OpenAPI document and an interactive CLI setup process to generate an MCP server. While this takes more time initially, it generates a clean, extensible SDK with a built-in MCP server that can integrate with Claude and Cursor, or run as a standalone service.
+
+### Visibility of generated code
+
+**FastMCP** takes the opposite approach: You don't see how tools are constructed. FastMCP automatically converts your FastAPI routes into MCP tools, but hides the internal logic, prompt structure, and resource handling. This makes debugging harder as your server grows.
+
+**Speakeasy** generates explicit code for the server and tools in the `mcp-server` directory. You can inspect how each tool is defined, see the input and output mappings, and modify behavior as needed. This helps when you want to understand or extend how the MCP layer works.
+
+### Customization options
+
+**FastMCP** provides basic customization options. You can rename tools, set timeouts, or exclude routes using configuration options, but you're limited to the configuration parameters the library exposes.
+
+**Speakeasy** allows for extensive customization, whether directly in the OpenAPI document or using overlays to define external configuration. You can change tool names, disable endpoints, apply scopes for selective tool groups, and modify descriptions, all without touching application code.
+
+### Long-term maintenance considerations
+
+**FastMCP** tightly couples your MCP server to your FastAPI app. Changes to the application's route structure will automatically update the available MCP tools, which simplifies maintenance for smaller projects but can create complexity as the API evolves.
+
+**Speakeasy** separates the MCP server from application logic using the OpenAPI document, which serves as the single source of truth. Changes to your API require regenerating the MCP server from the updated specification, but the server remains independent of your application's internal structure.
+
+### Distribution methods
+
+**FastMCP** is designed for local development workflows within Claude Desktop. While effective for personal tools and rapid prototyping, it doesn't provide built-in mechanisms for packaging or distributing MCP servers to other environments.
+
+**Speakeasy** generates MCP servers that can be published and distributed as npm packages or used directly with `npx`. This allows you to share tools across teams, deploy to different environments, and distribute to external users.
+
+## Next steps
+
+Having compared FastMCP and Speakeasy for generating MCP servers, here's how to choose the right tool for your project:
+
+- Choose **FastMCP** if you don't have an OpenAPI document or don't plan to deploy and maintain the MCP server in the long term. FastMCP is a quick way to turn your existing routes into tools with minimal complexity, making it useful for exploring the MCP ecosystem or rapid prototyping.
+- Choose **Speakeasy** if you have an OpenAPI document, plan to maintain the server over time, or want to share it with others. While Speakeasy requires more initial setup, it gives you more control, visibility, and customization. Speakeasy also works well for prototyping, especially when you want to build something fast while keeping a path open to production.
