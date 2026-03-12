@@ -126,7 +126,8 @@ The project uses two TypeScript configurations.
 
 Note the following two settings in `tsconfig.server.json`, which aren't immediately obvious:
 
-- You need `moduleResolution: "bundler"` because `@modelcontextprotocol/ext-apps` references browser types without NodeNext compatibility. - You need to put `"DOM"` in `lib` even though the server is a Node.js process, because the `ext-apps` type declarations reference DOM globals.
+- You need `moduleResolution: "bundler"` because `@modelcontextprotocol/ext-apps` references browser types without NodeNext compatibility. 
+- You need to put `"DOM"` in `lib` even though the server is a Node.js process, because the `ext-apps` type declarations reference DOM globals.
 
 The last config file is the `vite.config.ts` file:
 
