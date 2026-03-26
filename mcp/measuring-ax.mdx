@@ -11,31 +11,31 @@ In this guide, you will learn how to use Gram MCP observability features to help
 
 ## Task execution
 
-Task execution covers everything related to how an agent completes work. The primary signal is the tool call success rate, which indicates whether agents are completing tasks or failing.
+Task execution covers everything related to how an agent completes work. The primary signal is tool call success rate, which tells you directly whether agents finish tasks or fail.
 
-In the Gram dashboard, navigate to **Observe -> Insights** to get the **Tool Calls & Errors**.
+The Tool Calls & Errors metric is under **Observe -> Insights** in the Gram dashboard.
 
 ![Gram Insights dashboard showing tool calls and error counts over time](./assets/tool-calls-and-errors.png)
 
-To measure the error rate, scroll down under **System Metrics**.
+The error rate is under **System Metrics**, below the tool calls view.
 
 ![Gram System Metrics panel showing error rate breakdown](./assets/system-metrics-error-rate.png)
 
-Once you see these metrics, check the failure distribution by tool, then go to **MCP Logs** to analyze the errors in detail.
+These two metrics give you the baseline. The next step is checking Failure Distribution by Tool, then going to **MCP Logs** to analyze the errors in detail.
 
 ## Feedback loop quality
 
-Feedback loop quality measures how well a platform communicates the result of an agent's action back to the agent so it can decide what to do next. It requires qualitative analysis, not just numbers.
+Feedback loop quality measures how well a platform communicates the result of an agent's action back to the agent so it decides what to do next. It requires qualitative analysis, not just numbers.
 
-Gram helps you track this qualitatively using two features.
+Gram tracks feedback loop quality using two features.
 
-**Raw Tool Call Traces** under MCP Logs show you what tools an agent calls during a session and whether it self-corrects after a failure.
+**Raw Tool Call Traces** under MCP Logs show what tools an agent calls during a session and whether it self-corrects after a failure.
 
 ![Gram MCP Logs showing a raw tool call trace with sequential agent steps](./assets/raw-tool-call-traces.png)
 
-This data tells you how to fix your tools. If you see a long chain of sequential calls, you can combine them into one tool. If an agent calls a tool that fails before switching to another tool to complete the task, that tells you the first tool needs a better description or should be removed entirely.
+The traces tell you how to fix your tools. A long chain of sequential calls means you combine them into one tool. An agent calling a tool that fails before switching to another to complete the task means the first tool needs a better description or removal.
 
-**Hooks** at **Observe -> Hooks** let you set up telemetry collection with Claude Code. Claude Code sends pre-call, during-call, and post-call data to Gram so you can analyze the full execution context around every tool call.
+**Hooks** at **Observe -> Hooks** let you set up telemetry collection with Claude Code. Claude Code sends pre-call, during-call, and post-call data to Gram, giving you the full execution context around every tool call.
 
 ## Discovery and context
 
@@ -47,37 +47,41 @@ Gram measures discovery and context using two metrics in combination.
 
 ![Gram Insights panel showing top tools ranked by usage frequency](./assets/top-tools-by-usage.png)
 
-On its own, it shows you where agents land when they interpret intent. Combined with **Failure Distribution by Tool**, it reveals whether agents are picking the right tools or consistently gravitating toward the wrong ones.
+On its own, it shows where agents land when they interpret intent. Combined with **Failure Distribution by Tool**, it reveals whether agents pick the right tools or consistently gravitate toward the wrong ones.
 
 ![Gram Insights panel showing failure distribution broken down by tool name](./assets/failure-distribution-by-tool.png)
 
-The combination gives you a precise diagnosis. High usage and a low failure rate indicate that discovery and context are both working. High usage and a high failure rate mean agents find the tool but lack the context to use it correctly. Low usage, even with a failure rate, means agents are not finding the tool at all.
+The combination gives you a precise diagnosis:
 
-Once you identify a tool with a high failure rate in the Failure Distribution view, filter **MCP Logs** by the MCP server hosting that tool and analyze the raw traces.
+- High usage and low failure rate means discovery and context are both working.
+- High usage and high failure rate means agents find the tool but lack the context to use it correctly.
+- Low usage with any failure rate means agents are not finding the tool at all.
+
+After identifying a tool with a high failure rate in the Failure Distribution view, filter **MCP Logs** by the MCP server hosting that tool and analyze the raw traces.
 
 ![Gram MCP Logs filtered by a specific MCP server to show traces for a failing tool](./assets/mcp-logs-filtered-by-server.png)
 
-The traces show you exactly what parameters the agent passed on every failed call, whether it hallucinated a field, skipped a required parameter, or passed the wrong type.
+The traces show exactly what parameters the agent passed on every failed call, whether it hallucinated a field, skipped a required parameter, or passed the wrong type.
 
 ## Efficiency
 
-Gram measures efficiency both quantitatively and qualitatively.
+Efficiency measures how much time and tokens an agent consumes to complete a task. Gram tracks efficiency both quantitatively and qualitatively.
 
-**Avg Latency** measures the time it takes for an agent to complete a tool call. A high average latency means the tool execution is slow, or the agent spends too many steps searching for the right tool before calling it.
+**Avg Latency** measures the time for an agent to complete a tool call. A high average latency means the tool execution is slow, or the agent spends too many steps searching for the right tool before calling it.
 
 ![Gram Insights panel displaying average tool call latency in milliseconds](./assets/avg-latency.png)
 
-**Chat Metrics** are available if you use Gram Elements for chat experiences. Under **Observe -> Insights**, navigate to the **Chats** tab.
+**Chat Metrics** are available with Gram Elements for chat experiences. Under **Observe -> Insights**, the **Chats** tab surfaces resolution rate, average session length, and average session time.
 
 ![Gram Insights Chats tab showing resolution rate, average session length, and average session time](./assets/chat-metrics-chats-tab.png)
 
-The Chats tab surfaces resolution rate, average session length, and average session time. These metrics tell you whether agents are efficient with the tools available. A high average session time is a symptom worth investigating. It can mean users are spending too long before getting a useful response, or that the agent is taking too many steps to complete simple tasks.
+These metrics tell you whether agents are efficient with the tools available. A high average session time is a symptom worth investigating: the user spends too long before getting a useful response, or the agent takes too many steps to complete simple tasks.
 
-After reviewing these metrics, go to **MCP Logs** or **Chat Sessions** to analyze the behavior behind the numbers.
+From the Insights view, go to **MCP Logs** or **Chat Sessions** to analyze the behavior behind the numbers.
 
 ![Gram Chat Sessions list showing individual sessions with duration and tool call counts](./assets/chat-sessions.png)
 
-Clicking on a session shows **Telemetry Logs** with tokens consumed, models called, tool calls, and prompts. This is where steps-to-completion and token cost per task become visible.
+Clicking on a session surfaces **Telemetry Logs** with tokens consumed, models called, tool calls, and prompts. Steps-to-completion and token cost per task become visible here.
 
 ![Gram Telemetry Logs for a single chat session showing token usage, model calls, and tool invocations](./assets/telemetry-logs.png)
 
