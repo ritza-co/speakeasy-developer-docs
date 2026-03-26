@@ -1,0 +1,92 @@
+## Measuring AX performances with Gram
+
+Gram provides essential MCP observability features to help you measure your AX performance. Once you have an MCP server running under Gram, you can start measuring the following metrics to determine AX performance:
+
+- Task execution
+- Feedback loop quality
+- Discovery and context
+- Efficiency
+
+In this guide, you will learn how to use Gram MCP observability features to help you measure AX performance.
+
+## Task execution
+
+Task execution covers everything related to how an agent completes work. The primary signal is tool call success rate, which tells you directly whether agents finish tasks or fail.
+
+The Tool Calls & Errors metric is under **Observe -> Insights** in the Gram dashboard.
+
+![Gram Insights dashboard showing tool calls and error counts over time](./assets/tool-calls-and-errors.png)
+
+The error rate is under **System Metrics**, below the tool calls view.
+
+![Gram System Metrics panel showing error rate breakdown](./assets/system-metrics-error-rate.png)
+
+These two metrics give you the baseline. The next step is checking Failure Distribution by Tool, then going to **MCP Logs** to analyze the errors in detail.
+
+## Feedback loop quality
+
+Feedback loop quality measures how well a platform communicates the result of an agent's action back to the agent so it decides what to do next. It requires qualitative analysis, not just numbers.
+
+Gram tracks feedback loop quality using two features.
+
+**Raw Tool Call Traces** under MCP Logs show what tools an agent calls during a session and whether it self-corrects after a failure.
+
+![Gram MCP Logs showing a raw tool call trace with sequential agent steps](./assets/raw-tool-call-traces.png)
+
+The traces tell you how to fix your tools. A long chain of sequential calls means you combine them into one tool. An agent calling a tool that fails before switching to another to complete the task means the first tool needs a better description or removal.
+
+**Hooks** at **Observe -> Hooks** let you set up telemetry collection with Claude Code. Claude Code sends pre-call, during-call, and post-call data to Gram, giving you the full execution context around every tool call.
+
+## Discovery and context
+
+Discovery and context measures how well a platform helps an agent find the right tool for a given intent and arrive at that tool with enough information to use it correctly on the first attempt.
+
+Gram measures discovery and context using two metrics in combination.
+
+**Top Tools by Usage** is under **Observe -> Insights**.
+
+![Gram Insights panel showing top tools ranked by usage frequency](./assets/top-tools-by-usage.png)
+
+On its own, it shows where agents land when they interpret intent. Combined with **Failure Distribution by Tool**, it reveals whether agents pick the right tools or consistently gravitate toward the wrong ones.
+
+![Gram Insights panel showing failure distribution broken down by tool name](./assets/failure-distribution-by-tool.png)
+
+The combination gives you a precise diagnosis:
+
+- High usage and low failure rate means discovery and context are both working.
+- High usage and high failure rate means agents find the tool but lack the context to use it correctly.
+- Low usage with any failure rate means agents are not finding the tool at all.
+
+After identifying a tool with a high failure rate in the Failure Distribution view, filter **MCP Logs** by the MCP server hosting that tool and analyze the raw traces.
+
+![Gram MCP Logs filtered by a specific MCP server to show traces for a failing tool](./assets/mcp-logs-filtered-by-server.png)
+
+The traces show exactly what parameters the agent passed on every failed call, whether it hallucinated a field, skipped a required parameter, or passed the wrong type.
+
+## Efficiency
+
+Efficiency measures how much time and tokens an agent consumes to complete a task. Gram tracks efficiency both quantitatively and qualitatively.
+
+**Avg Latency** measures the time for an agent to complete a tool call. A high average latency means the tool execution is slow, or the agent spends too many steps searching for the right tool before calling it.
+
+![Gram Insights panel displaying average tool call latency in milliseconds](./assets/avg-latency.png)
+
+**Chat Metrics** are available with Gram Elements for chat experiences. Under **Observe -> Insights**, the **Chats** tab surfaces resolution rate, average session length, and average session time.
+
+![Gram Insights Chats tab showing resolution rate, average session length, and average session time](./assets/chat-metrics-chats-tab.png)
+
+These metrics tell you whether agents are efficient with the tools available. A high average session time is a symptom worth investigating: the user spends too long before getting a useful response, or the agent takes too many steps to complete simple tasks.
+
+From the Insights view, go to **MCP Logs** or **Chat Sessions** to analyze the behavior behind the numbers.
+
+![Gram Chat Sessions list showing individual sessions with duration and tool call counts](./assets/chat-sessions.png)
+
+Clicking on a session surfaces **Telemetry Logs** with tokens consumed, models called, tool calls, and prompts. Steps-to-completion and token cost per task become visible here.
+
+![Gram Telemetry Logs for a single chat session showing token usage, model calls, and tool invocations](./assets/telemetry-logs.png)
+
+## Conclusion
+
+Gram provides an easy pattern to follow to measure AX. Start with Insights to find the pattern. Go to MCP Logs or Chat Sessions to find the cause. Using the information collected, fix the tools or descriptions and measure again.
+
+This is where using Gram hooks can help, as you can run them locally, and use the logs collected for debugging.
